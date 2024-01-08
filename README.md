@@ -14,8 +14,8 @@ Credits
 =========
 
 - quickNES was originally by Shay Green (a.k.a. [Blaarg](http://www.slack.net/~ant/)) under the GNU GPLv2 license. The source code is still located at [](https://github.com/kode54/QuickNES) 
-- The code was later improved and maintained by Christopher Snowhill (a.k.a. [kode54](https://kode54.net/)
-- I could trace further contributions (e.g., new mappers) by retrowertz, CaH4e3, some adaptations from the (FCEUX emulator)[https://github.com/TASEmulators/fceux] (see mapper021)
+- The code was later improved and maintained by Christopher Snowhill (a.k.a. [kode54](https://kode54.net/))
+- I could trace further contributions (e.g., new mappers) by retrowertz, CaH4e3, some adaptations from the [FCEUX emulator](https://github.com/TASEmulators/fceux) (see mapper021)
 - The latest version of the code is maintained by Libretro's community at [](https://github.com/libretro/QuickNES_Core)
 
 All base code for this project was found under the GNU GPLv2 license, which I am preserving. Any non-credited work is unintentional and shall be immediately rectfied.
