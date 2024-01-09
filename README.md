@@ -17,6 +17,7 @@ Credits
 - The code was later improved and maintained by Christopher Snowhill (a.k.a. [kode54](https://kode54.net/))
 - I could trace further contributions (e.g., new mappers) by retrowertz, CaH4e3, some adaptations from the [FCEUX emulator](https://github.com/TASEmulators/fceux) (see mapper021)
 - The latest version of the code is maintained by Libretro's community [here](https://github.com/libretro/QuickNES_Core)
+- For the interactive player, this project uses a modified version of [HeadlessQuickNES (HQN)](https://github.com/Bindernews/HeadlessQuickNes).  
 
-All base code for this project was found under the GNU GPLv2 license, which I am preserving. Any non-credited work is unintentional and shall be immediately rectfied.
+All base code for this project was found under open source licenses, which I preserved in their corresponding files/folders. Any non-credited work is unintentional and shall be immediately rectfied.
 
