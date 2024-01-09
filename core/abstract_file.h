@@ -48,6 +48,25 @@ public:
 	~Mem_Writer();
 };
 
+// Dry writer to get the state size
+class Dry_Writer : public Data_Writer {
+	long size_;
+public:
+	// Keep all written data in expanding block of memory
+	Dry_Writer();
+	
+	const char *write( const void*, long );
+	
+	// Pointer to beginning of written data
+	char* data() { return NULL; }
+	
+	// Number of bytes written
+	long size() const { return size_; }
+	
+	~Dry_Writer();
+};
+
+
 // Auto_File to use in place of Data_Reader&/Data_Writer&, allowing a normal
 // file path to be used in addition to a Data_Reader/Data_Writer.
 

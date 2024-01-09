@@ -77,6 +77,23 @@ const char *Mem_Writer::write( const void* p, long s )
 	return 0;
 }
 
+// Dry_Writer for determining size
+
+Dry_Writer::Dry_Writer()
+{
+	size_ = 0;
+}
+
+Dry_Writer::~Dry_Writer()
+{
+}
+
+const char *Dry_Writer::write( const void* p, long s )
+{
+	size_ += s;
+	return 0;
+}
+
 // Auto_File_Reader
 
 const char* Auto_File_Reader::open()
