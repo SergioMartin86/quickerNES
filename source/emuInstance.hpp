@@ -1,10 +1,9 @@
 #pragma once
 
-#include <Nes_Emu.h>
-#include <Nes_State.h>
-#include <utils.hpp>
+#include <core/Nes_Emu.h>
+#include <core/Nes_State.h>
 #include <string>
-#include <utils.hpp>
+#include <utils.hpp> 
 
 #define _LOW_MEM_SIZE 0x800
 #define _HIGH_MEM_SIZE 0x2000
@@ -14,6 +13,11 @@ class EmuInstance
  public:
 
  typedef uint8_t inputType;
+
+ // Deleting default constructors
+ EmuInstance() = delete;
+ EmuInstance(EmuInstance& e) = delete;
+ ~EmuInstance() = default;
 
  EmuInstance(const std::string& romFilePath, const std::string& stateFilePath)
  {

@@ -1,7 +1,7 @@
 #ifndef __HQN_H__
 #define __HQN_H__
 
-#include <Nes_Emu.h>
+#include <core/Nes_Emu.h>
 #include <cstdint>
 
 #define BLIT_SIZE 65536

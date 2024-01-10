@@ -5,9 +5,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <utils.hpp>
-#include <hqn/hqn.h>
+#include <hqn/hqn.h> 
 #include <hqn/hqn_gui_controller.h>
-#include "core/emuInstance.hpp"
+#include "emuInstance.hpp"
 
 #define _INVERSE_FRAME_RATE 16667
 
@@ -29,7 +29,7 @@ class PlaybackInstance
 
  // Overlay info
  std::string _overlayPath;
- SDL_Surface* _overlayBaseSurface;
+ SDL_Surface* _overlayBaseSurface = NULL;
  SDL_Surface* _overlayButtonASurface;
  SDL_Surface* _overlayButtonBSurface;
  SDL_Surface* _overlayButtonSelectSurface;

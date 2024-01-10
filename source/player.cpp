@@ -1,7 +1,8 @@
 #include <cstdlib>
-#include "argparse.hpp"
+#include "argparse/argparse.hpp"
 #include "utils.hpp"
-#include "core/emuInstance.hpp"
+#include "emuInstance.hpp"
+#include "playbackInstance.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
 
   program.add_argument("stateFile")
   .help("(Optional) Path to the initial state file to load.")
-  .default_value("");
+  .default_value(std::string(""));
 
   program.add_argument("--reproduce")
     .help("Plays the entire sequence without interruptions and exit at the end.")
@@ -38,15 +39,28 @@ int main(int argc, char *argv[])
   std::string romFilePath = program.get<std::string>("romFile");
 
   // Getting sequence file path
-  std::string sequenceFile = program.get<std::string>("sequenceFile");
+  std::string sequenceFilePath = program.get<std::string>("sequenceFile");
 
   // If initial state file is specified, load it
-  std::string sequenceFile = program.get<std::string>("stateFile");
+  std::string stateFilePath = program.get<std::string>("stateFile");
 
   // Getting reproduce flag
   bool isReproduce = program.get<bool>("--reproduce");
 
   // Getting reproduce flag
   bool disableRender = program.get<bool>("--disableRender");
+
+  // Printing provided parameters
+  printf("Rom File Path:      %s\n", romFilePath.c_str());
+  printf("Sequence File Path: %s\n", sequenceFilePath.c_str());
+  printf("State File Path:    %s\n", stateFilePath.c_str());
+
+  // Creating emulator instance
+  auto e = EmuInstance(romFilePath, stateFilePath);
+
+  // Creating playback instance
+  auto p = PlaybackInstance(&e);
+
+  while(true) p.renderFrame(0, "");
 }
 

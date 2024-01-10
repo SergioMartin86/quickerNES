@@ -7,41 +7,41 @@ project('quickerNES','c','cpp',
 # quickerNES Core sources
 
 quickerNESCoreSrc = [
- 'core/abstract_file.cpp', 
- 'core/Nes_Apu.cpp', 
- 'core/Nes_File.cpp', 
- 'core/Nes_Oscs.cpp', 
- 'core/apu_state.cpp', 
- 'core/Nes_Buffer.cpp', 
- 'core/Nes_Fme7_Apu.cpp', 
- 'core/Nes_Ppu.cpp', 
- 'core/Blip_Buffer.cpp', 
- 'core/Nes_Cart.cpp', 
- 'core/Nes_Mapper.cpp', 
- 'core/Nes_Ppu_Impl.cpp', 
- 'core/Data_Reader.cpp', 
- 'core/Nes_Core.cpp', 
- 'core/Nes_Ppu_Rendering.cpp', 
- 'core/Effects_Buffer.cpp', 
- 'core/Nes_Cpu.cpp', 
- 'core/Nes_State.cpp', 
- 'core/emu2413.cpp', 
- 'core/nes_data.cpp', 
- 'core/nes_util.cpp', 
- 'core/emu2413_state.cpp', 
- 'core/Nes_Effects_Buffer.cpp', 
- 'core/Nes_Namco_Apu.cpp', 
- 'core/Nes_Vrc6_Apu.cpp', 
- 'core/Multi_Buffer.cpp', 
- 'core/Nes_Emu.cpp', 
- 'core/nes_ntsc.cpp', 
- 'core/Nes_Vrc7.cpp', 
+ 'source/core/abstract_file.cpp', 
+ 'source/core/Nes_Apu.cpp', 
+ 'source/core/Nes_File.cpp', 
+ 'source/core/Nes_Oscs.cpp', 
+ 'source/core/apu_state.cpp', 
+ 'source/core/Nes_Buffer.cpp', 
+ 'source/core/Nes_Fme7_Apu.cpp', 
+ 'source/core/Nes_Ppu.cpp', 
+ 'source/core/Blip_Buffer.cpp', 
+ 'source/core/Nes_Cart.cpp', 
+ 'source/core/Nes_Mapper.cpp', 
+ 'source/core/Nes_Ppu_Impl.cpp', 
+ 'source/core/Data_Reader.cpp', 
+ 'source/core/Nes_Core.cpp', 
+ 'source/core/Nes_Ppu_Rendering.cpp', 
+ 'source/core/Effects_Buffer.cpp', 
+ 'source/core/Nes_Cpu.cpp', 
+ 'source/core/Nes_State.cpp', 
+ 'source/core/emu2413.cpp', 
+ 'source/core/nes_data.cpp', 
+ 'source/core/nes_util.cpp', 
+ 'source/core/emu2413_state.cpp', 
+ 'source/core/Nes_Effects_Buffer.cpp', 
+ 'source/core/Nes_Namco_Apu.cpp', 
+ 'source/core/Nes_Vrc6_Apu.cpp', 
+ 'source/core/Multi_Buffer.cpp', 
+ 'source/core/Nes_Emu.cpp', 
+ 'source/core/nes_ntsc.cpp', 
+ 'source/core/Nes_Vrc7.cpp', 
 ]
 
 # quickerNES Core Configuration
 
 quickerNESCoreCPPFlags = [ '-Wfatal-errors','-Wall' ]
-quickerNESCoreIncludeDirs =  include_directories(['core', 'extern/metrohash128', 'extern/argparse', 'extern/phmap'])
+quickerNESCoreIncludeDirs =  include_directories(['source/core', 'extern'])
 quickerNESCoreDependencies = [ ]
 quickerNESCoreCPPFlags = [ ]
 quickerNESCoreCFlags = [ ]
@@ -50,21 +50,21 @@ quickerNESCoreLinkArgs = [ ]
 # Building playback/validation tool
 
 quickerNESPlayerSrc = [
-  'player/hqn/hqn.cpp',
-  'player/hqn/hqn_gui_controller.cpp',
-  'player/hqn/hqn_surface.cpp',
-  'player/hqn/hqn_util.cpp',
-  'player/hqn/options.cpp'
+  'extern/hqn/hqn.cpp',
+  'extern/hqn/hqn_gui_controller.cpp',
+  'extern/hqn/hqn_surface.cpp',
+  'extern/hqn/hqn_util.cpp',
+  'extern/hqn/options.cpp'
 ]
 
-quickerNESPlayerIncludeDirs =  include_directories([ 'player'])
+quickerNESPlayerIncludeDirs =  include_directories([ 'source'])
 quickerNESPlayerDependencies = [ dependency('sdl2'), dependency('SDL2_image') ]
 quickerNESPlayerCPPFlags = [ ]
 quickerNESPlayerCFlags = [ ]
 quickerNESPlayerLinkArgs = [ '-lncurses' ]
 
 executable('player',
-  'player/player.cpp',
+  'source/player.cpp',
   sources: [ quickerNESCoreSrc, quickerNESPlayerSrc ],
   include_directories: [ quickerNESCoreIncludeDirs, quickerNESPlayerIncludeDirs ],
   dependencies: [ quickerNESCoreDependencies, quickerNESPlayerDependencies ],

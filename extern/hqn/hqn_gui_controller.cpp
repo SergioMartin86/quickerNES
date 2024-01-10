@@ -218,9 +218,12 @@ void GUIController::update_blit(int32_t* blit, SDL_Surface* base, SDL_Surface* b
     SDL_RenderClear(m_renderer);
     SDL_RenderCopy(m_renderer, m_tex, &NES_BLIT_RECT, &m_nesDest);
 
-    auto overlayTex = SDL_CreateTextureFromSurface(m_renderer, base);
-    SDL_RenderCopy(m_renderer, overlayTex, &OVERLAY_BLIT_RECT_SRC, &OVERLAY_BLIT_RECT_DST);
-    SDL_DestroyTexture(overlayTex);
+    if (base != NULL)
+    {
+     auto overlayTex = SDL_CreateTextureFromSurface(m_renderer, base);
+     SDL_RenderCopy(m_renderer, overlayTex, &OVERLAY_BLIT_RECT_SRC, &OVERLAY_BLIT_RECT_DST);
+     SDL_DestroyTexture(overlayTex);
+    }
 
     if (button_a != NULL)
     {
