@@ -26,7 +26,7 @@ class PlaybackInstance
   {
     stepData_t step;
     step.input = input;
-    step.stateData = (uint8_t*) calloc(_emu->getStateSize(), 1);
+    step.stateData = (uint8_t*) malloc(_emu->getStateSize());
     _emu->serializeState(step.stateData);
     saveBlit(_emu->getInternalEmulator(), step.curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
 
@@ -35,7 +35,7 @@ class PlaybackInstance
   }
 
   // Initializes the playback module instance
- PlaybackInstance(EmuInstance* emu, const std::string sequenceString, const std::string& overlayPath = "") : _emu(emu)
+ PlaybackInstance(EmuInstance* emu, const std::vector<std::string>& sequence, const std::string& overlayPath = "") : _emu(emu)
  {
    // Loading Emulator instance HQN
   _hqnState.m_emu = _emu->getInternalEmulator();
@@ -43,10 +43,7 @@ class PlaybackInstance
   _hqnState.m_emu->set_pixels(video_buffer, Nes_Emu::image_width+8);
 
   // Building sequence information
-  const auto inputSequence = split(sequenceString, ' ');
-
-  // Building sequence information
-  for (const auto& input : inputSequence)
+  for (const auto& input : sequence)
   {
     // Adding new step
     addStep(input);

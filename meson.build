@@ -40,12 +40,11 @@ quickerNESCoreSrc = [
 
 # quickerNES Core Configuration
 
-quickerNESCoreCPPFlags = [ '-Wfatal-errors','-Wall' ]
-quickerNESCoreIncludeDirs =  include_directories(['source/core', 'extern'])
-quickerNESCoreDependencies = [ ]
-quickerNESCoreCPPFlags = [ ]
-quickerNESCoreCFlags = [ ]
-quickerNESCoreLinkArgs = [ ]
+ quickerNESCoreDependency = declare_dependency(
+  compile_args        : [ '-Wfatal-errors','-Wall' ],
+  include_directories : include_directories(['source', 'source/core', 'extern']),
+  sources             : quickerNESCoreSrc,
+ )
 
 # Building playback/validation tool
 
@@ -57,18 +56,20 @@ quickerNESPlayerSrc = [
   'extern/hqn/options.cpp'
 ]
 
-quickerNESPlayerIncludeDirs =  include_directories([ 'source'])
-quickerNESPlayerDependencies = [ dependency('sdl2'), dependency('SDL2_image') ]
-quickerNESPlayerCPPFlags = [ '-DNCURSES' ]
-quickerNESPlayerCFlags = [ ]
-quickerNESPlayerLinkArgs = [ '-lncurses' ]
+ quickerNESPlayerDependency = declare_dependency(
+  compile_args        : [ '-DNCURSES' ],
+  dependencies        : [ quickerNESCoreDependency, dependency('sdl2'), dependency('SDL2_image') ],
+  include_directories : include_directories(['source']),
+  link_args           : [ '-lncurses' ],
+  sources             : quickerNESPlayerSrc
+ )
 
 executable('player',
   'source/player.cpp',
-  sources: [ quickerNESCoreSrc, quickerNESPlayerSrc ],
-  include_directories: [ quickerNESCoreIncludeDirs, quickerNESPlayerIncludeDirs ],
-  dependencies: [ quickerNESCoreDependencies, quickerNESPlayerDependencies ],
-  cpp_args: [ quickerNESCoreCPPFlags, quickerNESPlayerCPPFlags ],
-  c_args: [ quickerNESCoreCFlags, quickerNESPlayerCFlags ],
-  link_args: [ quickerNESCoreLinkArgs, quickerNESPlayerLinkArgs ]
+  dependencies: quickerNESPlayerDependency,
 )
+
+# Building tests
+if get_option('buildTests') == true
+  subdir('tests')
+endif

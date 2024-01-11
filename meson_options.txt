@@ -1,0 +1,6 @@
+option('buildTests',
+  type : 'boolean',
+  value : false,
+  description : 'Build test suite',
+  yield: true
+)

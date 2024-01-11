@@ -55,6 +55,9 @@ int main(int argc, char *argv[])
   auto status = loadStringFromFile(inputSequence, sequenceFilePath.c_str());
   if (status == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
 
+  // Building sequence information
+  const auto sequence = split(inputSequence, ' ');
+
   // Initializing terminal
   initializeTerminal();
 
@@ -70,13 +73,13 @@ int main(int argc, char *argv[])
   auto e = EmuInstance(romFilePath, stateFilePath);
 
   // Creating playback instance
-  auto p = PlaybackInstance(&e, inputSequence);
+  auto p = PlaybackInstance(&e, sequence);
 
   // Flag to continue running playback
   bool continueRunning = true;
 
   // Variable for current step in view
-  ssize_t sequenceLength = p.getSequenceLength();
+  ssize_t sequenceLength = sequence.size();
   ssize_t currentStep = 0;
 
   // Flag to display frame information
@@ -89,7 +92,7 @@ int main(int argc, char *argv[])
     if (disableRender == false) p.renderFrame(currentStep);
 
     // Getting input
-    const auto& input = p.getInput(currentStep);
+    const auto& input = sequence[currentStep];
 
     // Getting state data
     //const auto stateData = p.getStateData(currentStep);
