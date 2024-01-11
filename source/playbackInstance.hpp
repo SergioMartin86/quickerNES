@@ -11,39 +11,54 @@
 
 #define _INVERSE_FRAME_RATE 16667
 
+struct stepData_t
+{
+  std::string input;
+  uint8_t* stateData;
+  int32_t curBlit[BLIT_SIZE];
+};
+
 class PlaybackInstance
 {
- private:
-
- // Storage for the HQN state
- hqn::HQNState _hqnState;
-
- // Storage for the HQN GUI controller
- hqn::GUIController* _hqnGUI;
-
- // Pointer to the contained emulator instance
- EmuInstance* const _emu;
-
- // Flag to store whether to use the button overlay
- bool _useOverlay = false;
-
- // Overlay info
- std::string _overlayPath;
- SDL_Surface* _overlayBaseSurface = NULL;
- SDL_Surface* _overlayButtonASurface;
- SDL_Surface* _overlayButtonBSurface;
- SDL_Surface* _overlayButtonSelectSurface;
- SDL_Surface* _overlayButtonStartSurface;
- SDL_Surface* _overlayButtonLeftSurface;
- SDL_Surface* _overlayButtonRightSurface;
- SDL_Surface* _overlayButtonUpSurface;
- SDL_Surface* _overlayButtonDownSurface;
-
  public:
 
+  void addStep(const std::string& input)
+  {
+    stepData_t step;
+    step.input = input;
+    step.stateData = (uint8_t*) calloc(_emu->getStateSize(), 1);
+    _emu->serializeState(step.stateData);
+    saveBlit(_emu->getInternalEmulator(), step.curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
+
+    // Adding the step into the sequence
+    _stepSequence.push_back(step);
+  }
+
   // Initializes the playback module instance
- PlaybackInstance(EmuInstance* emu, const std::string& overlayPath = "") : _emu(emu)
+ PlaybackInstance(EmuInstance* emu, const std::string sequenceString, const std::string& overlayPath = "") : _emu(emu)
  {
+   // Loading Emulator instance HQN
+  _hqnState.m_emu = _emu->getInternalEmulator();
+  static uint8_t video_buffer[Nes_Emu::image_width * Nes_Emu::image_height];
+  _hqnState.m_emu->set_pixels(video_buffer, Nes_Emu::image_width+8);
+
+  // Building sequence information
+  const auto inputSequence = split(sequenceString, ' ');
+
+  // Building sequence information
+  for (const auto& input : inputSequence)
+  {
+    // Adding new step
+    addStep(input);
+
+    // Advance state based on the input received
+    _emu->advanceState(input);
+  }
+
+  // Adding last step with no input
+  addStep("<End Of Sequence>");
+
+  // Loading overlay, if provided
   if (overlayPath != "")
   {
     // Using overlay
@@ -89,11 +104,6 @@ class PlaybackInstance
     if (_overlayButtonDownSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
   }
 
-  // Loading Emulator instance HQN
-  _hqnState.m_emu = _emu->getInternalEmulator();
-  static uint8_t video_buffer[Nes_Emu::image_width * Nes_Emu::image_height];
-  _hqnState.m_emu->set_pixels(video_buffer, Nes_Emu::image_width+8);
-
   // Opening rendering window
   SDL_SetMainReady();
 
@@ -108,14 +118,13 @@ class PlaybackInstance
  }
 
  // Function to render frame
- void renderFrame(const uint16_t currentStep, const std::string& move) 
+ void renderFrame(const size_t stepId) 
  {
-  // Sleeping for the inverse frame rate
-  usleep(_INVERSE_FRAME_RATE);
-
-  // Storing current game state
-  uint8_t emuState[_emu->getStateSize()];
-  _emu->serializeState(emuState);
+  // Checking the required step id does not exceed contents of the sequence
+  if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+ 
+  // Getting step information
+  const auto& step = _stepSequence[stepId];
 
   // Pointer to overlay images (NULL if unused)
   SDL_Surface* overlayButtonASurface = NULL;
@@ -130,24 +139,76 @@ class PlaybackInstance
   // Load correct overlay images, if using overlay
   if (_useOverlay == true)
   {
-    if (move.find("A") != std::string::npos) overlayButtonASurface = _overlayButtonASurface;
-    if (move.find("B") != std::string::npos) overlayButtonBSurface = _overlayButtonBSurface;
-    if (move.find("S") != std::string::npos) overlayButtonSelectSurface = _overlayButtonSelectSurface;
-    if (move.find("T") != std::string::npos) overlayButtonStartSurface = _overlayButtonStartSurface;
-    if (move.find("L") != std::string::npos) overlayButtonLeftSurface = _overlayButtonLeftSurface;
-    if (move.find("R") != std::string::npos) overlayButtonRightSurface = _overlayButtonRightSurface;
-    if (move.find("U") != std::string::npos) overlayButtonUpSurface = _overlayButtonUpSurface;
-    if (move.find("D") != std::string::npos) overlayButtonDownSurface = _overlayButtonDownSurface;
+    if (step.input.find("A") != std::string::npos) overlayButtonASurface = _overlayButtonASurface;
+    if (step.input.find("B") != std::string::npos) overlayButtonBSurface = _overlayButtonBSurface;
+    if (step.input.find("S") != std::string::npos) overlayButtonSelectSurface = _overlayButtonSelectSurface;
+    if (step.input.find("T") != std::string::npos) overlayButtonStartSurface = _overlayButtonStartSurface;
+    if (step.input.find("L") != std::string::npos) overlayButtonLeftSurface = _overlayButtonLeftSurface;
+    if (step.input.find("R") != std::string::npos) overlayButtonRightSurface = _overlayButtonRightSurface;
+    if (step.input.find("U") != std::string::npos) overlayButtonUpSurface = _overlayButtonUpSurface;
+    if (step.input.find("D") != std::string::npos) overlayButtonDownSurface = _overlayButtonDownSurface;
   }
 
-  // Since renderer is off by one frame, we need to emulate an additional frame
-  _emu->advanceState(0,0);
-  int32_t curImage[BLIT_SIZE];
-  _hqnState.blit(curImage, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
-  _hqnGUI->update_blit(curImage, _overlayBaseSurface, overlayButtonASurface, overlayButtonBSurface, overlayButtonSelectSurface, overlayButtonStartSurface, overlayButtonLeftSurface, overlayButtonRightSurface, overlayButtonUpSurface, overlayButtonDownSurface);
-
-  // Reload game state
-  _emu->deserializeState(emuState);
+  // Updating image
+  _hqnGUI->update_blit(step.curBlit, _overlayBaseSurface, overlayButtonASurface, overlayButtonBSurface, overlayButtonSelectSurface, overlayButtonStartSurface, overlayButtonLeftSurface, overlayButtonRightSurface, overlayButtonUpSurface, overlayButtonDownSurface);
  }
 
+ size_t getSequenceLength() const
+ {
+  return _stepSequence.size();
+ }
+
+ const std::string getInput(const size_t stepId) const
+ {
+  // Checking the required step id does not exceed contents of the sequence
+  if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+ 
+  // Getting step information
+  const auto& step = _stepSequence[stepId];
+
+  // Returning step input
+  return step.input;
+ }
+
+ const uint8_t* getStateData(const size_t stepId) const
+ {
+  // Checking the required step id does not exceed contents of the sequence
+  if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+ 
+  // Getting step information
+  const auto& step = _stepSequence[stepId];
+
+  // Returning step input
+  return step.stateData;
+ }
+
+
+ private:
+
+ // Internal sequence information
+ std::vector<stepData_t> _stepSequence;
+
+ // Storage for the HQN state
+ hqn::HQNState _hqnState;
+
+ // Storage for the HQN GUI controller
+ hqn::GUIController* _hqnGUI;
+
+ // Pointer to the contained emulator instance
+ EmuInstance* const _emu;
+
+ // Flag to store whether to use the button overlay
+ bool _useOverlay = false;
+
+ // Overlay info
+ std::string _overlayPath;
+ SDL_Surface* _overlayBaseSurface = NULL;
+ SDL_Surface* _overlayButtonASurface;
+ SDL_Surface* _overlayButtonBSurface;
+ SDL_Surface* _overlayButtonSelectSurface;
+ SDL_Surface* _overlayButtonStartSurface;
+ SDL_Surface* _overlayButtonLeftSurface;
+ SDL_Surface* _overlayButtonRightSurface;
+ SDL_Surface* _overlayButtonUpSurface;
+ SDL_Surface* _overlayButtonDownSurface;
 };

@@ -59,7 +59,7 @@ quickerNESPlayerSrc = [
 
 quickerNESPlayerIncludeDirs =  include_directories([ 'source'])
 quickerNESPlayerDependencies = [ dependency('sdl2'), dependency('SDL2_image') ]
-quickerNESPlayerCPPFlags = [ ]
+quickerNESPlayerCPPFlags = [ '-DNCURSES' ]
 quickerNESPlayerCFlags = [ ]
 quickerNESPlayerLinkArgs = [ '-lncurses' ]
 

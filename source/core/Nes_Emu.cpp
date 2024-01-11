@@ -177,7 +177,10 @@ const char * Nes_Emu::emulate_frame( int joypad1, int joypad2 )
 		f->joypad_read_count = emu.joypad_read_count;
 		f->burst_phase       = emu.ppu.burst_phase;
 		f->pitch             = emu.ppu.host_row_bytes;
-		f->pixels            = emu.ppu.host_pixels + f->left;
+		if (emu.ppu.host_pixels != NULL)
+		  f->pixels            = emu.ppu.host_pixels + f->left;
+		else 
+		 f->pixels = NULL;
 	}
 	else
 	{

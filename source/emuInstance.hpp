@@ -32,17 +32,16 @@ class EmuInstance
   auto result = _nes->load_ines(romFile);
   if (result != 0) EXIT_WITH_ERROR("Could not initialize emulator with rom file: %s\n", romFilePath.c_str());
 
-  // Setting base memory pointers
-  _baseMem = _nes->low_mem();
-  _ppuNameTableMem = _nes->nametable_mem();
-  _highMem = _nes->high_mem();
-
   // Getting state size to use
   _stateSize = getStateSizeImpl();
 
   // Loading state file, if specified
   if (stateFilePath != "") loadStateFile(stateFilePath);
  }
+
+ uint8_t* getLowMem() { return _nes->low_mem(); };
+ uint8_t* getNametableMem() { return _nes->nametable_mem(); };
+ uint8_t* getHighMem() { return _nes->high_mem();};
 
  void loadStateFile(const std::string& stateFilePath) 
  {
@@ -166,11 +165,6 @@ class EmuInstance
 
  // Emulator instance
  Nes_Emu* _nes;
-
- // Base low-memory pointer
- uint8_t* _baseMem;
- uint8_t* _ppuNameTableMem;
- uint8_t* _highMem;
 
  // State size for the given rom
  size_t _stateSize;

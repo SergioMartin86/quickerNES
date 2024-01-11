@@ -183,45 +183,5 @@ double HQNState::getFPS() const
     return fps;
 }
 
-// Copied from bizinterface.cpp in BizHawk/quicknes
-void HQNState::blit(int32_t *dest, const int32_t *colors, int cropleft, int croptop, int cropright, int cropbottom) const
-{
-    // what is the point of the 256 color bitmap and the dynamic color allocation to it?
-    // why not just render directly to a 512 color bitmap with static palette positions?
-//    Nes_Emu *e = m_emu; // e was a parameter but since this is now part of a class, it's just in here
-//    const int srcpitch = e->frame().pitch;
-//    const unsigned char *src = e->frame().pixels;
-//    const unsigned char *const srcend = src + (e->image_height - cropbottom) * srcpitch;
-//
-//    const short *lut = e->frame().palette;
-//
-//    const int rowlen = 256 - cropleft - cropright;
-//
-//    src += cropleft;
-//    src += croptop * srcpitch;
-//
-//    for (; src < srcend; src += srcpitch)
-//    {
-//        for (int i = 0; i < rowlen; i++)
-//        {
-//            *dest++ = colors[lut[src[i]]];
-//        }
-//    }
-
- Nes_Emu *e = m_emu; // e was a parameter but since this is now part of a class, it's just in here
- const unsigned char *in_pixels = e->frame().pixels;
- int32_t *out_pixels = dest;
-
- for (unsigned h = 0; h < Nes_Emu::image_height;  h++, in_pixels += e->frame().pitch, out_pixels += Nes_Emu::image_width)
-  for (unsigned w = 0; w < Nes_Emu::image_width; w++)
-  {
-     unsigned col = e->frame().palette[in_pixels[w]];
-     const Nes_Emu::rgb_t& rgb = m_emu->nes_colors[col];
-     unsigned r = rgb.red;
-     unsigned g = rgb.green;
-     unsigned b = rgb.blue;
-     out_pixels[w] = (r << 16) | (g << 8) | (b << 0);
-  }
-}
 
 } // end namespace hqn

@@ -46,6 +46,8 @@ public:
 	enum { image_width   = 256 };
 	enum { image_height  = 240 };
 
+    const uint8_t* getHostPixels () const { return emu.ppu.host_pixels; }
+  
 // Basic emulation
 
 	// Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image
@@ -264,6 +266,7 @@ inline void Nes_Emu::set_pixels( void* p, long n )
 	host_pixels = (char*) p + n;
 	emu.ppu.host_row_bytes = n;
 }
+
 
 inline uint8_t const* Nes_Emu::chr_mem()
 {

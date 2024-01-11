@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdexcept>
 #include <stdio.h>
+#include <unistd.h>
 #include <algorithm>
 
 // If we use NCurses, we need to use the appropriate printing function
@@ -56,7 +57,33 @@ inline int getKeyPress()
   return getch();
 }
 
-#endif
+void initializeTerminal()
+{
+  // Initializing ncurses screen
+  initscr();
+  cbreak();
+  noecho();
+  nodelay(stdscr, TRUE);
+  scrollok(stdscr, TRUE);
+}
+
+void clearTerminal()
+{
+  clear();
+}
+
+void finalizeTerminal()
+{
+  endwin();
+}
+
+void refreshTerminal()
+{
+  refresh();
+}
+
+
+#endif // NCURSES
 
 // Function to split a string into a sub-strings delimited by a character
 // Taken from stack overflow answer to https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string

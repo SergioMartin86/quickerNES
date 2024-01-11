@@ -50,17 +50,105 @@ int main(int argc, char *argv[])
   // Getting reproduce flag
   bool disableRender = program.get<bool>("--disableRender");
 
+  // Loading sequence file
+  std::string inputSequence;
+  auto status = loadStringFromFile(inputSequence, sequenceFilePath.c_str());
+  if (status == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
+
+  // Initializing terminal
+  initializeTerminal();
+
   // Printing provided parameters
-  printf("Rom File Path:      %s\n", romFilePath.c_str());
-  printf("Sequence File Path: %s\n", sequenceFilePath.c_str());
-  printf("State File Path:    %s\n", stateFilePath.c_str());
+  printw("[] Rom File Path:      '%s'\n", romFilePath.c_str());
+  printw("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
+  printw("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
+  printw("[] Generating Sequence...\n");
+
+  refreshTerminal();
 
   // Creating emulator instance
   auto e = EmuInstance(romFilePath, stateFilePath);
 
   // Creating playback instance
-  auto p = PlaybackInstance(&e);
+  auto p = PlaybackInstance(&e, inputSequence);
 
-  while(true) p.renderFrame(0, "");
+  // Flag to continue running playback
+  bool continueRunning = true;
+
+  // Variable for current step in view
+  ssize_t sequenceLength = p.getSequenceLength();
+  ssize_t currentStep = 0;
+
+  // Flag to display frame information
+  bool showFrameInfo = true;
+
+  // Interactive section
+  while(continueRunning)
+  {
+    // Updating display
+    if (disableRender == false) p.renderFrame(currentStep);
+
+    // Getting input
+    const auto& input = p.getInput(currentStep);
+
+    // Getting state data
+    //const auto stateData = p.getStateData(currentStep);
+
+    // Printing data and commands
+    if (showFrameInfo)
+    {
+      clearTerminal();
+
+      printw("[] ----------------------------------------------------------------\n");
+      printw("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
+      printw("[] Input: %s\n", input.c_str());
+
+      // Only print commands if not in reproduce mode
+      if (isReproduce == false) printw("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
+
+      refreshTerminal();
+    }
+
+    // Resetting show frame info flag
+    showFrameInfo = true;
+
+    // Get command
+    auto command = getKeyPress();
+
+    // Advance/Rewind commands
+    if (command == 'n') currentStep = currentStep - 1;
+    if (command == 'm') currentStep = currentStep + 1;
+    if (command == 'h') currentStep = currentStep - 10;
+    if (command == 'j') currentStep = currentStep + 10;
+    if (command == 'y') currentStep = currentStep - 100;
+    if (command == 'u') currentStep = currentStep + 100;
+    if (command == 'k') currentStep = currentStep - 1000;
+    if (command == 'i') currentStep = currentStep + 1000;
+
+    // Correct current step if requested more than possible
+    if (currentStep < 0) currentStep = 0;
+    if (currentStep >= sequenceLength) currentStep = sequenceLength-1;
+
+    // Quicksave creation command
+    if (command == 's')
+    {
+        // Storing state file
+      std::string saveFileName = "quicksave.state";
+      e.saveStateFile(saveFileName);
+      printw("[] Saved state to %s\n", saveFileName.c_str());
+
+      // Do no show frame info again after this action
+      showFrameInfo = false;
+    }
+
+    // Start playback from current point
+    if (command == 'p') isReproduce = true;
+
+    // Start playback from current point
+    if (command == 'q') continueRunning = false;
+  }
+
+  // Ending ncurses window
+  finalizeTerminal();
 }
 

@@ -190,7 +190,6 @@ void GUIController::update(bool readNES)
 
     if (SDL_LockTexture(m_tex, nullptr, &nesPixels, &pitch) < 0) return;
 
-    m_state.blit((int32_t*)nesPixels, HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
     SDL_UnlockTexture(m_tex);
 
     // render to screen
@@ -201,7 +200,7 @@ void GUIController::update(bool readNES)
     processEvents();
 }
 
-void GUIController::update_blit(int32_t* blit, SDL_Surface* base, SDL_Surface* button_a, SDL_Surface* button_b, SDL_Surface* button_select, SDL_Surface* button_start, SDL_Surface* button_up, SDL_Surface* button_down, SDL_Surface* button_left, SDL_Surface* button_right)
+void GUIController::update_blit(const int32_t* blit, SDL_Surface* base, SDL_Surface* button_a, SDL_Surface* button_b, SDL_Surface* button_select, SDL_Surface* button_start, SDL_Surface* button_up, SDL_Surface* button_down, SDL_Surface* button_left, SDL_Surface* button_right)
 {
     void *nesPixels = nullptr;
     int pitch = 0;
