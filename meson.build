@@ -35,7 +35,8 @@ quickerNESCoreSrc = [
  'source/core/Multi_Buffer.cpp', 
  'source/core/Nes_Emu.cpp', 
  'source/core/nes_ntsc.cpp', 
- 'source/core/Nes_Vrc7.cpp', 
+ 'source/core/Nes_Vrc7.cpp',
+ 'extern/sha1/sha1.cpp' 
 ]
 
 # quickerNES Core Configuration

@@ -1,3 +1,0 @@
-[submodule "tests/roms/nes-test-roms"]
-	path = tests/roms/test-roms
-	url = git@github.com:christopherpow/nes-test-roms.git
