@@ -4,6 +4,7 @@
 #include <core/Nes_State.h>
 #include <string>
 #include <utils.hpp> 
+#include "sha1/sha1.hpp"
 
 #define _LOW_MEM_SIZE 0x800
 #define _HIGH_MEM_SIZE 0x2000
@@ -26,7 +27,13 @@ class EmuInstance
 
   // Loading ROM
   std::string romData;
-  loadStringFromFile(romData, romFilePath.c_str());
+  bool status = loadStringFromFile(romData, romFilePath.c_str());
+  if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", romFilePath.c_str());
+
+  // Calculating ROM hash value
+  _romSHA1String = SHA1::GetHash((uint8_t*)romData.data(), romData.size());
+
+  // Loading the rom into the emulator
   Mem_File_Reader romReader(romData.data(), (int)romData.size());
   Auto_File_Reader romFile(romReader);
   auto result = _nes->load_ines(romFile);
@@ -42,12 +49,14 @@ class EmuInstance
  uint8_t* getLowMem() { return _nes->low_mem(); };
  uint8_t* getNametableMem() { return _nes->nametable_mem(); };
  uint8_t* getHighMem() { return _nes->high_mem();};
-
+ const std::string getRomSHA1() const { return _romSHA1String; }; 
+ 
  void loadStateFile(const std::string& stateFilePath) 
  {
   // Loading state data
   std::string stateData;
-  if (loadStringFromFile(stateData, stateFilePath.c_str()) == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
+  bool status = loadStringFromFile(stateData, stateFilePath.c_str());
+  if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
   Mem_File_Reader stateReader(stateData.data(), (int)stateData.size());
   Auto_File_Reader stateFile(stateReader);
 
@@ -168,5 +177,8 @@ class EmuInstance
 
  // State size for the given rom
  size_t _stateSize;
+
+ // SHA1 rom hash 
+ std::string _romSHA1String;
 
 };

@@ -35,8 +35,7 @@ quickerNESCoreSrc = [
  'source/core/Multi_Buffer.cpp', 
  'source/core/Nes_Emu.cpp', 
  'source/core/nes_ntsc.cpp', 
- 'source/core/Nes_Vrc7.cpp',
- 'extern/sha1/sha1.cpp' 
+ 'source/core/Nes_Vrc7.cpp'
 ]
 
 # quickerNES Core Configuration
@@ -47,7 +46,7 @@ quickerNESCoreSrc = [
   sources             : quickerNESCoreSrc,
  )
 
-# Building playback/validation tool
+# Building playback tool
 
 quickerNESPlayerSrc = [
   'extern/hqn/hqn.cpp',
@@ -57,18 +56,22 @@ quickerNESPlayerSrc = [
   'extern/hqn/options.cpp'
 ]
 
- quickerNESPlayerDependency = declare_dependency(
-  compile_args        : [ '-DNCURSES' ],
+executable('player',
+  'source/player.cpp',
+  cpp_args            : [ '-DNCURSES' ],
   dependencies        : [ quickerNESCoreDependency, dependency('sdl2'), dependency('SDL2_image') ],
   include_directories : include_directories(['source']),
   link_args           : [ '-lncurses' ],
   sources             : quickerNESPlayerSrc
- )
-
-executable('player',
-  'source/player.cpp',
-  dependencies: quickerNESPlayerDependency,
 )
+
+# Building tester tool
+
+tester = executable('tester',
+   'source/tester.cpp',
+   dependencies: [ quickerNESCoreDependency ],
+   include_directories: include_directories(['../extern/json'])
+  )
 
 # Building tests
 if get_option('buildTests') == true

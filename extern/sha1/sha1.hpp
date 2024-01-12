@@ -1,27 +1,34 @@
 /*
-	 sha1.cpp - source code of
+    sha1.h - header of
 
-	 ============
-	 SHA-1 in C++
-	 ============
+    ============
+    SHA-1 in C++
+    ============
 
-	 100% Public Domain.
+    100% Public Domain.
 
-	 Original C Code
-		  -- Steve Reid <steve@edmweb.com>
-	 Small changes to fit into bglibs
-		  -- Bruce Guenter <bruce@untroubled.org>
-	 Translation to simpler C++ Code
-		  -- Volker Grabsch <vog@notjusthosting.com>
-	 Safety fixes
-		  -- Eugene Hopkinson <slowriot at voxelstorm dot com>
+    Original C Code
+        -- Steve Reid <steve@edmweb.com>
+    Small changes to fit into bglibs
+        -- Bruce Guenter <bruce@untroubled.org>
+    Translation to simpler C++ Code
+        -- Volker Grabsch <vog@notjusthosting.com>
+    Safety fixes
+        -- Eugene Hopkinson <slowriot at voxelstorm dot com>
+
+   Taken and adapted to be a single header from https://github.com/SourMesen/Mesen2/blob/master/Utilities/sha1.cpp
+   by Sergio Martin (eien86)
+
 */
 
-#include "sha1.h"
+#pragma once
+
+#include <cstdint>
+#include <iostream>
+#include <string>
 #include <sstream>
 #include <iomanip>
 #include <fstream>
-#include <vector>
 
 static const size_t BLOCK_INTS = 16;  /* number of 32bit integers per SHA1 block */
 static const size_t BLOCK_BYTES = BLOCK_INTS * 4;
@@ -215,21 +222,23 @@ static void buffer_to_block(const std::string &buffer, uint32_t block[BLOCK_INTS
 	}
 }
 
-
-SHA1::SHA1()
+class SHA1
+{
+public:
+SHA1()
 {
 	reset(digest, buffer, transforms);
 }
 
 
-void SHA1::update(const std::string &s)
+void update(const std::string &s)
 {
 	std::istringstream is(s);
 	update(is);
 }
 
 
-void SHA1::update(std::istream &is)
+void update(std::istream &is)
 {
 	char sbuf[BLOCK_BYTES];
 	uint32_t block[BLOCK_INTS];
@@ -252,7 +261,7 @@ void SHA1::update(std::istream &is)
  * Add padding and return the message digest.
  */
 
-std::string SHA1::final()
+std::string final()
 {
 	/* Total number of hashed bits */
 	uint64_t total_bits = (transforms*BLOCK_BYTES + buffer.size()) * 8;
@@ -293,7 +302,7 @@ std::string SHA1::final()
 }
 
 
-std::string SHA1::GetHash(uint8_t* data, size_t size)
+static std::string GetHash(uint8_t* data, size_t size)
 {
 	std::stringstream ss;
 	ss.write((char*)data, size);
@@ -303,17 +312,24 @@ std::string SHA1::GetHash(uint8_t* data, size_t size)
 	return checksum.final();
 }
 
-std::string SHA1::GetHash(std::istream &stream)
+static std::string GetHash(std::istream &stream)
 {
 	SHA1 checksum;
 	checksum.update(stream);
 	return checksum.final();
 }
 
-std::string SHA1::GetHash(const std::string &filename)
+static std::string GetHash(const std::string &filename)
 {
 	std::ifstream stream(filename.c_str(), std::ios::binary);
 	SHA1 checksum;
 	checksum.update(stream);
 	return checksum.final();
 }
+
+private:
+    uint32_t digest[5];
+    std::string buffer;
+    uint64_t transforms;
+};
+

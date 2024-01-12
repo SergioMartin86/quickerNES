@@ -1,0 +1,7 @@
+{
+  "Rom File": "Castlevania (U) (PRG0) [!].nes",
+  "Expected ROM SHA1": "A31B8BD5B370A9103343C866F3C2B2998E889341",
+  "Initial State File": "",
+  "Final State File": "anyPercent.final.state",
+  "Sequence File": "anyPercent.sol"
+}
