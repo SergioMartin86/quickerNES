@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <algorithm>
+#include <metrohash128/metrohash128.h>
 
 // If we use NCurses, we need to use the appropriate printing function
 #ifdef NCURSES
@@ -85,6 +86,17 @@ void refreshTerminal()
 
 #endif // NCURSES
 
+
+typedef _uint128_t hash_t;
+inline hash_t calculateMetroHash(uint8_t* data, size_t size)
+{
+  MetroHash128 hash;
+  hash.Update(data, size);
+  hash_t result;
+  hash.Finalize(reinterpret_cast<uint8_t *>(&result));
+  return result;
+}
+
 // Function to split a string into a sub-strings delimited by a character
 // Taken from stack overflow answer to https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
 // By Evan Teran
@@ -137,9 +149,9 @@ inline  void exitWithError [[noreturn]] (const char *fileName, const int lineNum
 }
 
 // Loads a string from a given file
-inline bool loadStringFromFile(std::string &dst, const char *fileName)
+inline bool loadStringFromFile(std::string &dst, std::string path)
 {
-  std::ifstream fi(fileName);
+  std::ifstream fi(path);
 
   // If file not found or open, return false
   if (fi.good() == false) return false;

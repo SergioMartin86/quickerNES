@@ -35,7 +35,7 @@ quickerNESCoreSrc = [
  'source/core/Multi_Buffer.cpp', 
  'source/core/Nes_Emu.cpp', 
  'source/core/nes_ntsc.cpp', 
- 'source/core/Nes_Vrc7.cpp'
+ 'source/core/Nes_Vrc7.cpp',
 ]
 
 # quickerNES Core Configuration
@@ -43,7 +43,7 @@ quickerNESCoreSrc = [
  quickerNESCoreDependency = declare_dependency(
   compile_args        : [ '-Wfatal-errors','-Wall' ],
   include_directories : include_directories(['source', 'source/core', 'extern']),
-  sources             : quickerNESCoreSrc,
+  sources             : [ quickerNESCoreSrc, 'extern/metrohash128/metrohash128.cpp' ]
  )
 
 # Building playback tool
@@ -53,7 +53,7 @@ quickerNESPlayerSrc = [
   'extern/hqn/hqn_gui_controller.cpp',
   'extern/hqn/hqn_surface.cpp',
   'extern/hqn/hqn_util.cpp',
-  'extern/hqn/options.cpp'
+  'extern/hqn/options.cpp',
 ]
 
 executable('player',

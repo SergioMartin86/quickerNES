@@ -72,14 +72,19 @@ int main(int argc, char *argv[])
   // Creating emulator instance
   auto e = EmuInstance(romFilePath, stateFilePath);
 
+  auto stateHash = e.getStateHash();
+
   // Creating playback instance
   auto p = PlaybackInstance(&e, sequence);
+
+  // Getting state size
+  auto stateSize = e.getStateSize();
 
   // Flag to continue running playback
   bool continueRunning = true;
 
   // Variable for current step in view
-  ssize_t sequenceLength = sequence.size();
+  ssize_t sequenceLength = p.getSequenceLength();
   ssize_t currentStep = 0;
 
   // Flag to display frame information
@@ -92,10 +97,13 @@ int main(int argc, char *argv[])
     if (disableRender == false) p.renderFrame(currentStep);
 
     // Getting input
-    const auto& input = sequence[currentStep];
+    const auto& input = p.getStateInput(currentStep);
+
+    // Getting state hash
+    const auto hash = p.getStateHash(currentStep);
 
     // Getting state data
-    //const auto stateData = p.getStateData(currentStep);
+    const auto stateData = p.getStateData(currentStep);
 
     // Printing data and commands
     if (showFrameInfo)
@@ -104,7 +112,8 @@ int main(int argc, char *argv[])
 
       printw("[] ----------------------------------------------------------------\n");
       printw("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
-      printw("[] Input: %s\n", input.c_str());
+      printw("[] Input:          %s\n", input.c_str());
+      printw("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
 
       // Only print commands if not in reproduce mode
       if (isReproduce == false) printw("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
@@ -137,7 +146,11 @@ int main(int argc, char *argv[])
     {
         // Storing state file
       std::string saveFileName = "quicksave.state";
-      e.saveStateFile(saveFileName);
+
+      std::string saveData;
+      saveData.resize(stateSize);
+      memcpy(saveData.data(), stateData, stateSize);
+      if (saveStringToFile(saveData, saveFileName.c_str()) == false) EXIT_WITH_ERROR("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
       printw("[] Saved state to %s\n", saveFileName.c_str());
 
       // Do no show frame info again after this action

@@ -16,6 +16,7 @@ struct stepData_t
   std::string input;
   uint8_t* stateData;
   int32_t curBlit[BLIT_SIZE];
+  hash_t hash;
 };
 
 class PlaybackInstance
@@ -28,6 +29,7 @@ class PlaybackInstance
     step.input = input;
     step.stateData = (uint8_t*) malloc(_emu->getStateSize());
     _emu->serializeState(step.stateData);
+    step.hash = _emu->getStateHash();
     saveBlit(_emu->getInternalEmulator(), step.curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
 
     // Adding the step into the sequence
@@ -177,6 +179,30 @@ class PlaybackInstance
 
   // Returning step input
   return step.stateData;
+ }
+
+ const hash_t getStateHash(const size_t stepId) const
+ {
+  // Checking the required step id does not exceed contents of the sequence
+  if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+ 
+  // Getting step information
+  const auto& step = _stepSequence[stepId];
+
+  // Returning step input
+  return step.hash;
+ }
+
+const std::string getStateInput(const size_t stepId) const
+ {
+  // Checking the required step id does not exceed contents of the sequence
+  if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+ 
+  // Getting step information
+  const auto& step = _stepSequence[stepId];
+
+  // Returning step input
+  return step.input;
  }
 
 

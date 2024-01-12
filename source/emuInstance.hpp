@@ -8,6 +8,7 @@
 
 #define _LOW_MEM_SIZE 0x800
 #define _HIGH_MEM_SIZE 0x2000
+#define _NAMETABLES_MEM_SIZE 0x1000
 
 class EmuInstance
 {
@@ -49,8 +50,11 @@ class EmuInstance
  uint8_t* getLowMem() { return _nes->low_mem(); };
  uint8_t* getNametableMem() { return _nes->nametable_mem(); };
  uint8_t* getHighMem() { return _nes->high_mem();};
+ const uint8_t* getChrMem() { return _nes->chr_mem();};
+ size_t getChrMemSize() { return _nes->chr_size();};
+
  const std::string getRomSHA1() const { return _romSHA1String; }; 
- 
+
  void loadStateFile(const std::string& stateFilePath) 
  {
   // Loading state data
@@ -69,6 +73,23 @@ class EmuInstance
  }
 
  inline size_t getStateSize() const { return _stateSize; }
+
+ inline hash_t getStateHash() 
+ {
+  MetroHash128 hash;
+
+  uint8_t stateData[_stateSize];
+  serializeState(stateData);
+
+  hash.Update(getLowMem(), _LOW_MEM_SIZE);
+  hash.Update(getHighMem(), _HIGH_MEM_SIZE);
+  hash.Update(getNametableMem(), _NAMETABLES_MEM_SIZE);
+  hash.Update(getChrMem(), getChrMemSize());
+
+  hash_t result;
+  hash.Finalize(reinterpret_cast<uint8_t *>(&result));
+  return result;
+ }
 
  void saveStateFile(const std::string& stateFilePath) const 
  {
