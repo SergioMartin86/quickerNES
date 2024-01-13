@@ -109,7 +109,7 @@ imm##op:                                \
  pc++;                   \
  int offset = (int8_t) data;  \
  int extra_clock = (pc & 0xFF) + offset; \
- if ( !(cond) ) goto dec_clock_loop; \
+ if ( !(cond) ) {clock_count--; goto loop; } \
  pc += offset;       \
  pc = uint16_t( pc ); \
  clock_count += (extra_clock >> 8) & 1;  \
@@ -239,11 +239,6 @@ Nes_Cpu::result_t Nes_Cpu::run( nes_time_t end )
 
  volatile result_t result = result_cycles;
 
-#if !BLARGG_CPU_CISC
- long clock_count = this->clock_count;
- uint8_t* const low_mem = this->low_mem;
-#endif
-
  // registers
  unsigned pc = r.pc;
  int sp;
@@ -251,7 +246,6 @@ Nes_Cpu::result_t Nes_Cpu::run( nes_time_t end )
  int a = r.a;
  int x = r.x;
  int y = r.y;
-
 
  int status;
  int c;  // carry set if (c & 0x100) != 0
@@ -261,9 +255,6 @@ Nes_Cpu::result_t Nes_Cpu::run( nes_time_t end )
   SET_STATUS( temp );
  }
 
- goto loop;
-dec_clock_loop:
- clock_count--;
 loop:
 
  uint8_t const* page = code_map [pc >> page_bits];
