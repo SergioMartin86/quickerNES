@@ -1,15 +1,6 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/nes-emu/
 
-// TODO: remove
-#if !defined (NDEBUG) && 0
- #pragma peephole on
- #pragma global_optimizer on
- #pragma optimization_level 4
- #pragma scheduling 604
- #undef BLARGG_ENABLE_OPTIMIZER
-#endif
-
 #include "Nes_Cpu.h"
 
 #include <string.h>
@@ -31,10 +22,6 @@ Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 #include "blargg_source.h"
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
- #include BLARGG_ENABLE_OPTIMIZER
-#endif
 
 inline void Nes_Cpu::set_code_page( int i, uint8_t const* p )
 {
@@ -92,9 +79,21 @@ void Nes_Cpu::map_code( nes_addr_t start, unsigned size, const void* data )
 #define GET_SP()        ((sp - 1) & 0xFF)
 #define PUSH( v )       ((sp = (sp - 1) | 0x100), WRITE_LOW( sp, v ))
 
-#ifdef BLARGG_ENABLE_OPTIMIZER
- #include BLARGG_ENABLE_OPTIMIZER
-#endif
+ #define IS_NEG (nz & 0x880)
+
+ #define CALC_STATUS( out ) do {             \
+  out = status & (st_v | st_d | st_i);    \
+  out |= (c >> 8) & st_c;                 \
+  if ( IS_NEG ) out |= st_n;              \
+  if ( !(nz & 0xFF) ) out |= st_z;        \
+ } while ( 0 )
+
+ #define SET_STATUS( in ) do {               \
+  status = in & (st_v | st_d | st_i);     \
+  c = in << 8;                            \
+  nz = (in << 4) & 0x800;                 \
+  nz |= ~in & st_z;                       \
+ } while ( 0 )
 
 int Nes_Cpu::read( nes_addr_t addr )
 {
@@ -106,7 +105,18 @@ void Nes_Cpu::write( nes_addr_t addr, int value )
  WRITE( addr, value );
 }
 
-#ifndef NES_CPU_GLUE_ONLY
+ // status flags
+
+enum {
+  st_n = 0x80,
+  st_v = 0x40,
+  st_r = 0x20,
+  st_b = 0x10,
+  st_d = 0x08,
+  st_i = 0x04,
+  st_z = 0x02,
+  st_c = 0x01,
+};
 
 static const unsigned char clock_table [256] = {
 //  0 1 2 3 4 5 6 7 8 9 A B C D E F
@@ -149,32 +159,6 @@ Nes_Cpu::result_t Nes_Cpu::run( nes_time_t end )
  int x = r.x;
  int y = r.y;
 
- // status flags
-
- int const st_n = 0x80;
- int const st_v = 0x40;
- int const st_r = 0x20;
- int const st_b = 0x10;
- int const st_d = 0x08;
- int const st_i = 0x04;
- int const st_z = 0x02;
- int const st_c = 0x01;
-
- #define IS_NEG (nz & 0x880)
-
- #define CALC_STATUS( out ) do {             \
-  out = status & (st_v | st_d | st_i);    \
-  out |= (c >> 8) & st_c;                 \
-  if ( IS_NEG ) out |= st_n;              \
-  if ( !(nz & 0xFF) ) out |= st_z;        \
- } while ( 0 )
-
- #define SET_STATUS( in ) do {               \
-  status = in & (st_v | st_d | st_i);     \
-  c = in << 8;                            \
-  nz = (in << 4) & 0x800;                 \
-  nz |= ~in & st_z;                       \
- } while ( 0 )
 
  int status;
  int c;  // carry set if (c & 0x100) != 0
@@ -1187,7 +1171,7 @@ imm##op:                                \
 
  // KIL (JAM) [HLT]
  default:
- case 0x02: case 0x12: case 0x22: case 0x32: case 0x42: case 0x52: case 0x62: case 0x72: case 0x92: case 0xB2: case 0xD2: case 0xF2:
+ //case 0x02: case 0x12: case 0x22: case 0x32: case 0x42: case 0x52: case 0x62: case 0x72: case 0x92: case 0xB2: case 0xD2: case 0xF2:
  isCorrectExecution = false;
  goto stop;
 
@@ -1237,4 +1221,3 @@ end:
  return result;
 }
 
-#endif
