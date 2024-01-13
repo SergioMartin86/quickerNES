@@ -91,7 +91,7 @@ double Options::getNum(const std::string &name, double def)
     double result;
     if (!has(name))
         return def;
-    if (sscanf(m_data[name].c_str(), "%f", &result) != 1)
+    if (sscanf(m_data[name].c_str(), "%lf", &result) != 1)
         result = def;
     return result;
 }
