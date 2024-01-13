@@ -65,7 +65,7 @@ case op + 0x18: /* abs,X */             \
  data += x;                          \
 ind##op: {                              \
  HANDLE_PAGE_CROSSING( data );       \
- int temp = data;                    \
+ uint32_t temp = data;                    \
  ADD_PAGE                            \
  if ( temp & 0x100 )                 \
    READ( data - 0x100 );          \
@@ -94,7 +94,7 @@ case op + 0x14: /* abs,Y */             \
 case op + 0x18: /* abs,X */             \
  data += x;                          \
 ind##op: {                              \
- int temp = data;                    \
+ uint32_t temp = data;                    \
  ADD_PAGE                            \
  READ( data - ( temp & 0x100 ) );    \
  goto imm##op;                       \
