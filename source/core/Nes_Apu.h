@@ -1,10 +1,10 @@
+#pragma once
 
 // NES 2A03 APU sound chip emulator
 
 // Nes_Snd_Emu 0.1.7
 
-#ifndef NES_APU_H
-#define NES_APU_H
+#include <cstdint>
 
 typedef long     nes_time_t; // CPU clock cycle count
 typedef unsigned nes_addr_t; // 16-bit memory address
@@ -172,4 +172,3 @@ inline nes_time_t Nes_Dmc::next_read_time() const
 
 inline nes_time_t Nes_Apu::next_dmc_read_time() const { return dmc.next_read_time(); }
 
-#endif

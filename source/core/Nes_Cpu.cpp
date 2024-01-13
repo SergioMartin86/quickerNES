@@ -255,18 +255,19 @@ Nes_Cpu::result_t Nes_Cpu::run( nes_time_t end )
   SET_STATUS( temp );
  }
 
+ uint32_t data;
+ uint8_t const* page;
+ uint8_t opcode;
+
 loop:
 
- uint8_t const* page = code_map [pc >> page_bits];
- uint8_t opcode = page [pc];
- pc++;
-
- if ( clock_count >= clock_limit )
-  goto stop;
+ page = code_map [pc >> page_bits];
+ opcode = page [pc++];
+ data = page [pc];
+ 
+ if ( clock_count >= clock_limit ) [[unlikely]] goto stop;
 
  clock_count += clock_table [opcode];
- unsigned data;
- data = page [pc];
 
  switch ( opcode )
  {
@@ -367,35 +368,6 @@ loop:
   nz = data;
   goto loop;
 
-#if 0
- case 0xA1: // LDA (ind,X)
-  IND_X
-  goto lda_ptr;
-
- case 0xB1: // LDA (ind),Y
-  IND_Y(true,true)
-  goto lda_ptr;
-
- case 0xB9: // LDA abs,Y
-  data += y;
-  goto lda_ind_common;
-
- case 0xBD: // LDA abs,X
-  data += x;
- lda_ind_common: {
-  HANDLE_PAGE_CROSSING( data );
-  int temp = data;
-  ADD_PAGE
-  if ( temp & 0x100 )
-   READ( data - 0x100 );
- }
- lda_ptr:
-  a = nz = READ( data );
-  pc++;
-  goto loop;
-#else
- // optimization of most commonly used memory read instructions
-
  case 0xB9:// LDA abs,Y
   data += y;
   data -= x;
@@ -439,8 +411,6 @@ loop:
   a = nz = READ( data );
   pc++;
   goto loop;
-
-#endif
 
 // Branch
 

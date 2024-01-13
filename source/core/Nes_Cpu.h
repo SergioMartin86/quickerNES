@@ -6,7 +6,7 @@
 #ifndef NES_CPU_H
 #define NES_CPU_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "blargg_common.h"
 
 typedef long     nes_time_t; // clock cycle count
