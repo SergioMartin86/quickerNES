@@ -1,4 +1,4 @@
-Git revision: main:d023e639c3ac3ad84cffba52d5645b81a501c4d4
+Git revision: main:95a95df8e17630200c2f9741786b1abd9159c7a3
 Getting system information
 Architecture:                    x86_64
 CPU op-mode(s):                  32-bit, 64-bit
@@ -52,8 +52,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0xB1413A628D2B1D1B79B4F07B3E70AE83
 [] State Size:              12793 bytes
 [] ********** Running Test **********
-[] Elapsed time:            0.413s
-[] Performance:             38227.178 steps / s
+[] Elapsed time:            0.371s
+[] Performance:             42603.262 steps / s
 [] Final State Hash:        0x1FA0AE49927B0C7485B8A8931F14A57A
 [] Verification Hash:       0x1FA0AE49927B0C7485B8A8931F14A57A (Passed)
 [] -----------------------------------------
@@ -66,8 +66,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0xB1413A628D2B1D1B79B4F07B3E70AE83
 [] State Size:              12793 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.162s
-[] Performance:             33942.159 steps / s
+[] Elapsed time:            1.055s
+[] Performance:             37366.389 steps / s
 [] Final State Hash:        0xCDD173D996245BF7133375B2217A01C
 [] Verification Hash:       0xCDD173D996245BF7133375B2217A01C (Passed)
 ~/quickerNES/tests/games
@@ -82,8 +82,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x3CA9F26CF6511A0694C15C1FF876FCC
 [] State Size:              12807 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.334s
-[] Performance:             27443.872 steps / s
+[] Elapsed time:            1.305s
+[] Performance:             28064.077 steps / s
 [] Final State Hash:        0xB6A66050EB4D7445D6A84A76D7B2BB65
 [] Verification Hash:       0xB6A66050EB4D7445D6A84A76D7B2BB65 (Passed)
 [] -----------------------------------------
@@ -97,7 +97,7 @@ Running Tests sequentially...
 [] State Size:              12807 bytes
 [] ********** Running Test **********
 [] Elapsed time:            1.242s
-[] Performance:             27916.811 steps / s
+[] Performance:             27902.635 steps / s
 [] Final State Hash:        0xDF97F201F54959948D4C4B89C4D220FC
 [] Verification Hash:       0xDF97F201F54959948D4C4B89C4D220FC (Passed)
 ~/quickerNES/tests/games
@@ -112,8 +112,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
 [] State Size:              20993 bytes
 [] ********** Running Test **********
-[] Elapsed time:            7.240s
-[] Performance:             25162.227 steps / s
+[] Elapsed time:            7.480s
+[] Performance:             24355.534 steps / s
 [] Final State Hash:        0xF0F317E40A902D175E6902B49500DF4B
 [] Verification Hash:       0xF0F317E40A902D175E6902B49500DF4B (Passed)
 ~/quickerNES/tests/games
@@ -128,8 +128,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0xB6C7EB1C577108C7C0E045D00EC73DDC
 [] State Size:              12798 bytes
 [] ********** Running Test **********
-[] Elapsed time:            10.556s
-[] Performance:             28096.433 steps / s
+[] Elapsed time:            10.656s
+[] Performance:             27832.552 steps / s
 [] Final State Hash:        0x407AA16502BE4D678916D218B1310132
 [] Verification Hash:       0x407AA16502BE4D678916D218B1310132 (Passed)
 ~/quickerNES/tests/games
@@ -144,8 +144,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
 [] State Size:              20993 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.601s
-[] Performance:             24709.686 steps / s
+[] Elapsed time:            1.318s
+[] Performance:             30011.572 steps / s
 [] Final State Hash:        0x65214803DC4559ABBED8C449F04D4C91
 [] Verification Hash:       0x65214803DC4559ABBED8C449F04D4C91 (Passed)
 [] -----------------------------------------
@@ -158,8 +158,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
 [] State Size:              20993 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.527s
-[] Performance:             24456.475 steps / s
+[] Elapsed time:            1.198s
+[] Performance:             31170.751 steps / s
 [] Final State Hash:        0x9042C9EFA138F36E505AA33BF50436
 [] Verification Hash:       0x9042C9EFA138F36E505AA33BF50436 (Passed)
 ~/quickerNES/tests/games
@@ -174,8 +174,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x7BE2D5D63A0545DF3D44A5881CA69E9D
 [] State Size:              12798 bytes
 [] ********** Running Test **********
-[] Elapsed time:            2.353s
-[] Performance:             36618.048 steps / s
+[] Elapsed time:            2.292s
+[] Performance:             37588.356 steps / s
 [] Final State Hash:        0xFFB8ABEE93CDEA838DB6B69470AC819A
 [] Verification Hash:       0xFFB8ABEE93CDEA838DB6B69470AC819A (Passed)
 ~/quickerNES/tests/games
@@ -190,8 +190,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x43443FDD057BBE517B4CDA12736CAD67
 [] State Size:              12792 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.075s
-[] Performance:             37795.958 steps / s
+[] Elapsed time:            1.008s
+[] Performance:             40292.895 steps / s
 [] Final State Hash:        0x926C1D6B031E5BD739B13B5734C3D500
 [] Verification Hash:       0x926C1D6B031E5BD739B13B5734C3D500 (Passed)
 ~/quickerNES/tests/games
@@ -206,8 +206,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x1F405ED3A13732A3DBEDC4C54A50AC79
 [] State Size:              12792 bytes
 [] ********** Running Test **********
-[] Elapsed time:            0.713s
-[] Performance:             25064.892 steps / s
+[] Elapsed time:            0.737s
+[] Performance:             24225.342 steps / s
 [] Final State Hash:        0xFBB1BE4D99BB17041747DF056C079D57
 [] Verification Hash:       0xFBB1BE4D99BB17041747DF056C079D57 (Passed)
 [] -----------------------------------------
@@ -220,8 +220,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x1F405ED3A13732A3DBEDC4C54A50AC79
 [] State Size:              12792 bytes
 [] ********** Running Test **********
-[] Elapsed time:            2.690s
-[] Performance:             24953.019 steps / s
+[] Elapsed time:            2.803s
+[] Performance:             23939.753 steps / s
 [] Final State Hash:        0xDC3A45216E64D193849B0B248D18E0C3
 [] Verification Hash:       0xDC3A45216E64D193849B0B248D18E0C3 (Passed)
 ~/quickerNES/tests/games
@@ -236,8 +236,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x7CC865ED649238B850937BAE9DCADC5
 [] State Size:              12798 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.406s
-[] Performance:             28927.321 steps / s
+[] Elapsed time:            1.381s
+[] Performance:             29450.401 steps / s
 [] Final State Hash:        0x358165AE6BC7A3EAE0E08D24F9A19BC6
 [] Verification Hash:       0x358165AE6BC7A3EAE0E08D24F9A19BC6 (Passed)
 [] -----------------------------------------
@@ -250,8 +250,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x7CC865ED649238B850937BAE9DCADC5
 [] State Size:              12798 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.327s
-[] Performance:             29464.084 steps / s
+[] Elapsed time:            1.287s
+[] Performance:             30400.721 steps / s
 [] Final State Hash:        0x5527602EE5679B55EC45BA654B704477
 [] Verification Hash:       0x5527602EE5679B55EC45BA654B704477 (Passed)
 ~/quickerNES/tests/games
@@ -266,8 +266,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
 [] State Size:              20993 bytes
 [] ********** Running Test **********
-[] Elapsed time:            0.901s
-[] Performance:             28617.890 steps / s
+[] Elapsed time:            0.895s
+[] Performance:             28805.919 steps / s
 [] Final State Hash:        0xCCB65DF6BED258071A720C5FA2FE4FB9
 [] Verification Hash:       0xCCB65DF6BED258071A720C5FA2FE4FB9 (Passed)
 ~/quickerNES/tests/games
@@ -282,8 +282,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0xA1482537F260939E3E0059719CD723AD
 [] State Size:              12793 bytes
 [] ********** Running Test **********
-[] Elapsed time:            2.328s
-[] Performance:             32959.393 steps / s
+[] Elapsed time:            2.365s
+[] Performance:             32439.480 steps / s
 [] Final State Hash:        0xC988A4BDCB3B44DA54AD97D2F2E0F4AF
 [] Verification Hash:       0xC988A4BDCB3B44DA54AD97D2F2E0F4AF (Passed)
 ~/quickerNES/tests/games
@@ -298,8 +298,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
 [] State Size:              20993 bytes
 [] ********** Running Test **********
-[] Elapsed time:            0.736s
-[] Performance:             35346.699 steps / s
+[] Elapsed time:            0.684s
+[] Performance:             38036.181 steps / s
 [] Final State Hash:        0x3D0ACE9B9D592AE6922354DDC3682BAB
 [] Verification Hash:       0x3D0ACE9B9D592AE6922354DDC3682BAB (Passed)
 ~/quickerNES/tests/games
@@ -314,8 +314,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
 [] State Size:              20993 bytes
 [] ********** Running Test **********
-[] Elapsed time:            1.768s
-[] Performance:             26014.717 steps / s
+[] Elapsed time:            1.780s
+[] Performance:             25838.636 steps / s
 [] Final State Hash:        0x1E08CEBDE3EC56B659D54328D3D9E344
 [] Verification Hash:       0x1E08CEBDE3EC56B659D54328D3D9E344 (Passed)
 ~/quickerNES/tests/games
@@ -330,8 +330,8 @@ Running Tests sequentially...
 [] Initial State Hash:      0x4BB3E8B61F496038D8A01894B8B824F
 [] State Size:              12792 bytes
 [] ********** Running Test **********
-[] Elapsed time:            0.890s
-[] Performance:             33617.789 steps / s
+[] Elapsed time:            0.888s
+[] Performance:             33704.677 steps / s
 [] Final State Hash:        0x4E40A40820C188009A061C5C7FC7DB29
 [] Verification Hash:       0x4E40A40820C188009A061C5C7FC7DB29 (Passed)
 ~/quickerNES/tests/games

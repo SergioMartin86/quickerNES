@@ -37,6 +37,14 @@ Nes_Ppu_Impl::Nes_Ppu_Impl()
 	mmc24_enabled = false;
 	mmc24_latched[0] = 0;
 	mmc24_latched[1] = 0;
+
+	#if !defined(NDEBUG) && !defined(PSP) && !defined(PS2)
+		// verify that unaligned accesses work
+		static unsigned char b  [19] = { 0 };
+		static unsigned char b2 [19] = { 1,2,3,4,0,5,6,7,8,0,9,0,1,2,0,3,4,5,6 };
+		for ( int i = 0; i < 19; i += 5 )
+			*(volatile uint32_t*) &b [i] = *(volatile uint32_t*) &b2 [i];
+	#endif
 }
 
 Nes_Ppu_Impl::~Nes_Ppu_Impl()

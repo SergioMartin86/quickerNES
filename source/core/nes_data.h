@@ -6,10 +6,8 @@
 #ifndef NES_DATA_H
 #define NES_DATA_H
 
-#include "blargg_endian.h"
 #include "blargg_common.h"
 #include "apu_state.h"
-#include <cstring>
 
 typedef long nes_tag_t;
 
@@ -50,13 +48,8 @@ struct nes_block_t
 	uint32_t tag; // ** stored in big-endian
 	uint32_t size;
 	
-	inline void swap()
-	{
-		SWAP_BE( tag );
-		SWAP_LE( size );
-	}
+	void swap();
 };
-
 BOOST_STATIC_ASSERT( sizeof (nes_block_t) == 8 );
 
 unsigned long const group_begin_size = 0xffffffff; // group block has this size
@@ -70,13 +63,8 @@ struct nes_state_t
 	uint32_t frame_count; // number of frames emulated since power-up
 	
 	enum { tag = FOUR_CHAR('TIME') };
-	inline void swap()
-	{
-		SWAP_LE( timestamp );
-		SWAP_LE( frame_count );
-	}
+	void swap();
 };
-
 BOOST_STATIC_ASSERT( sizeof (nes_state_t) == 8 );
 
 struct joypad_state_t
@@ -86,12 +74,7 @@ struct joypad_state_t
 	uint8_t unused [3];
 	
 	enum { tag = FOUR_CHAR('CTRL') };
-	inline void swap()
-	{
-	 SWAP_LE( joypad_latches [0] );
-	 SWAP_LE( joypad_latches [1] );
-  }
-
+	void swap();
 };
 BOOST_STATIC_ASSERT( sizeof (joypad_state_t) == 12 );
 
@@ -106,18 +89,8 @@ struct mapper_state_t
 		uint8_t data [max_mapper_state_size];
 	};
 	
-	inline void write( const void* p, unsigned long s )
-	{
-		size = s;
-		memcpy( data, p, s );
-	}
-
-	inline int read( void* p, unsigned long s ) const
-	{
-		if ( (long) s > size )s = size;
-		memcpy( p, data, s );
-		return s;
-	}
+	void write( const void* p, unsigned long s );
+	int read( void* p, unsigned long s ) const;
 };
 
 struct cpu_state_t
@@ -131,12 +104,8 @@ struct cpu_state_t
 	uint8_t unused [1];
 	
 	enum { tag = FOUR_CHAR('CPUR') };
-	inline void swap()
-	{
-		SWAP_LE( pc );
-	}
+	void swap();
 };
-
 BOOST_STATIC_ASSERT( sizeof (cpu_state_t) == 8 );
 
 struct ppu_state_t
@@ -158,15 +127,8 @@ struct ppu_state_t
 	uint8_t unused2[3];
 	
 	enum { tag = FOUR_CHAR('PPUR') };
-	void swap()
-	{
-		SWAP_LE( vram_addr );
-		SWAP_LE( vram_temp );
-		SWAP_LE( decay_low );
-		SWAP_LE( decay_high );
-	}
+	void swap();
 };
-
 BOOST_STATIC_ASSERT( sizeof (ppu_state_t) == 20 + 0x20 );
 
 struct mmc1_state_t

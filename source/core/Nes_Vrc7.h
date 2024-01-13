@@ -20,7 +20,7 @@ public:
 	void volume( double );
 	void treble_eq( blip_eq_t const& );
 	void output( Blip_Buffer* );
-	static const uint8_t osc_count = 6;
+	enum { osc_count = 6 };
 	void osc_output( int index, Blip_Buffer* );
 	void end_frame( nes_time_t );
 	void save_snapshot(vrc7_snapshot_t*);

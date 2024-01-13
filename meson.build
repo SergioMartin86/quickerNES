@@ -26,6 +26,7 @@ quickerNESCoreSrc = [
  'source/core/Nes_Cpu.cpp', 
  'source/core/Nes_State.cpp', 
  'source/core/emu2413.cpp', 
+ 'source/core/nes_data.cpp', 
  'source/core/nes_util.cpp', 
  'source/core/emu2413_state.cpp', 
  'source/core/Nes_Effects_Buffer.cpp', 
@@ -40,7 +41,7 @@ quickerNESCoreSrc = [
 # quickerNES Core Configuration
 
  quickerNESCoreDependency = declare_dependency(
-  compile_args        : [ '-Wfatal-errors', '-Wall', '-Werror', '-Wno-multichar', '-DBLARGG_NONPORTABLE'],
+  compile_args        : [ '-Wfatal-errors', '-Wall',  '-Wno-multichar'  ],
   include_directories : include_directories(['source', 'source/core', 'extern']),
   sources             : [ quickerNESCoreSrc, 'extern/metrohash128/metrohash128.cpp' ]
  )

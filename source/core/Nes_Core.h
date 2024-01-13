@@ -104,7 +104,6 @@ public: private: friend class Nes_Mapper;
 	void add_mapper_intercept( nes_addr_t start, unsigned size, bool read, bool write );
 	
 public: private: friend class Nes_Cpu;
-
 	int  cpu_read_ppu( nes_addr_t, nes_time_t );
 	int  cpu_read( nes_addr_t, nes_time_t );
 	void cpu_write( nes_addr_t, int data, nes_time_t );

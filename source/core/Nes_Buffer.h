@@ -11,8 +11,8 @@ class Nes_Apu;
 
 class Nes_Nonlinearizer {
 private:
-	static const uint8_t table_bits = 11;
-	static const uint32_t table_size = 1 << table_bits;
+	enum { table_bits = 11 };
+	enum { table_size = 1 << table_bits };
 	int16_t table [table_size];
 	Nes_Apu* apu;
 	long accum;

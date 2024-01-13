@@ -27,8 +27,8 @@ if ( sprite_2 & 0x80 )
 // attributes
 unsigned long offset = (sprite_2 & 3) * 0x04040404 + (this->palette_offset + 0x10101010);
 
-unsigned long const mask    = 0x03030303;
-unsigned long const maskgen = 0x80808080;
+unsigned long const mask    = 0x03030303 + zero;
+unsigned long const maskgen = 0x80808080 + zero;
 
 #define DRAW_PAIR( shift ) {                    \
 	int sprite_count = *scanlines;              \
@@ -48,7 +48,7 @@ unsigned long const maskgen = 0x80808080;
 if ( !(sprite_2 & 0x20) )
 {
 	// front
-	unsigned long const maskgen2 = 0x7f7f7f7f;
+	unsigned long const maskgen2 = 0x7f7f7f7f + zero;
 
 	#define CALC_FOUR( in, line, out )                          \
 		unsigned long out;                                      \
@@ -88,8 +88,8 @@ if ( !(sprite_2 & 0x20) )
 else
 {
 	// behind
-	unsigned long const omask = 0x20202020;
-	unsigned long const bg_or = 0xc3c3c3c3;
+	unsigned long const omask = 0x20202020 + zero;
+	unsigned long const bg_or = 0xc3c3c3c3 + zero;
 
 	#define CALC_FOUR( in, line, out )                      \
 		unsigned long out;                                  \

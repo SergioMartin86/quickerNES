@@ -34,6 +34,9 @@ arithmetic on smaller types. */
 // In case compiler doesn't support these properly. Used rarely.
 #define STATIC_CAST(T,expr) static_cast<T> (expr)
 
+// User configuration can override the above macros if necessary
+#include "blargg_config.h"
+
 // BOOST_STATIC_ASSERT( expr ): Generates compile error if expr is 0.
 #ifndef BOOST_STATIC_ASSERT
 #ifdef _MSC_VER

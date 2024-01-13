@@ -3,9 +3,8 @@
 
 #include "Nes_Ppu_Rendering.h"
 
-#include <algorithm>
-#include <cstring>
-#include <cstddef>
+#include <string.h>
+#include <stddef.h>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -19,6 +18,16 @@ Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 #include "blargg_source.h"
+
+#ifdef BLARGG_ENABLE_OPTIMIZER
+	#include BLARGG_ENABLE_OPTIMIZER
+#endif
+
+#ifdef __MWERKS__
+	static unsigned zero = 0; // helps CodeWarrior optimizer when added to constants
+#else
+	const  unsigned zero = 0; // compile-time constant on other compilers
+#endif
 
 // Nes_Ppu_Impl
 
@@ -178,83 +187,26 @@ void Nes_Ppu_Rendering::draw_background_( int remain )
 		uint8_t* pixels = row_pixels;
 		row_pixels += height * row_bytes;
 		
-		unsigned long const mask = 0x03030303;
-		unsigned long const attrib_factor = 0x04040404;
+		unsigned long const mask = 0x03030303 + zero;
+		unsigned long const attrib_factor = 0x04040404 + zero;
 		
-		const int fine_y = (height == 8) ? 0 : addr >> 12;
-		const int clipped = (height == 8) ? false : true; 
-        addr &= 0x03ff;
-        if (height == 8) height -= fine_y & 1;
-
-		while ( true )
+		if ( height == 8 )
 		{
-			while ( count-- )
-			{
-				int attrib = attr_table [addr >> 2 & 0x07];
-				attrib >>= (addr >> 4 & 4) | (addr & 2);
-				unsigned long offset = (attrib & 3) * attrib_factor + this->palette_offset;
-				
-				// draw one tile
-				cache_t const* lines = this->get_bg_tile( nametable [addr] + bg_bank );
-				uint8_t* p = pixels;
-				addr++;
-				pixels += 8; // next tile
-				
-				if ( !clipped )
-				{
-					// optimal case: no clipping
-					for ( int n = 4; n--; )
-					{
-						unsigned long line = *lines++;
-						((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
-						((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
-						p += row_bytes;
-						((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
-						((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
-						p += row_bytes;
-					}
-				}
-				else
-				{
-					lines += fine_y >> 1;
-					
-					if ( fine_y & 1 )
-					{
-						unsigned long line = *lines++;
-						((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
-						((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
-						p += row_bytes;
-					}
-					
-					for ( int n = height >> 1; n--; )
-					{
-						unsigned long line = *lines++;
-						((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
-						((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
-						p += row_bytes;
-						((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
-						((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
-						p += row_bytes;
-					}
-					
-					if ( height & 1 )
-					{
-						unsigned long line = *lines;
-						((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
-						((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
-					}
-				} 
-			}
-			
-			count = count2;
-			count2 = 0;
-			addr -= 32;
-			attr_table = attr_table - nametable + nametable2;
-			nametable = nametable2;
-			if ( !count )
-				break;
+			// unclipped
+			addr &= 0x03ff;
+			int const fine_y = 0;
+			int const clipped = false;
+			#include "Nes_Ppu_Bg.h"
 		}
-
+		else
+		{
+			// clipped
+			int const fine_y = addr >> 12;
+			addr &= 0x03ff;
+			height -= fine_y & 1;
+			int const clipped = true;
+			#include "Nes_Ppu_Bg.h"
+		}
 	}
 	while ( remain );
 }
@@ -363,7 +315,7 @@ void Nes_Ppu_Rendering::check_sprite_hit( int begin, int end )
 	}
 	
 	// check each line
-	unsigned long const mask = 0x01010101;
+	unsigned long const mask = 0x01010101 + zero;
 	do
 	{
 		// get pixels for line
@@ -500,8 +452,8 @@ void Nes_Ppu_Rendering::draw_background( int start, int count )
 	{
 		// not rendering, but still handle sprite hit using mini graphics buffer
 		int y = spr_ram [0] + 1;
-		int skip = std::min( count, std::max( y - start, 0 ) );
-		int visible = std::min( count - skip, sprite_height() );
+		int skip = min( count, max( y - start, 0 ) );
+		int visible = min( count - skip, sprite_height() );
 		
 		if ( visible > 0 )
 		{
