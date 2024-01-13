@@ -22,18 +22,17 @@ public:
 
 	// Reads min(*n,remain()) bytes and sets *n to this number, thus trying to read more
 	// tham remain() bytes doesn't result in error, just *n being set to remain().
-	const char * read_avail( void* p, int* n );
-	const char * read_avail( void* p, long* n );
+	const char * read_avail( void* p, size_t* n );
 
 	// Reads exactly n bytes, or returns error if they couldn't ALL be read.
 	// Reading past end of file results in blargg_err_file_eof.
-	const char * read( void* p, int n );
+	const char * read( void* p, size_t n );
 
 	// Number of bytes remaining until end of file
-	uint64_t remain() const                              { return remain_; }
+	size_t remain() const  { return remain_; }
 
 	// Reads and discards n bytes. Skipping past end of file results in blargg_err_file_eof.
-	const char * skip( int n );
+	const char * skip( size_t n );
 	
 	virtual ~Data_Reader() { }
 
@@ -47,7 +46,7 @@ protected:
 	Data_Reader()                                   : remain_( 0 ) { }
 	
 	// Sets remain
-	void set_remain( uint64_t n )                        { remain_ = n; }
+	void set_remain( size_t n )                        { remain_ = n; }
 	
 	// Do same as read(). Guaranteed that 0 < n <= remain(). Value of remain() is updated
 	// AFTER this call succeeds, not before. set_remain() should NOT be called from this.

@@ -163,7 +163,7 @@ Nes_Nonlinearizer::Nes_Nonlinearizer()
 	float const gain = 0x7fff * 1.3f;
 	// don't use entire range, so any overflow will stay within table
 	int const range = (int) (table_size * Nes_Apu::nonlinear_tnd_gain());
-	for ( int i = 0; i < table_size; i++ )
+	for (uint32_t i = 0; i < table_size; i++ )
 	{
 		int const offset = table_size - range;
 		int j = i - offset;

@@ -60,7 +60,7 @@ private:
 	} oscs [osc_count];
 	blip_time_t last_time;
 	
-	enum { amp_range = 192 }; // can be any value; this gives best error/quality tradeoff
+	static const uint8_t amp_range = 192; // can be any value; this gives best error/quality tradeoff
 	Blip_Synth<blip_good_quality,1> synth;
 	
 	void run_until( blip_time_t );

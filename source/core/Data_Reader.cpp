@@ -20,7 +20,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 // Data_Reader
 
-const char * Data_Reader::read( void* p, int n )
+const char * Data_Reader::read( void* p, size_t n )
 {
 	if ( n < 0 )
 		return "Internal usage bug";
@@ -38,13 +38,10 @@ const char * Data_Reader::read( void* p, int n )
 	return err;
 }
 
-const char * Data_Reader::read_avail( void* p, int* n_ )
+const char * Data_Reader::read_avail( void* p, size_t* n_ )
 {
 	int n = min( (uint64_t)(*n_), remain() );
 	*n_ = 0;
-	
-	if ( n < 0 )
-		return "Internal usage bug";
 	
 	if ( n <= 0 )
 		return 0;
@@ -56,14 +53,6 @@ const char * Data_Reader::read_avail( void* p, int* n_ )
 		*n_ = n;
 	}
 	
-	return err;
-}
-
-const char * Data_Reader::read_avail( void* p, long* n )
-{
-	int i = STATIC_CAST(int, *n);
-	const char * err = read_avail( p, &i );
-	*n = i;
 	return err;
 }
 
@@ -79,11 +68,8 @@ const char * Data_Reader::skip_v( int count )
 	return 0;
 }
 
-const char * Data_Reader::skip( int n )
+const char * Data_Reader::skip( size_t n )
 {
-	if ( n < 0 )
-		return "Internal usage bug";
-	
 	if ( n <= 0 )
 		return 0;
 	

@@ -1,8 +1,6 @@
 
 #include "abstract_file.h"
 
-#include "blargg_config.h"
-
 #include <string.h>
 #include <stdlib.h>
 

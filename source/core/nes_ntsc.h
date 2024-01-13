@@ -111,6 +111,7 @@ typedef unsigned long nes_ntsc_rgb_t;
 struct nes_ntsc_t {
 	nes_ntsc_rgb_t table [nes_ntsc_palette_size] [nes_ntsc_entry_size];
 };
+
 enum { nes_ntsc_burst_size = nes_ntsc_entry_size / nes_ntsc_burst_count };
 
 #define NES_NTSC_ENTRY_( ktable, n ) \
