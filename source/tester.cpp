@@ -57,8 +57,11 @@ int main(int argc, char *argv[])
   // Creating emulator instance
   auto e = EmuInstance(romFilePath, initialStateFilePath);
   
+  // Disable rendering
+  e.getInternalEmulator()->disableRendering();
+
+  // Getting initial hash
   auto initialHash = e.getStateHash();
-  printf("[] Initial State Hash:        0x%lX%lX\n", initialHash.first, initialHash.second);
 
   // Getting state size
   const auto stateSize = e.getStateSize();
@@ -98,6 +101,7 @@ int main(int argc, char *argv[])
   printf("[] Verification State File: '%s'\n", verificationStateFilePath.c_str());
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
+  printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
   printf("[] State Size:              %lu bytes\n", stateSize);
   printf("[] Running Test...\n");
   

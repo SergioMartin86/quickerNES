@@ -41,7 +41,10 @@ public:
 	enum { image_height  = 240 };
 
     const uint8_t* getHostPixels () const { return emu.ppu.host_pixels; }
-  
+    
+    void enableRendering() { emu._doRendering = true; }
+	void disableRendering() { emu._doRendering = false; }
+ 
 // Basic emulation
 
 	// Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image

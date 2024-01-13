@@ -20,6 +20,9 @@ public:
 	Nes_Core();
 	~Nes_Core();
 	
+	// Flag to enable/disable rendering
+	bool _doRendering;
+
 	const char * init();
 	const char * open( Nes_Cart const* );
 	void reset( bool full_reset = true, bool erase_battery_ram = false );

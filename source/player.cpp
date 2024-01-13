@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
   // Printing provided parameters
   printw("[] Rom File Path:      '%s'\n", romFilePath.c_str());
   printw("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
+  printw("[] Sequence Length:    %lu\n", sequence.size());
   printw("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
   printw("[] Generating Sequence...\n");
 

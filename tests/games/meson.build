@@ -1,5 +1,6 @@
 nomalloc = environment({'MALLOC_PERTURB_': '0'})
 
+subdir('arkanoid')
 subdir('castlevania1')
 subdir('superOffroad')
 subdir('princeOfPersia')
@@ -8,3 +9,4 @@ subdir('ninjaGaiden2')
 subdir('ironSword')
 subdir('solarJetman')
 subdir('tennis')
+subdir('nigelMansell')
