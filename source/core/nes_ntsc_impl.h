@@ -44,9 +44,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 #define rgb_unit            (1 << rgb_bits)
 #define rgb_offset          (rgb_unit * 2 + 0.5f)
 
-enum { burst_size  = nes_ntsc_entry_size / burst_count };
-enum { kernel_half = 16 };
-enum { kernel_size = kernel_half * 2 + 1 };
+const static uint16_t burst_size  = nes_ntsc_entry_size / burst_count;
+const static uint8_t kernel_half = 16;
+const static uint8_t kernel_size = kernel_half * 2 + 1;
 
 typedef struct init_t
 {
@@ -284,8 +284,8 @@ static void init( init_t* impl, nes_ntsc_setup_t const* setup )
 
 #define PACK_RGB( r, g, b ) ((r) << 21 | (g) << 11 | (b) << 1)
 
-enum { rgb_kernel_size = burst_size / alignment_count };
-enum { rgb_bias = rgb_unit * 2 * nes_ntsc_rgb_builder };
+const static uint16_t rgb_kernel_size = burst_size / alignment_count;
+const static uint32_t rgb_bias = rgb_unit * 2 * nes_ntsc_rgb_builder;
 
 typedef struct pixel_info_t
 {

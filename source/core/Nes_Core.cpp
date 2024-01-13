@@ -1,9 +1,9 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
+#include <algorithm>
+#include <cstring>
 #include "Nes_Core.h"
-
-#include <string.h>
 #include "Nes_Mapper.h"
 #include "Nes_State.h"
 
@@ -167,7 +167,7 @@ void Nes_Core::load_state( Nes_State_ const& in )
 	if ( in.sram_size )
 	{
 		sram_present = true;
-		memcpy( impl->sram, in.sram, min( (int) in.sram_size, (int) sizeof impl->sram ) );
+		memcpy( impl->sram, in.sram, std::min( (int) in.sram_size, (int) sizeof impl->sram ) );
 		enable_sram( true ); // mapper can override (read-only, unmapped, etc.)
 	}
 	
@@ -370,7 +370,7 @@ void Nes_Core::vector_interrupt( nes_addr_t vector )
 
 inline nes_time_t Nes_Core::earliest_irq( nes_time_t present )
 {
-	return min( impl->apu.earliest_irq( present ), mapper->next_irq( present ) );
+	return std::min( impl->apu.earliest_irq( present ), mapper->next_irq( present ) );
 }
 
 void Nes_Core::irq_changed()
@@ -395,13 +395,13 @@ inline nes_time_t Nes_Core::earliest_event( nes_time_t present )
 	
 	// DMC
 	if ( wait_states_enabled )
-		t = min( t, impl->apu.next_dmc_read_time() + 1 );
+		t = std::min( t, impl->apu.next_dmc_read_time() + 1 );
 	
 	// NMI
-	t = min( t, ppu.nmi_time() );
+	t = std::min( t, ppu.nmi_time() );
 	
 	if ( single_instruction_mode )
-		t = min( t, present + 1 );
+		t = std::min( t, present + 1 );
 	
 	return t;
 }

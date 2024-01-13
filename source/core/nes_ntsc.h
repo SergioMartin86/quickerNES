@@ -5,6 +5,7 @@
 #define NES_NTSC_H
 
 #include "nes_ntsc_config.h"
+#include <cstdint>
 
 #ifdef __cplusplus
 	extern "C" {
@@ -46,9 +47,9 @@ extern nes_ntsc_setup_t const nes_ntsc_rgb;       /* crisp image */
 extern nes_ntsc_setup_t const nes_ntsc_monochrome;/* desaturated + artifacts */
 
 #ifdef NES_NTSC_EMPHASIS
-	enum { nes_ntsc_palette_size = 64 * 8 };
+	static const uint16_t nes_ntsc_palette_size = 64 * 8;
 #else
-	enum { nes_ntsc_palette_size = 64 };
+	static const uint16_t { nes_ntsc_palette_size = 64 };
 #endif
 
 /* Initializes and adjusts parameters. Can be called multiple times on the same
@@ -79,10 +80,10 @@ value. */
 
 /* Interface for user-defined custom blitters */
 
-enum { nes_ntsc_in_chunk    = 3  }; /* number of input pixels read per chunk */
-enum { nes_ntsc_out_chunk   = 7  }; /* number of output pixels generated per chunk */
-enum { nes_ntsc_black       = 15 }; /* palette index for black */
-enum { nes_ntsc_burst_count = 3  }; /* burst phase cycles through 0, 1, and 2 */
+const static uint8_t nes_ntsc_in_chunk    = 3; /* number of input pixels read per chunk */
+const static uint8_t nes_ntsc_out_chunk   = 7 ; /* number of output pixels generated per chunk */
+const static uint8_t nes_ntsc_black       = 15; /* palette index for black */
+const static uint8_t nes_ntsc_burst_count = 3 ; /* burst phase cycles through 0, 1, and 2 */
 
 /* Begins outputting row and starts three pixels. First pixel will be cut off a bit.
 Use nes_ntsc_black for unused pixels. Declares variables, so must be before first
@@ -106,13 +107,13 @@ statement in a block (unless you're using C++). */
 
 
 /* private */
-enum { nes_ntsc_entry_size = 128 };
+const static uint8_t nes_ntsc_entry_size = 128;
 typedef unsigned long nes_ntsc_rgb_t;
 struct nes_ntsc_t {
 	nes_ntsc_rgb_t table [nes_ntsc_palette_size] [nes_ntsc_entry_size];
 };
 
-enum { nes_ntsc_burst_size = nes_ntsc_entry_size / nes_ntsc_burst_count };
+const static uint8_t nes_ntsc_burst_size = nes_ntsc_entry_size / nes_ntsc_burst_count;
 
 #define NES_NTSC_ENTRY_( ktable, n ) \
 	(nes_ntsc_rgb_t const*) (ktable + (n) * (nes_ntsc_entry_size * sizeof (nes_ntsc_rgb_t)))
@@ -123,18 +124,18 @@ enum { nes_ntsc_burst_size = nes_ntsc_entry_size / nes_ntsc_burst_count };
 #define NES_NTSC_RGB15_OUT( x, out ) NES_NTSC_RGB_OUT( x, out, 15 )
 #define NES_NTSC_RAW_OUT( x, out )   NES_NTSC_RGB_OUT( x, out,  0 )
 
-enum { nes_ntsc_min_in_width  = 256 };
-enum { nes_ntsc_min_out_width = NES_NTSC_OUT_WIDTH( nes_ntsc_min_in_width ) };
+const static uint16_t nes_ntsc_min_in_width  = 256;
+const static uint16_t nes_ntsc_min_out_width = NES_NTSC_OUT_WIDTH( nes_ntsc_min_in_width );
 
-enum { nes_ntsc_640_in_width  = 271 };
-enum { nes_ntsc_640_out_width = NES_NTSC_OUT_WIDTH( nes_ntsc_640_in_width ) };
-enum { nes_ntsc_640_overscan_left  = 8 };
-enum { nes_ntsc_640_overscan_right = nes_ntsc_640_in_width - 256 - nes_ntsc_640_overscan_left };
+const static uint16_t nes_ntsc_640_in_width  = 271;
+const static uint16_t nes_ntsc_640_out_width = NES_NTSC_OUT_WIDTH( nes_ntsc_640_in_width );
+const static uint16_t nes_ntsc_640_overscan_left  = 8;
+const static uint16_t nes_ntsc_640_overscan_right = nes_ntsc_640_in_width - 256 - nes_ntsc_640_overscan_left;
 
-enum { nes_ntsc_full_in_width  = 283 };
-enum { nes_ntsc_full_out_width = NES_NTSC_OUT_WIDTH( nes_ntsc_full_in_width ) };
-enum { nes_ntsc_full_overscan_left  = 16 };
-enum { nes_ntsc_full_overscan_right = nes_ntsc_full_in_width - 256 - nes_ntsc_full_overscan_left };
+const static uint16_t nes_ntsc_full_in_width  = 283;
+const static uint16_t nes_ntsc_full_out_width = NES_NTSC_OUT_WIDTH( nes_ntsc_full_in_width );
+const static uint16_t nes_ntsc_full_overscan_left  = 16;
+const static uint16_t nes_ntsc_full_overscan_right = nes_ntsc_full_in_width - 256 - nes_ntsc_full_overscan_left;
 
 /* common 3->7 ntsc macros */
 #define NES_NTSC_BEGIN_ROW_6_( pixel0, pixel1, pixel2, ENTRY, table ) \

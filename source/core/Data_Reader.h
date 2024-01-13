@@ -4,8 +4,10 @@
 #ifndef DATA_READER_H
 #define DATA_READER_H
 
-#include <stdint.h>
+#include <algorithm>
+#include <cstdint>
 #include "blargg_common.h"
+#include "blargg_source.h"
 
 /* Some functions accept a long instead of int for convenience where caller has
 a long due to some other interface, and would otherwise have to get a warning,
@@ -22,7 +24,23 @@ public:
 
 	// Reads min(*n,remain()) bytes and sets *n to this number, thus trying to read more
 	// tham remain() bytes doesn't result in error, just *n being set to remain().
-	const char * read_avail( void* p, size_t* n );
+	const char * read_avail( void* p, size_t* count )
+	{
+		int n = std::min(*count, remain());
+		*count = 0;
+		
+		if ( n <= 0 )
+			return 0;
+		
+		const char * err = read_v( p, n );
+		if ( !err )
+		{
+			remain_ -= n;
+			*count = n;
+		}
+		
+		return err;
+	}
 
 	// Reads exactly n bytes, or returns error if they couldn't ALL be read.
 	// Reading past end of file results in blargg_err_file_eof.

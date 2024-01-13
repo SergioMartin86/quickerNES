@@ -3,9 +3,9 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
+#include <algorithm>
+#include <cstring>
 #include "Nes_Ppu.h"
-
-#include <string.h>
 #include "Nes_State.h"
 #include "Nes_Mapper.h"
 #include "Nes_Core.h"
@@ -272,7 +272,7 @@ void Nes_Ppu::update_sprite_hit( nes_time_t cpu_time )
 	if ( count_needed > 240 )
 		count_needed = 240;
 	while ( scanline_count < count_needed )
-		render_bg_until( max( cpu_time, next_bg_time + 1 ) );
+		render_bg_until( std::max( cpu_time, next_bg_time + 1 ) );
 	
 	if ( sprite_hit_found < 0 )
 		return; // sprite won't hit

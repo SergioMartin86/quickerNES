@@ -3,8 +3,9 @@
 
 #include "Nes_Ppu_Rendering.h"
 
-#include <string.h>
-#include <stddef.h>
+#include <algorithm>
+#include <cstring>
+#include <cstddef>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -509,8 +510,8 @@ void Nes_Ppu_Rendering::draw_background( int start, int count )
 	{
 		// not rendering, but still handle sprite hit using mini graphics buffer
 		int y = spr_ram [0] + 1;
-		int skip = min( count, max( y - start, 0 ) );
-		int visible = min( count - skip, sprite_height() );
+		int skip = std::min( count, std::max( y - start, 0 ) );
+		int visible = std::min( count - skip, sprite_height() );
 		
 		if ( visible > 0 )
 		{

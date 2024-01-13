@@ -19,9 +19,9 @@ public:
 	
 	// Map code memory (memory accessed via the program counter). Start and size
 	// must be multiple of page_size.
-	enum { page_bits = 11 };
-	enum { page_count = 0x10000 >> page_bits };
-	enum { page_size = 1L << page_bits };
+	static const uint8_t page_bits = 11;
+	static const uint16_t page_count = 0x10000 >> page_bits;
+	static const uint16_t page_size = 1L << page_bits;
 	void map_code( nes_addr_t start, unsigned size, void const* code );
 	
 	// Access memory as the emulated CPU does.
@@ -60,10 +60,10 @@ public:
 	unsigned long error_count() const   { return error_count_; }
 	
 	// If PC exceeds 0xFFFF and encounters page_wrap_opcode, it will be silently wrapped.
-	enum { page_wrap_opcode = 0xF2 };
+	static const uint8_t page_wrap_opcode = 0xF2;
 	
 	// One of the many opcodes that are undefined and stop CPU emulation.
-	enum { bad_opcode = 0xD2 };
+	static const uint8_t bad_opcode = 0xD2;
 	
 	uint8_t const* code_map [page_count + 1];
 	nes_time_t clock_limit;
@@ -72,7 +72,7 @@ public:
 	nes_time_t end_time_;
 	unsigned long error_count_;
 	
-	enum { irq_inhibit = 0x04 };
+	static const uint8_t irq_inhibit = 0x04;
 	void set_code_page( int, uint8_t const* );
 	void update_clock_limit();
 	

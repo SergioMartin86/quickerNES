@@ -62,7 +62,7 @@ public:
 	struct frame_t
 	{
 		static const uint8_t left = 8;
-		
+
 		int joypad_read_count;  // number of times joypads were strobed (read)
 		int burst_phase;        // NTSC burst phase for frame (0, 1, or 2)
 
@@ -162,10 +162,10 @@ public:
 // Graphics
 
 	// Number of frames generated per second
-	enum { frame_rate = 60 };
+	static const uint16_t frame_rate = 60;
 
 	// Size of fixed NES color table (including the 8 color emphasis modes)
-	enum { color_table_size = 8 * 64 };
+	static const uint16_t color_table_size = 8 * 64;
 
 	// NES color lookup table based on standard NTSC TV decoder. Use nes_ntsc.h to
 	// generate a palette with custom parameters.
@@ -183,7 +183,7 @@ public:
 	// Set range of host palette entries to use in graphics buffer; default uses
 	// all of them. Begin will be rounded up to next multiple of palette_alignment.
 	// Use frame().palette_begin to find the adjusted beginning entry used.
-	enum { palette_alignment = 64 };
+	static const uint8_t palette_alignment = 64;
 	void set_palette_range( int begin, int end = 256 );
 
 // Access to emulated memory, for viewer/cheater/debugger
@@ -198,11 +198,11 @@ public:
 	long nametable_size() const { return 0x1000; }
 
 	// Built-in 2K memory
-	enum { low_mem_size = 0x800 };
+	static const uint16_t low_mem_size = 0x800;
 	uint8_t* low_mem()             { return emu.low_mem; }
 
 	// Optional 8K memory
-	enum { high_mem_size = 0x2000 };
+	static const uint16_t high_mem_size = 0x2000;
 	uint8_t* high_mem()            { return emu.impl->sram; }
 
 	// End of public interface

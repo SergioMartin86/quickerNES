@@ -1,14 +1,6 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/nes-emu/
 
-// TODO: remove
-#if !defined (NDEBUG) && 0
- #pragma peephole on
- #pragma global_optimizer on
- #pragma optimization_level 4
- #pragma scheduling 604
- #undef BLARGG_ENABLE_OPTIMIZER
-#endif
 
 #include "Nes_Cpu.h"
 
@@ -31,10 +23,6 @@ Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 #include "blargg_source.h"
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
- #include BLARGG_ENABLE_OPTIMIZER
-#endif
 
 inline void Nes_Cpu::set_code_page( int i, uint8_t const* p )
 {

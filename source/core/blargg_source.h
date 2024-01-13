@@ -32,9 +32,4 @@ otherwise continues normally. */
 			return "Out of memory";\
 	} while ( 0 )
 
-/* The usual min/max functions for built-in types. */
-
-template<typename T> T min( T x, T y ) { return x < y ? x : y; }
-template<typename T> T max( T x, T y ) { return x > y ? x : y; }
-
 #endif
