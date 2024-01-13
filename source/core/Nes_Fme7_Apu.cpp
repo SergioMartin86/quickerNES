@@ -31,7 +31,7 @@ void Nes_Fme7_Apu::reset()
 
 unsigned char Nes_Fme7_Apu::amp_table [16] =
 {
-	#define ENTRY( n ) (unsigned char) (n * amp_range + 0.5)
+	#define ENTRY( n ) (unsigned char) (n * +amp_range + 0.5)
 	ENTRY(0.0000), ENTRY(0.0078), ENTRY(0.0110), ENTRY(0.0156),
 	ENTRY(0.0221), ENTRY(0.0312), ENTRY(0.0441), ENTRY(0.0624),
 	ENTRY(0.0883), ENTRY(0.1249), ENTRY(0.1766), ENTRY(0.2498),

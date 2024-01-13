@@ -82,7 +82,7 @@ inline uint8_t& Nes_Namco_Apu::access()
 	return reg [addr];
 }
 
-inline void Nes_Namco_Apu::volume( double v ) { synth.volume( 0.10 / osc_count * v ); }
+inline void Nes_Namco_Apu::volume( double v ) { synth.volume( 0.10 / +osc_count * v ); }
 
 inline void Nes_Namco_Apu::treble_eq( const blip_eq_t& eq ) { synth.treble_eq( eq ); }
 

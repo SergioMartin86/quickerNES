@@ -20,14 +20,16 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 // Data_Reader
 
-const char * Data_Reader::read( void* p, int n )
+const char * Data_Reader::read( void* p, int n_ )
 {
-	if ( n < 0 )
+	if ( n_ < 0 )
 		return "Internal usage bug";
 	
-	if ( n <= 0 )
+	if ( n_ == 0 )
 		return 0;
-	
+
+  size_t n = n_;	
+
 	if ( n > remain() )
 		return "Truncated file";
 	
@@ -79,13 +81,14 @@ const char * Data_Reader::skip_v( int count )
 	return 0;
 }
 
-const char * Data_Reader::skip( int n )
+const char * Data_Reader::skip( int n_ )
 {
-	if ( n < 0 )
+	if ( n_ < 0 )
 		return "Internal usage bug";
 	
-	if ( n <= 0 )
-		return 0;
+	if ( n_ == 0 )	return 0;
+
+	size_t n = n_;	
 	
 	if ( n > remain() )
 		return "Truncated file";
