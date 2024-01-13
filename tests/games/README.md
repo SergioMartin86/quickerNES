@@ -1,0 +1,1 @@
+Some of the sequences hosted in this folder correspond to movies published in tasvideos.org under the Creative Commons 2.0 license. These movies were created by the author of this code (Sergio Martin, a.k.a. eien86), unless stated otherwise.
