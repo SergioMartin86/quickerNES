@@ -21,7 +21,100 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
+// Macros
+
+#define GET_OPERAND( addr )   page [addr]
+#define GET_OPERAND16( addr ) GET_LE16( &page [addr] )
+
+#define ADD_PAGE        (pc++, data += 0x100 * GET_OPERAND( pc ));
+#define GET_ADDR()      GET_OPERAND16( pc )
+
+#define HANDLE_PAGE_CROSSING( lsb ) clock_count += (lsb) >> 8;
+
+#define INC_DEC_XY( reg, n ) reg = uint8_t (nz = reg + n); goto loop;
+
+#define IND_Y(r,c) {                                            \
+  int temp = READ_LOW( data ) + y;                        \
+  data = temp + 0x100 * READ_LOW( uint8_t (data + 1) );   \
+  if (c) HANDLE_PAGE_CROSSING( temp );                    \
+  if (!(r) || (temp & 0x100))                             \
+   READ( data - ( temp & 0x100 ) );                    \
+ }
+
+#define IND_X {                                                 \
+  int temp = data + x;                                    \
+  data = 0x100 * READ_LOW( uint8_t (temp + 1) ) + READ_LOW( uint8_t (temp) ); \
+ }
+
+#define ARITH_ADDR_MODES( op )          \
+case op - 0x04: /* (ind,x) */           \
+ IND_X                               \
+ goto ptr##op;                       \
+case op + 0x0C: /* (ind),y */           \
+ IND_Y(true,true)                    \
+ goto ptr##op;                       \
+case op + 0x10: /* zp,X */              \
+ data = uint8_t (data + x);          \
+case op + 0x00: /* zp */                \
+ data = READ_LOW( data );            \
+ goto imm##op;                       \
+case op + 0x14: /* abs,Y */             \
+ data += y;                          \
+ goto ind##op;                       \
+case op + 0x18: /* abs,X */             \
+ data += x;                          \
+ind##op: {                              \
+ HANDLE_PAGE_CROSSING( data );       \
+ int temp = data;                    \
+ ADD_PAGE                            \
+ if ( temp & 0x100 )                 \
+   READ( data - 0x100 );          \
+ goto ptr##op;                       \
+}                                       \
+case op + 0x08: /* abs */               \
+ ADD_PAGE                            \
+ptr##op:                                \
+ data = READ( data );                \
+case op + 0x04: /* imm */               \
+imm##op:                                \
+
+#define ARITH_ADDR_MODES_PTR( op )      \
+case op - 0x04: /* (ind,x) */           \
+ IND_X                               \
+ goto imm##op;                       \
+case op + 0x0C:                         \
+ IND_Y(false,false)                  \
+ goto imm##op;                       \
+case op + 0x10: /* zp,X */              \
+ data = uint8_t (data + x);          \
+ goto imm##op;                       \
+case op + 0x14: /* abs,Y */             \
+ data += y;                          \
+ goto ind##op;                       \
+case op + 0x18: /* abs,X */             \
+ data += x;                          \
+ind##op: {                              \
+ int temp = data;                    \
+ ADD_PAGE                            \
+ READ( data - ( temp & 0x100 ) );    \
+ goto imm##op;                       \
+}                                       \
+case op + 0x08: /* abs */               \
+ ADD_PAGE                            \
+case op + 0x00: /* zp */                \
+imm##op:                                \
+
+#define BRANCH( cond )      \
+{                           \
+ pc++;                   \
+ int offset = (int8_t) data;  \
+ int extra_clock = (pc & 0xFF) + offset; \
+ if ( !(cond) ) goto dec_clock_loop; \
+ pc += offset;       \
+ pc = uint16_t( pc ); \
+ clock_count += (extra_clock >> 8) & 1;  \
+ goto loop;          \
+}
 
 inline void Nes_Cpu::set_code_page( int i, uint8_t const* p )
 {
@@ -118,7 +211,7 @@ enum {
   st_c = 0x01,
 };
 
-static const unsigned char clock_table [256] = {
+constexpr uint8_t clock_table [256] = {
 //  0 1 2 3 4 5 6 7 8 9 A B C D E F
  7,6,2,8,3,3,5,5,3,2,2,2,4,4,6,6,// 0
  3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 1
@@ -174,7 +267,7 @@ dec_clock_loop:
 loop:
 
  uint8_t const* page = code_map [pc >> page_bits];
- unsigned opcode = page [pc];
+ uint8_t opcode = page [pc];
  pc++;
 
  if ( clock_count >= clock_limit )
@@ -186,104 +279,6 @@ loop:
 
  switch ( opcode )
  {
-
-// Macros
-
-#define GET_OPERAND( addr )   page [addr]
-#define GET_OPERAND16( addr ) GET_LE16( &page [addr] )
-
-//#define GET_OPERAND( addr )   READ_PROG( addr )
-//#define GET_OPERAND16( addr ) READ_PROG16( addr )
-
-#define ADD_PAGE        (pc++, data += 0x100 * GET_OPERAND( pc ));
-#define GET_ADDR()      GET_OPERAND16( pc )
-
-#define HANDLE_PAGE_CROSSING( lsb ) clock_count += (lsb) >> 8;
-
-#define INC_DEC_XY( reg, n ) reg = uint8_t (nz = reg + n); goto loop;
-
-#define IND_Y(r,c) {                                            \
-  int temp = READ_LOW( data ) + y;                        \
-  data = temp + 0x100 * READ_LOW( uint8_t (data + 1) );   \
-  if (c) HANDLE_PAGE_CROSSING( temp );                    \
-  if (!(r) || (temp & 0x100))                             \
-   READ( data - ( temp & 0x100 ) );                    \
- }
-
-#define IND_X {                                                 \
-  int temp = data + x;                                    \
-  data = 0x100 * READ_LOW( uint8_t (temp + 1) ) + READ_LOW( uint8_t (temp) ); \
- }
-
-#define ARITH_ADDR_MODES( op )          \
-case op - 0x04: /* (ind,x) */           \
- IND_X                               \
- goto ptr##op;                       \
-case op + 0x0C: /* (ind),y */           \
- IND_Y(true,true)                    \
- goto ptr##op;                       \
-case op + 0x10: /* zp,X */              \
- data = uint8_t (data + x);          \
-case op + 0x00: /* zp */                \
- data = READ_LOW( data );            \
- goto imm##op;                       \
-case op + 0x14: /* abs,Y */             \
- data += y;                          \
- goto ind##op;                       \
-case op + 0x18: /* abs,X */             \
- data += x;                          \
-ind##op: {                              \
- HANDLE_PAGE_CROSSING( data );       \
- int temp = data;                    \
- ADD_PAGE                            \
- if ( temp & 0x100 )                 \
-   READ( data - 0x100 );          \
- goto ptr##op;                       \
-}                                       \
-case op + 0x08: /* abs */               \
- ADD_PAGE                            \
-ptr##op:                                \
- data = READ( data );                \
-case op + 0x04: /* imm */               \
-imm##op:                                \
-
-#define ARITH_ADDR_MODES_PTR( op )      \
-case op - 0x04: /* (ind,x) */           \
- IND_X                               \
- goto imm##op;                       \
-case op + 0x0C:                         \
- IND_Y(false,false)                  \
- goto imm##op;                       \
-case op + 0x10: /* zp,X */              \
- data = uint8_t (data + x);          \
- goto imm##op;                       \
-case op + 0x14: /* abs,Y */             \
- data += y;                          \
- goto ind##op;                       \
-case op + 0x18: /* abs,X */             \
- data += x;                          \
-ind##op: {                              \
- int temp = data;                    \
- ADD_PAGE                            \
- READ( data - ( temp & 0x100 ) );    \
- goto imm##op;                       \
-}                                       \
-case op + 0x08: /* abs */               \
- ADD_PAGE                            \
-case op + 0x00: /* zp */                \
-imm##op:                                \
-
-#define BRANCH( cond )      \
-{                           \
- pc++;                   \
- int offset = (int8_t) data;  \
- int extra_clock = (pc & 0xFF) + offset; \
- if ( !(cond) ) goto dec_clock_loop; \
- pc += offset;       \
- pc = uint16_t( pc ); \
- clock_count += (extra_clock >> 8) & 1;  \
- goto loop;          \
-}
 
 // Often-Used
 

@@ -190,23 +190,80 @@ void Nes_Ppu_Rendering::draw_background_( int remain )
 		unsigned long const mask = 0x03030303 + zero;
 		unsigned long const attrib_factor = 0x04040404 + zero;
 		
-		if ( height == 8 )
+		const int fine_y = (height == 8) ? 0 : addr >> 12;
+		const int clipped = (height == 8) ? false : true; 
+        addr &= 0x03ff;
+        if (height == 8) height -= fine_y & 1;
+
+		while ( true )
+	{
+		while ( count-- )
 		{
-			// unclipped
-			addr &= 0x03ff;
-			int const fine_y = 0;
-			int const clipped = false;
-			#include "Nes_Ppu_Bg.h"
+			int attrib = attr_table [addr >> 2 & 0x07];
+			attrib >>= (addr >> 4 & 4) | (addr & 2);
+			unsigned long offset = (attrib & 3) * attrib_factor + this->palette_offset;
+			
+			// draw one tile
+			cache_t const* lines = this->get_bg_tile( nametable [addr] + bg_bank );
+			uint8_t* p = pixels;
+			addr++;
+			pixels += 8; // next tile
+			
+			if ( !clipped )
+			{
+				// optimal case: no clipping
+				for ( int n = 4; n--; )
+				{
+					unsigned long line = *lines++;
+					((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
+					((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
+					p += row_bytes;
+					((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
+					((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
+					p += row_bytes;
+				}
+			}
+			else
+			{
+				lines += fine_y >> 1;
+				
+				if ( fine_y & 1 )
+				{
+					unsigned long line = *lines++;
+					((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
+					((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
+					p += row_bytes;
+				}
+				
+				for ( int n = height >> 1; n--; )
+				{
+					unsigned long line = *lines++;
+					((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
+					((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
+					p += row_bytes;
+					((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
+					((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
+					p += row_bytes;
+				}
+				
+				if ( height & 1 )
+				{
+					unsigned long line = *lines;
+					((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
+					((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
+				}
+			} 
 		}
-		else
-		{
-			// clipped
-			int const fine_y = addr >> 12;
-			addr &= 0x03ff;
-			height -= fine_y & 1;
-			int const clipped = true;
-			#include "Nes_Ppu_Bg.h"
-		}
+		
+		count = count2;
+		count2 = 0;
+		addr -= 32;
+		attr_table = attr_table - nametable + nametable2;
+		nametable = nametable2;
+		if ( !count )
+			break;
+	}
+
 	}
 	while ( remain );
 }
