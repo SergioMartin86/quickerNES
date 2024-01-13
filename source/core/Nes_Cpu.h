@@ -34,7 +34,7 @@ public:
 	
 	// NES 6502 registers. *Not* kept updated during a call to run().
 	struct registers_t {
-		long pc; // more than 16 bits to allow overflow detection
+		uint16_t pc; // Should be more than 16 bits to allow overflow detection -- but I (eien86) removed it to maximize performance.
 		uint8_t a;
 		uint8_t x;
 		uint8_t y;
