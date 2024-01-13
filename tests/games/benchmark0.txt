@@ -1,0 +1,337 @@
+Git revision: main:df999066a35ed6a2c70dee4ce16a8644ad0b6fa4
+Getting system information
+Architecture:                    x86_64
+CPU op-mode(s):                  32-bit, 64-bit
+Address sizes:                   48 bits physical, 48 bits virtual
+Byte Order:                      Little Endian
+CPU(s):                          12
+On-line CPU(s) list:             0-11
+Vendor ID:                       AuthenticAMD
+Model name:                      AMD Ryzen 5 5600G with Radeon Graphics
+CPU family:                      25
+Model:                           80
+Thread(s) per core:              2
+Core(s) per socket:              6
+Socket(s):                       1
+Stepping:                        0
+BogoMIPS:                        7785.38
+Flags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves clzero xsaveerptr arat umip vaes vpclmulqdq rdpid fsrm
+Hypervisor vendor:               Microsoft
+Virtualization type:             full
+L1d cache:                       192 KiB (6 instances)
+L1i cache:                       192 KiB (6 instances)
+L2 cache:                        3 MiB (6 instances)
+L3 cache:                        16 MiB (1 instance)
+Vulnerability Itlb multihit:     Not affected
+Vulnerability L1tf:              Not affected
+Vulnerability Mds:               Not affected
+Vulnerability Meltdown:          Not affected
+Vulnerability Mmio stale data:   Not affected
+Vulnerability Retbleed:          Not affected
+Vulnerability Spec store bypass: Vulnerable
+Vulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:        Mitigation; Retpolines, IBPB conditional, IBRS_FW, STIBP conditional, RSB filling, PBRSB-eIBRS Not affected
+Vulnerability Srbds:             Not affected
+Vulnerability Tsx async abort:   Not affected
+RANGE                                  SIZE  STATE REMOVABLE  BLOCK
+0x0000000000000000-0x00000000f7ffffff  3.9G online       yes   0-30
+0x0000000100000000-0x0000000447ffffff 13.1G online       yes 32-136
+
+Memory block size:       128M
+Total online memory:      17G
+Total offline memory:      0B
+Running Tests sequentially...
+~/quickerNES/tests/games/arkanoid ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'warps.test'
+[] ROM File:                'Arkanoid (U) [!].nes'
+[] ROM SHA1:                'B2B30C4F30DD853C215C17B0C67CFE63D61A3062'
+[] Verification State File: 'warps.final.state'
+[] Sequence File:           'warps.sol'
+[] Sequence Length:         15806
+[] Initial State Hash:      0xB1413A628D2B1D1B79B4F07B3E70AE83
+[] State Size:              12793 bytes
+[] ********** Running Test **********
+[] Elapsed time:            0.930s
+[] Performance:             16988.794 steps / s
+[] Final State Hash:        0x1FA0AE49927B0C7485B8A8931F14A57A
+[] Verification Hash:       0x1FA0AE49927B0C7485B8A8931F14A57A (Passed)
+[] -----------------------------------------
+[] Running Script:          'warpless.test'
+[] ROM File:                'Arkanoid (U) [!].nes'
+[] ROM SHA1:                'B2B30C4F30DD853C215C17B0C67CFE63D61A3062'
+[] Verification State File: 'warpless.final.state'
+[] Sequence File:           'warpless.sol'
+[] Sequence Length:         39431
+[] Initial State Hash:      0xB1413A628D2B1D1B79B4F07B3E70AE83
+[] State Size:              12793 bytes
+[] ********** Running Test **********
+[] Elapsed time:            2.580s
+[] Performance:             15283.888 steps / s
+[] Final State Hash:        0xCDD173D996245BF7133375B2217A01C
+[] Verification Hash:       0xCDD173D996245BF7133375B2217A01C (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/ninjaGaiden2 ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'pacifist.test'
+[] ROM File:                'Ninja Gaiden II - The Dark Sword of Chaos (U) [!].nes'
+[] ROM SHA1:                'B1796660E4A4CEFC72181D4BF4F97999BC048A77'
+[] Verification State File: 'pacifist.final.state'
+[] Sequence File:           'pacifist.sol'
+[] Sequence Length:         36619
+[] Initial State Hash:      0x3CA9F26CF6511A0694C15C1FF876FCC
+[] State Size:              12807 bytes
+[] ********** Running Test **********
+[] Elapsed time:            3.633s
+[] Performance:             10080.282 steps / s
+[] Final State Hash:        0xB6A66050EB4D7445D6A84A76D7B2BB65
+[] Verification Hash:       0xB6A66050EB4D7445D6A84A76D7B2BB65 (Passed)
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Ninja Gaiden II - The Dark Sword of Chaos (U) [!].nes'
+[] ROM SHA1:                'B1796660E4A4CEFC72181D4BF4F97999BC048A77'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         34660
+[] Initial State Hash:      0x3CA9F26CF6511A0694C15C1FF876FCC
+[] State Size:              12807 bytes
+[] ********** Running Test **********
+[] Elapsed time:            3.427s
+[] Performance:             10113.456 steps / s
+[] Final State Hash:        0xDF97F201F54959948D4C4B89C4D220FC
+[] Verification Hash:       0xDF97F201F54959948D4C4B89C4D220FC (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/superOffroad ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Ivan 'Ironman' Stewart's Super Off Road (USA).nes'
+[] ROM SHA1:                '57919B685B55EE3ED3AD98FB1D25626B98BE7D39'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         182180
+[] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
+[] State Size:              20993 bytes
+[] ********** Running Test **********
+[] Elapsed time:            17.789s
+[] Performance:             10241.044 steps / s
+[] Final State Hash:        0xF0F317E40A902D175E6902B49500DF4B
+[] Verification Hash:       0xF0F317E40A902D175E6902B49500DF4B (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/nigelMansell ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Nigel Mansell's World Championship Challenge (U) [!].nes'
+[] ROM SHA1:                'BBE5CF2DFA0B5422776A530D6F1B617238A8569F'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         296590
+[] Initial State Hash:      0xB6C7EB1C577108C7C0E045D00EC73DDC
+[] State Size:              12798 bytes
+[] ********** Running Test **********
+[] Elapsed time:            30.850s
+[] Performance:             9614.052 steps / s
+[] Final State Hash:        0x407AA16502BE4D678916D218B1310132
+[] Verification Hash:       0x407AA16502BE4D678916D218B1310132 (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/castlevania1 ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'pacifist.test'
+[] ROM File:                'Castlevania (U) (PRG0) [!].nes'
+[] ROM SHA1:                'A31B8BD5B370A9103343C866F3C2B2998E889341'
+[] Verification State File: 'pacifist.final.state'
+[] Sequence File:           'pacifist.sol'
+[] Sequence Length:         39555
+[] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
+[] State Size:              20993 bytes
+[] ********** Running Test **********
+[] Elapsed time:            3.462s
+[] Performance:             11424.429 steps / s
+[] Final State Hash:        0x65214803DC4559ABBED8C449F04D4C91
+[] Verification Hash:       0x65214803DC4559ABBED8C449F04D4C91 (Passed)
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Castlevania (U) (PRG0) [!].nes'
+[] ROM SHA1:                'A31B8BD5B370A9103343C866F3C2B2998E889341'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         37338
+[] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
+[] State Size:              20993 bytes
+[] ********** Running Test **********
+[] Elapsed time:            3.262s
+[] Performance:             11447.134 steps / s
+[] Final State Hash:        0x9042C9EFA138F36E505AA33BF50436
+[] Verification Hash:       0x9042C9EFA138F36E505AA33BF50436 (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/saintSeiyaKanketsuHen ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Saint Seiya - Ougon Densetsu Kanketsu Hen (J) [!].nes'
+[] ROM SHA1:                'F871D9B3DAFDDCDAD5F2ACD71044292E5169064E'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         86170
+[] Initial State Hash:      0x7BE2D5D63A0545DF3D44A5881CA69E9D
+[] State Size:              12798 bytes
+[] ********** Running Test **********
+[] Elapsed time:            7.527s
+[] Performance:             11448.072 steps / s
+[] Final State Hash:        0xFFB8ABEE93CDEA838DB6B69470AC819A
+[] Verification Hash:       0xFFB8ABEE93CDEA838DB6B69470AC819A (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/tennis ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Tennis (JU) [!].nes'
+[] ROM SHA1:                '80D99C035E6A5AB9718E413EC25CBE094F085962'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         40627
+[] Initial State Hash:      0x43443FDD057BBE517B4CDA12736CAD67
+[] State Size:              12792 bytes
+[] ********** Running Test **********
+[] Elapsed time:            3.017s
+[] Performance:             13464.837 steps / s
+[] Final State Hash:        0x926C1D6B031E5BD739B13B5734C3D500
+[] Verification Hash:       0x926C1D6B031E5BD739B13B5734C3D500 (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/superMarioBros ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'warps.test'
+[] ROM File:                'Super Mario Bros. (W) [!].nes'
+[] ROM SHA1:                'EA343F4E445A9050D4B4FBAC2C77D0693B1D0922'
+[] Verification State File: 'warps.final.state'
+[] Sequence File:           'warps.sol'
+[] Sequence Length:         17866
+[] Initial State Hash:      0x1F405ED3A13732A3DBEDC4C54A50AC79
+[] State Size:              12792 bytes
+[] ********** Running Test **********
+[] Elapsed time:            1.624s
+[] Performance:             10999.864 steps / s
+[] Final State Hash:        0xFBB1BE4D99BB17041747DF056C079D57
+[] Verification Hash:       0xFBB1BE4D99BB17041747DF056C079D57 (Passed)
+[] -----------------------------------------
+[] Running Script:          'warpless.test'
+[] ROM File:                'Super Mario Bros. (W) [!].nes'
+[] ROM SHA1:                'EA343F4E445A9050D4B4FBAC2C77D0693B1D0922'
+[] Verification State File: 'warpless.final.state'
+[] Sequence File:           'warpless.sol'
+[] Sequence Length:         67115
+[] Initial State Hash:      0x1F405ED3A13732A3DBEDC4C54A50AC79
+[] State Size:              12792 bytes
+[] ********** Running Test **********
+[] Elapsed time:            6.098s
+[] Performance:             11005.733 steps / s
+[] Final State Hash:        0xDC3A45216E64D193849B0B248D18E0C3
+[] Verification Hash:       0xDC3A45216E64D193849B0B248D18E0C3 (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/ninjaGaiden ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'pacifist.test'
+[] ROM File:                'Ninja Gaiden (U) [!].nes'
+[] ROM SHA1:                'CA513F841D75EFEB33BB8099FB02BEEB39F6BB9C'
+[] Verification State File: 'pacifist.final.state'
+[] Sequence File:           'pacifist.sol'
+[] Sequence Length:         40680
+[] Initial State Hash:      0x7CC865ED649238B850937BAE9DCADC5
+[] State Size:              12798 bytes
+[] ********** Running Test **********
+[] Elapsed time:            3.934s
+[] Performance:             10340.566 steps / s
+[] Final State Hash:        0x358165AE6BC7A3EAE0E08D24F9A19BC6
+[] Verification Hash:       0x358165AE6BC7A3EAE0E08D24F9A19BC6 (Passed)
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Ninja Gaiden (U) [!].nes'
+[] ROM SHA1:                'CA513F841D75EFEB33BB8099FB02BEEB39F6BB9C'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         39111
+[] Initial State Hash:      0x7CC865ED649238B850937BAE9DCADC5
+[] State Size:              12798 bytes
+[] ********** Running Test **********
+[] Elapsed time:            3.776s
+[] Performance:             10358.859 steps / s
+[] Final State Hash:        0x5527602EE5679B55EC45BA654B704477
+[] Verification Hash:       0x5527602EE5679B55EC45BA654B704477 (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/ironSword ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Ironsword - Wizards & Warriors II (U) [!].nes'
+[] ROM SHA1:                '97B79E432F62403FB9F877090850C41112A9A168'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         25785
+[] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
+[] State Size:              20993 bytes
+[] ********** Running Test **********
+[] Elapsed time:            2.510s
+[] Performance:             10271.551 steps / s
+[] Final State Hash:        0xCCB65DF6BED258071A720C5FA2FE4FB9
+[] Verification Hash:       0xCCB65DF6BED258071A720C5FA2FE4FB9 (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/saintSeiyaOugonDensetsu ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Saint Seiya - Ougon Densetsu (J) [!].nes'
+[] ROM SHA1:                '3F3B499CF50386084E053BCA096AE8E52330CFAE'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         76723
+[] Initial State Hash:      0xA1482537F260939E3E0059719CD723AD
+[] State Size:              12793 bytes
+[] ********** Running Test **********
+[] Elapsed time:            6.672s
+[] Performance:             11498.784 steps / s
+[] Final State Hash:        0xC988A4BDCB3B44DA54AD97D2F2E0F4AF
+[] Verification Hash:       0xC988A4BDCB3B44DA54AD97D2F2E0F4AF (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/princeOfPersia ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'lvl7.test'
+[] ROM File:                'Prince of Persia (U) [!].nes'
+[] ROM SHA1:                '6B58F149F34FA829135619C58700CAAA95B9CDE3'
+[] Verification State File: 'lvl7.final.state'
+[] Sequence File:           'lvl7.sol'
+[] Sequence Length:         26003
+[] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
+[] State Size:              20993 bytes
+[] ********** Running Test **********
+[] Elapsed time:            2.417s
+[] Performance:             10758.659 steps / s
+[] Final State Hash:        0x3D0ACE9B9D592AE6922354DDC3682BAB
+[] Verification Hash:       0x3D0ACE9B9D592AE6922354DDC3682BAB (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/solarJetman ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Solar Jetman - Hunt for the Golden Warpship (U) [!].nes'
+[] ROM SHA1:                '872B91A2F7A2F635061EF43F79E7F7E9F59F5C50'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         45983
+[] Initial State Hash:      0x6FE586095495B63F2EFD6B69C5560FC9
+[] State Size:              20993 bytes
+[] ********** Running Test **********
+[] Elapsed time:            4.826s
+[] Performance:             9528.956 steps / s
+[] Final State Hash:        0x1E08CEBDE3EC56B659D54328D3D9E344
+[] Verification Hash:       0x1E08CEBDE3EC56B659D54328D3D9E344 (Passed)
+~/quickerNES/tests/games
+~/quickerNES/tests/games/galaga ~/quickerNES/tests/games
+[] -----------------------------------------
+[] Running Script:          'anyPercent.test'
+[] ROM File:                'Galaga - Demons of Death (U) [!].nes'
+[] ROM SHA1:                'DA54C223D79FA59EB95437854B677CF69B5CAC8A'
+[] Verification State File: 'anyPercent.final.state'
+[] Sequence File:           'anyPercent.sol'
+[] Sequence Length:         29916
+[] Initial State Hash:      0x4BB3E8B61F496038D8A01894B8B824F
+[] State Size:              12792 bytes
+[] ********** Running Test **********
+[] Elapsed time:            2.654s
+[] Performance:             11273.317 steps / s
+[] Final State Hash:        0x4E40A40820C188009A061C5C7FC7DB29
+[] Verification Hash:       0x4E40A40820C188009A061C5C7FC7DB29 (Passed)
+~/quickerNES/tests/games

@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
   const auto sequenceLength = sequence.size();
 
   // Printing test information
+  printf("[] -----------------------------------------\n");
   printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
   printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
   printf("[] Sequence Length:         %lu\n", sequenceLength);
   printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
   printf("[] State Size:              %lu bytes\n", stateSize);
-  printf("[] Running Test...\n");
+  printf("[] ********** Running Test **********\n");
   
   fflush(stdout);
   
@@ -135,7 +136,6 @@ int main(int argc, char *argv[])
   }
 
   // Printing time information
-  printf("[] -----------------------------------------\n");
   printf("[] Elapsed time:            %3.3fs\n", (double)dt * 1.0e-9);
   printf("[] Performance:             %.3f steps / s\n", (double)sequenceLength / elapsedTimeSeconds);
   printf("[] Final State Hash:        0x%lX%lX\n", finalStateHash.first, finalStateHash.second);
