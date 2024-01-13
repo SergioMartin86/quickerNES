@@ -28,17 +28,17 @@ public:
 	// Size and depth of graphics buffer required for rendering. Note that this
 	// is larger than the actual image, with a temporary area around the edge
 	// that gets filled with junk.
-	enum { buffer_width  = Nes_Ppu::buffer_width };
-	int buffer_height() const { return buffer_height_; }
-	enum { bits_per_pixel = 8 };
+	static const uint16_t buffer_width  = Nes_Ppu::buffer_width;
+	uint16_t buffer_height() const { return buffer_height_; }
+	static const uint8_t bits_per_pixel = 8;
 
 	// Set graphics buffer to render pixels to. Pixels points to top-left pixel and
 	// row_bytes is the number of bytes to get to the next line (positive or negative).
 	void set_pixels( void* pixels, long row_bytes );
 
 	// Size of image generated in graphics buffer
-	enum { image_width   = 256 };
-	enum { image_height  = 240 };
+	static const uint16_t image_width   = 256;
+	static const uint16_t image_height  = 240;
 
     const uint8_t* getHostPixels () const { return emu.ppu.host_pixels; }
     
@@ -56,11 +56,13 @@ public:
 	virtual const char * emulate_skip_frame( int joypad1, int joypad2 = 0 );
 
 	// Maximum size of palette that can be generated
-	enum { max_palette_size = 256 };
+	static const uint16_t max_palette_size = 256;
 
 	// Result of current frame
 	struct frame_t
 	{
+		static const uint8_t left = 8;
+		
 		int joypad_read_count;  // number of times joypads were strobed (read)
 		int burst_phase;        // NTSC burst phase for frame (0, 1, or 2)
 
@@ -68,7 +70,6 @@ public:
 		int chan_count;         // 1: mono, 2: stereo
 
 		int top;                // top-left position of image in graphics buffer
-		enum { left = 8 };
 		unsigned char* pixels;  // pointer to top-left pixel of image
 		long pitch;             // number of bytes to get to next row of image
 

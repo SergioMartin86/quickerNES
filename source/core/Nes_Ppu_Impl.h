@@ -23,33 +23,34 @@ public:
 	void save_state( Nes_State_* out ) const;
 	void load_state( Nes_State_ const& );
 	
-	enum { image_width = 256 };
-	enum { image_height = 240 };
-	enum { image_left = 8 };
-	enum { buffer_width = image_width + 16 };
-	enum { buffer_height = image_height };
+	static const uint16_t image_width = 256;
+	static const uint16_t image_height = 240;
+	static const uint16_t image_left = 8;
+	static const uint16_t buffer_width = image_width + 16;
+	static const uint16_t buffer_height = image_height;
 	
 	int write_2007( int );
 	
 	// Host palette
-	enum { palette_increment = 64 };
+	static const uint8_t palette_increment = 64;
 	short* host_palette;
 	int palette_begin;
 	int max_palette_size;
 	int palette_size; // set after frame is rendered
 	
 	// Mapping
-	enum { vaddr_clock_mask = 0x1000 };
+	static const uint16_t vaddr_clock_mask = 0x1000;
 	void set_nt_banks( int bank0, int bank1, int bank2, int bank3 );
 	void set_chr_bank( int addr, int size, long data );
 	void set_chr_bank_ex( int addr, int size, long data );
 	
 	// Nametable and CHR RAM
-	enum { nt_ram_size = 0x1000 };
-	enum { chr_addr_size = 0x2000 };
-	enum { bytes_per_tile = 16 };
-	enum { chr_tile_count = chr_addr_size / bytes_per_tile };
-	enum { mini_offscreen_height = 16 }; // double-height sprite
+	static const uint16_t nt_ram_size = 0x1000;
+	static const uint16_t chr_addr_size = 0x2000;
+	static const uint8_t bytes_per_tile = 16;
+	static const uint16_t chr_tile_count = chr_addr_size / bytes_per_tile;
+	static const uint8_t mini_offscreen_height = 16; // double-height sprite
+
 	struct impl_t
 	{
 		uint8_t nt_ram [nt_ram_size];
@@ -60,7 +61,8 @@ public:
 		};
 	};
 	impl_t* impl;
-	enum { scanline_len = 341 };
+
+	static const uint16_t scanline_len = 341;
 	
 protected:
 	uint8_t spr_ram [0x100];
@@ -73,7 +75,7 @@ protected: //friend class Nes_Ppu; private:
 	int addr_inc; // pre-calculated $2007 increment (based on w2001 & 0x04)
 	int read_2007( int addr );
 	
-	enum { last_sprite_max_scanline = 240 };
+	static const uint16_t last_sprite_max_scanline = 240;
 	long recalc_sprite_max( int scanline );
 	int first_opaque_sprite_line();
 	
@@ -99,7 +101,7 @@ private:
 	int sprite_tile_index( uint8_t const* sprite ) const;
 	
 	// Mapping
-	enum { chr_page_size = 0x400 };
+	static const uint16_t chr_page_size = 0x400;
 	long chr_pages [chr_addr_size / chr_page_size];
 	long chr_pages_ex [chr_addr_size / chr_page_size];
 	long map_chr_addr( unsigned a ) /*const*/

@@ -26,8 +26,8 @@ private:
 // Write data to memory
 class Mem_Writer : public Data_Writer {
 	char* data_;
-	long size_;
-	long allocated;
+	size_t size_;
+	size_t allocated;
 	enum { expanding, fixed, ignore_excess } mode;
 public:
 	// Keep all written data in expanding block of memory
@@ -43,7 +43,7 @@ public:
 	char* data() { return data_; }
 	
 	// Number of bytes written
-	long size() const { return size_; }
+	size_t size() const { return size_; }
 	
 	~Mem_Writer();
 };

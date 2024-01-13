@@ -73,8 +73,6 @@ int main(int argc, char *argv[])
   // Creating emulator instance
   auto e = EmuInstance(romFilePath, stateFilePath);
 
-  auto stateHash = e.getStateHash();
-
   // Creating playback instance
   auto p = PlaybackInstance(&e, sequence);
 
