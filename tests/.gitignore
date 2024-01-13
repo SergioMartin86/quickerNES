@@ -1,4 +1,5 @@
 *.nes
+*.Identifier
 *.zip
 *.fds
 

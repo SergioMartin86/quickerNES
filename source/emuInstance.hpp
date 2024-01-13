@@ -141,6 +141,7 @@ class EmuInstance
     case 's': moveCode |= 0b00000100; break;
     case 'B': moveCode |= 0b00000010; break;
     case 'A': moveCode |= 0b00000001; break;
+    case 'r': break;
     case '.': break;
     case '|': break;
     default: EXIT_WITH_ERROR("Move provided cannot be parsed: '%s', unrecognized character: '%c'\n", move.c_str(), move[i]);
@@ -172,6 +173,8 @@ class EmuInstance
 
  void advanceState(const std::string& move)
  {
+  if (move.find("r") != std::string::npos) _nes->reset(false); 
+
   advanceState(moveStringToCode(move), 0);
  }
 

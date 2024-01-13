@@ -1,0 +1,7 @@
+{
+  "Rom File": "Ninja Gaiden II - The Dark Sword of Chaos (U) [!].nes",
+  "Expected ROM SHA1": "B1796660E4A4CEFC72181D4BF4F97999BC048A77",
+  "Initial State File": "",
+  "Verification State File": "pacifist.final.state",
+  "Sequence File": "pacifist.sol"
+}
