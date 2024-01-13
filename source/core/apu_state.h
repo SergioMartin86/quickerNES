@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include "blargg_common.h"
+#include "blargg_endian.h"
 
 struct apu_state_t
 {
@@ -70,7 +71,19 @@ struct apu_state_t
 	//uint8_t length_counters [4];
 	
 	enum { tag = 0x41505552 }; // 'APUR'
-	void swap();
+	void swap()
+	{
+		SWAP_LE( apu.frame_delay );
+		SWAP_LE( square1.delay );
+		SWAP_LE( square2.delay );
+		SWAP_LE( triangle.delay );
+		SWAP_LE( noise.delay );
+		SWAP_LE( noise.shift_reg );
+		SWAP_LE( dmc.delay );
+		SWAP_LE( dmc.remain );
+		SWAP_LE( dmc.addr );
+ }
+
 };
 BOOST_STATIC_ASSERT( sizeof (apu_state_t) == 72 );
 

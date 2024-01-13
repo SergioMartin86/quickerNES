@@ -1,12 +1,4 @@
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
-
-#include <algorithm>
-#include <cstring>
-#include "Nes_Core.h"
-#include "Nes_Mapper.h"
-#include "Nes_State.h"
-
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
 General Public License as published by the Free Software Foundation; either
@@ -17,8 +9,75 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
 more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
+// Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
+#include <algorithm>
+#include <cstring>
+#include "Nes_Core.h"
+#include "Nes_Mapper.h"
+#include "Nes_State.h"
 #include "blargg_source.h"
+
+/*
+  New mapping distribution by Sergio Martin (eien86)
+  https://github.com/SergioMartin86/jaffarPlus
+*/
+#include "mappers/mapper000.hpp"
+#include "mappers/mapper001.hpp"
+#include "mappers/mapper002.hpp"
+#include "mappers/mapper003.hpp"
+#include "mappers/mapper004.hpp"
+#include "mappers/mapper005.hpp"
+#include "mappers/mapper007.hpp"
+#include "mappers/mapper009.hpp"
+#include "mappers/mapper010.hpp"
+#include "mappers/mapper011.hpp"
+#include "mappers/mapper015.hpp"
+#include "mappers/mapper019.hpp"
+#include "mappers/mapper021.hpp"
+#include "mappers/mapper022.hpp"
+#include "mappers/mapper023.hpp"
+#include "mappers/mapper024.hpp"
+#include "mappers/mapper025.hpp"
+#include "mappers/mapper026.hpp"
+#include "mappers/mapper030.hpp"
+#include "mappers/mapper032.hpp"
+#include "mappers/mapper033.hpp"
+#include "mappers/mapper034.hpp"
+#include "mappers/mapper060.hpp"
+#include "mappers/mapper066.hpp"
+#include "mappers/mapper069.hpp"
+#include "mappers/mapper070.hpp"
+#include "mappers/mapper071.hpp"
+#include "mappers/mapper073.hpp"
+#include "mappers/mapper075.hpp"
+#include "mappers/mapper078.hpp"
+#include "mappers/mapper079.hpp"
+#include "mappers/mapper085.hpp"
+#include "mappers/mapper086.hpp"
+#include "mappers/mapper087.hpp"
+#include "mappers/mapper088.hpp"
+#include "mappers/mapper089.hpp"
+#include "mappers/mapper093.hpp"
+#include "mappers/mapper094.hpp"
+#include "mappers/mapper097.hpp"
+#include "mappers/mapper113.hpp"
+#include "mappers/mapper140.hpp"
+#include "mappers/mapper152.hpp"
+#include "mappers/mapper154.hpp"
+#include "mappers/mapper156.hpp"
+#include "mappers/mapper180.hpp"
+#include "mappers/mapper184.hpp"
+#include "mappers/mapper190.hpp"
+#include "mappers/mapper193.hpp"
+#include "mappers/mapper206.hpp"
+#include "mappers/mapper207.hpp"
+#include "mappers/mapper232.hpp"
+#include "mappers/mapper240.hpp"
+#include "mappers/mapper241.hpp"
+#include "mappers/mapper244.hpp"
+#include "mappers/mapper246.hpp"
+
 
 extern const char unsupported_mapper [] = "Unsupported mapper";
 
@@ -70,9 +129,79 @@ const char * Nes_Core::open( Nes_Cart const* new_cart )
 	
 	RETURN_ERR( init() );
 	
-	mapper = Nes_Mapper::create( new_cart, this );
-	if ( !mapper ) 
-		return unsupported_mapper;
+	// Getting cartdrige mapper code
+	auto mapperCode = new_cart->mapper_code();
+	
+	// Storage for the mapper, NULL by default	
+	mapper = NULL;
+
+	// Now checking if the detected mapper code is supported
+	if (mapperCode ==   0) mapper = new Mapper000();
+	if (mapperCode ==   1) mapper = new Mapper001();
+	if (mapperCode ==   2) mapper = new Mapper002();
+	if (mapperCode ==   3) mapper = new Mapper003();
+	if (mapperCode ==   4) mapper = new Mapper004();
+	if (mapperCode ==   5) mapper = new Mapper005();
+	if (mapperCode ==   7) mapper = new Mapper007();
+	if (mapperCode ==   9) mapper = new Mapper009();
+	if (mapperCode ==  10) mapper = new Mapper010();
+	if (mapperCode ==  11) mapper = new Mapper011();
+	if (mapperCode ==  15) mapper = new Mapper015();
+	if (mapperCode ==  19) mapper = new Mapper019();
+	if (mapperCode ==  21) mapper = new Mapper021();
+	if (mapperCode ==  22) mapper = new Mapper022();
+	if (mapperCode ==  23) mapper = new Mapper023();
+	if (mapperCode ==  24) mapper = new Mapper024();
+	if (mapperCode ==  25) mapper = new Mapper025();
+	if (mapperCode ==  26) mapper = new Mapper026();
+	if (mapperCode ==  30) mapper = new Mapper030();
+	if (mapperCode ==  32) mapper = new Mapper032();
+	if (mapperCode ==  33) mapper = new Mapper033();
+	if (mapperCode ==  34) mapper = new Mapper034();
+	if (mapperCode ==  60) mapper = new Mapper060();
+	if (mapperCode ==  66) mapper = new Mapper066();
+	if (mapperCode ==  69) mapper = new Mapper069();
+	if (mapperCode ==  70) mapper = new Mapper070();
+	if (mapperCode ==  71) mapper = new Mapper071();
+	if (mapperCode ==  73) mapper = new Mapper073();
+	if (mapperCode ==  75) mapper = new Mapper075();
+	if (mapperCode ==  78) mapper = new Mapper078();
+	if (mapperCode ==  79) mapper = new Mapper079();
+	if (mapperCode ==  85) mapper = new Mapper085();
+	if (mapperCode ==  86) mapper = new Mapper086();
+	if (mapperCode ==  87) mapper = new Mapper087();
+	if (mapperCode ==  88) mapper = new Mapper088();
+	if (mapperCode ==  89) mapper = new Mapper089();
+	if (mapperCode ==  93) mapper = new Mapper093();
+	if (mapperCode ==  94) mapper = new Mapper094();
+	if (mapperCode ==  97) mapper = new Mapper097();
+	if (mapperCode == 113) mapper = new Mapper113();
+	if (mapperCode == 140) mapper = new Mapper140();
+	if (mapperCode == 152) mapper = new Mapper152();
+	if (mapperCode == 154) mapper = new Mapper154();
+	if (mapperCode == 156) mapper = new Mapper156();
+	if (mapperCode == 180) mapper = new Mapper180();
+	if (mapperCode == 184) mapper = new Mapper184();
+	if (mapperCode == 190) mapper = new Mapper190();
+	if (mapperCode == 193) mapper = new Mapper193();
+	if (mapperCode == 206) mapper = new Mapper206();
+	if (mapperCode == 207) mapper = new Mapper207();
+	if (mapperCode == 232) mapper = new Mapper232();
+	if (mapperCode == 240) mapper = new Mapper240();
+	if (mapperCode == 241) mapper = new Mapper241();
+	if (mapperCode == 244) mapper = new Mapper244();
+	if (mapperCode == 246) mapper = new Mapper246();
+
+	// If no mapper was found, return null (error) now 
+	if (mapper == NULL)
+	{
+		fprintf(stderr, "Could not find mapper for code: %u\n", mapperCode);
+		return NULL;
+	} 
+
+	// Assigning backwards pointers to cartdrige and emulator now
+	mapper->setCartridge(new_cart);
+	mapper->setCore(this);
 
 	RETURN_ERR( ppu.open_chr( new_cart->chr(), new_cart->chr_size() ) );
 	
@@ -205,13 +334,6 @@ void Nes_Core::enable_sram( bool b, bool read_only )
 	}
 }
 
-// Unmapped memory
-
-
-void Nes_Core::log_unmapped( nes_addr_t addr, int data )
-{
-}
-
 inline void Nes_Core::cpu_adjust_time( int n )
 {
 	ppu_2002_time   -= n;
@@ -273,10 +395,6 @@ void Nes_Core::write_io( nes_addr_t addr, int data )
 		}
 		return;
 	}
-	
-	#ifndef NDEBUG
-		log_unmapped( addr, data );
-	#endif
 }
 
 int Nes_Core::read_io( nes_addr_t addr )
@@ -294,10 +412,6 @@ int Nes_Core::read_io( nes_addr_t addr )
 	
 	if ( addr == Nes_Apu::status_addr )
 		return impl->apu.read_status( clock() );
-	
-	#ifndef NDEBUG
-		log_unmapped( addr );
-	#endif
 	
 	return addr >> 8; // simulate open bus
 }

@@ -41,10 +41,6 @@ int Nes_Core::cpu_read( nes_addr_t addr, nes_time_t time )
 	if ( addr < lrom_readable )
 		return *cpu::get_code( addr );
 	
-	#ifndef NDEBUG
-		log_unmapped( addr );
-	#endif
-	
 	return addr >> 8; // simulate open bus
 }
 
@@ -79,7 +75,7 @@ void Nes_Core::cpu_write_2007( int data )
 		mapper->a12_clocked();
 }
 
-void Nes_Core::cpu_write( nes_addr_t addr, int data, nes_time_t time )
+inline void Nes_Core::cpu_write( nes_addr_t addr, int data, nes_time_t time )
 {
 	//LOG_FREQ( "cpu_write", 16, addr >> 12 );
 	
@@ -120,24 +116,4 @@ void Nes_Core::cpu_write( nes_addr_t addr, int data, nes_time_t time )
 		mapper->write( clock_, addr, data );
 		return;
 	}
-	
-	#ifndef NDEBUG
-		log_unmapped( addr, data );
-	#endif
-}
-
-#define NES_CPU_READ_PPU( cpu, addr, time ) \
-	STATIC_CAST(Nes_Core&,*cpu).cpu_read_ppu( addr, time )
-
-#define NES_CPU_READ( cpu, addr, time ) \
-	STATIC_CAST(Nes_Core&,*cpu).cpu_read( addr, time )
-
-#define NES_CPU_WRITEX( cpu, addr, data, time ){\
-	STATIC_CAST(Nes_Core&,*cpu).cpu_write( addr, data, time );\
-}
-
-#define NES_CPU_WRITE( cpu, addr, data, time ){\
-	if ( addr < 0x800 ) cpu->low_mem [addr] = data;\
-	else if ( addr == 0x2007 ) STATIC_CAST(Nes_Core&,*cpu).cpu_write_2007( data );\
-	else STATIC_CAST(Nes_Core&,*cpu).cpu_write( addr, data, time );\
 }

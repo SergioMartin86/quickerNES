@@ -20,16 +20,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 #include "blargg_source.h"
 
-#ifdef BLARGG_ENABLE_OPTIMIZER
-	#include BLARGG_ENABLE_OPTIMIZER
-#endif
-
-#ifdef __MWERKS__
-	static unsigned zero = 0; // helps CodeWarrior optimizer when added to constants
-#else
-	const  unsigned zero = 0; // compile-time constant on other compilers
-#endif
-
 // Nes_Ppu_Impl
 
 inline Nes_Ppu_Impl::cached_tile_t const&
@@ -188,8 +178,8 @@ void Nes_Ppu_Rendering::draw_background_( int remain )
 		uint8_t* pixels = row_pixels;
 		row_pixels += height * row_bytes;
 		
-		unsigned long const mask = 0x03030303 + zero;
-		unsigned long const attrib_factor = 0x04040404 + zero;
+		unsigned long const mask = 0x03030303;
+		unsigned long const attrib_factor = 0x04040404;
 		
 		const int fine_y = (height == 8) ? 0 : addr >> 12;
 		const int clipped = (height == 8) ? false : true; 
@@ -373,7 +363,7 @@ void Nes_Ppu_Rendering::check_sprite_hit( int begin, int end )
 	}
 	
 	// check each line
-	unsigned long const mask = 0x01010101 + zero;
+	unsigned long const mask = 0x01010101;
 	do
 	{
 		// get pixels for line

@@ -1,7 +1,4 @@
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/nes-emu/
-
-
 #include "Nes_Cpu.h"
 
 #include <string.h>
@@ -11,55 +8,17 @@
 
 #include "nes_cpu_io.h"
 
-/* Copyright (C) 2003-2006 Shay Green. This module is free software; you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version. This
-module is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
-more details. You should have received a copy of the GNU Lesser General
-Public License along with this module; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
-
-inline void Nes_Cpu::set_code_page( int i, uint8_t const* p )
-{
- code_map [i] = p - (unsigned) i * page_size;
+#define NES_CPU_READ_PPU( cpu, addr, time ) STATIC_CAST(Nes_Core&,*cpu).cpu_read_ppu( addr, time )
+#define NES_CPU_READ( cpu, addr, time ) STATIC_CAST(Nes_Core&,*cpu).cpu_read( addr, time )
+#define NES_CPU_WRITEX( cpu, addr, data, time ) {STATIC_CAST(Nes_Core&,*cpu).cpu_write( addr, data, time );}
+#define NES_CPU_WRITE( cpu, addr, data, time ) \
+{\
+	if ( addr < 0x800 ) cpu->low_mem [addr] = data;\
+	else if ( addr == 0x2007 ) STATIC_CAST(Nes_Core&,*cpu).cpu_write_2007( data );\
+	else STATIC_CAST(Nes_Core&,*cpu).cpu_write( addr, data, time );\
 }
 
-void Nes_Cpu::reset( void const* unmapped_page )
-{
- r.status = 0;
- r.sp = 0;
- r.pc = 0;
- r.a = 0;
- r.x = 0;
- r.y = 0;
-
- error_count_ = 0;
- clock_count = 0;
- clock_limit = 0;
- irq_time_ = LONG_MAX / 2 + 1;
- end_time_ = LONG_MAX / 2 + 1;
-
- set_code_page( 0, low_mem );
- set_code_page( 1, low_mem );
- set_code_page( 2, low_mem );
- set_code_page( 3, low_mem );
- for ( int i = 4; i < page_count + 1; i++ )
-  set_code_page( i, (uint8_t*) unmapped_page );
-
- isCorrectExecution = true;
-}
-
-void Nes_Cpu::map_code( nes_addr_t start, unsigned size, const void* data )
-{
- unsigned first_page = start / page_size;
- for ( unsigned i = size / page_size; i--; )
-  set_code_page( first_page + i, (uint8_t*) data + i * page_size );
-}
 
 // Note: 'addr' is evaulated more than once in the following macros, so it
 // must not contain side-effects.
@@ -79,10 +38,6 @@ void Nes_Cpu::map_code( nes_addr_t start, unsigned size, const void* data )
 #define SET_SP( v )     (sp = ((v) + 1) | 0x100)
 #define GET_SP()        ((sp - 1) & 0xFF)
 #define PUSH( v )       ((sp = (sp - 1) | 0x100), WRITE_LOW( sp, v ))
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
- #include BLARGG_ENABLE_OPTIMIZER
-#endif
 
 int Nes_Cpu::read( nes_addr_t addr )
 {

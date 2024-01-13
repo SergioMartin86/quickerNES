@@ -26,7 +26,6 @@ quickerNESCoreSrc = [
  'source/core/Nes_Cpu.cpp', 
  'source/core/Nes_State.cpp', 
  'source/core/emu2413.cpp', 
- 'source/core/nes_data.cpp', 
  'source/core/nes_util.cpp', 
  'source/core/emu2413_state.cpp', 
  'source/core/Nes_Effects_Buffer.cpp', 
