@@ -1,0 +1,7 @@
+{
+  "Rom File": "Ninja Gaiden (U) [!].nes",
+  "Expected ROM SHA1": "CA513F841D75EFEB33BB8099FB02BEEB39F6BB9C",
+  "Initial State File": "",
+  "Verification State File": "pacifist.final.state",
+  "Sequence File": "pacifist.sol"
+}
