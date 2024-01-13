@@ -1,5 +1,3 @@
-nomalloc = environment({'MALLOC_PERTURB_': '0'})
-
 # Castlevania 1 Tests
 game = 'castlevania1'
 goal = 'anyPercent'

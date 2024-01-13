@@ -15,7 +15,6 @@ struct stepData_t
 {
   std::string input;
   uint8_t* stateData;
-  int32_t curBlit[BLIT_SIZE];
   hash_t hash;
 };
 
@@ -30,7 +29,6 @@ class PlaybackInstance
     step.stateData = (uint8_t*) malloc(_emu->getStateSize());
     _emu->serializeState(step.stateData);
     step.hash = _emu->getStateHash();
-    saveBlit(_emu->getInternalEmulator(), step.curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
 
     // Adding the step into the sequence
     _stepSequence.push_back(step);
@@ -148,8 +146,23 @@ class PlaybackInstance
     if (step.input.find("D") != std::string::npos) overlayButtonDownSurface = _overlayButtonDownSurface;
   }
 
+  // Since we do not store the blit information (too much memory), we need to load the previous frame and re-run the input
+
+  // If its the first step, then simply reset
+  if (stepId == 0) _emu->getInternalEmulator()->reset();
+
+  // Else we load the previous frame
+  if (stepId > 0)
+  {
+    const auto stateData = getStateData(stepId-1);
+    _emu->deserializeState(stateData);
+    _emu->advanceState(getStateInput(stepId-1));
+  }
+  
   // Updating image
-  _hqnGUI->update_blit(step.curBlit, _overlayBaseSurface, overlayButtonASurface, overlayButtonBSurface, overlayButtonSelectSurface, overlayButtonStartSurface, overlayButtonLeftSurface, overlayButtonRightSurface, overlayButtonUpSurface, overlayButtonDownSurface);
+   int32_t curBlit[BLIT_SIZE];
+   saveBlit(_emu->getInternalEmulator(), curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
+  _hqnGUI->update_blit(curBlit, _overlayBaseSurface, overlayButtonASurface, overlayButtonBSurface, overlayButtonSelectSurface, overlayButtonStartSurface, overlayButtonLeftSurface, overlayButtonRightSurface, overlayButtonUpSurface, overlayButtonDownSurface);
  }
 
  size_t getSequenceLength() const

@@ -99,6 +99,7 @@ int main(int argc, char *argv[])
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
   printf("[] State Size:              %lu bytes\n", stateSize);
+  printf("[] Running Test...\n");
   
   fflush(stdout);
   
