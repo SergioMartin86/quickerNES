@@ -1,0 +1,7 @@
+{
+  "Rom File": "Nigel Mansell's World Championship Challenge (U) [!].nes",
+  "Expected ROM SHA1": "BBE5CF2DFA0B5422776A530D6F1B617238A8569F",
+  "Initial State File": "",
+  "Verification State File": "anyPercent.final.state",
+  "Sequence File": "anyPercent.sol"
+}
