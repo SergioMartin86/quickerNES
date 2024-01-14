@@ -41,10 +41,6 @@ int Nes_Core::cpu_read( nes_addr_t addr, nes_time_t time )
 	if ( addr < lrom_readable )
 		return *cpu::get_code( addr );
 	
-	#ifndef NDEBUG
-		log_unmapped( addr );
-	#endif
-	
 	return addr >> 8; // simulate open bus
 }
 
@@ -120,10 +116,6 @@ void Nes_Core::cpu_write( nes_addr_t addr, int data, nes_time_t time )
 		mapper->write( clock_, addr, data );
 		return;
 	}
-	
-	#ifndef NDEBUG
-		log_unmapped( addr, data );
-	#endif
 }
 
 #define NES_CPU_READ_PPU( cpu, addr, time ) \

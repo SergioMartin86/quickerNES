@@ -210,12 +210,6 @@ void Nes_Core::enable_sram( bool b, bool read_only )
 	}
 }
 
-// Unmapped memory
-
-void Nes_Core::log_unmapped( nes_addr_t addr, int data )
-{
-}
-
 inline void Nes_Core::cpu_adjust_time( int n )
 {
 	ppu_2002_time   -= n;
@@ -277,10 +271,6 @@ void Nes_Core::write_io( nes_addr_t addr, int data )
 		}
 		return;
 	}
-	
-	#ifndef NDEBUG
-		log_unmapped( addr, data );
-	#endif
 }
 
 int Nes_Core::read_io( nes_addr_t addr )
@@ -298,10 +288,6 @@ int Nes_Core::read_io( nes_addr_t addr )
 	
 	if ( addr == Nes_Apu::status_addr )
 		return impl->apu.read_status( clock() );
-	
-	#ifndef NDEBUG
-		log_unmapped( addr );
-	#endif
 	
 	return addr >> 8; // simulate open bus
 }
