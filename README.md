@@ -13,7 +13,9 @@ The main aim is to improve the performance of skip (non-rendering, no-audio) fra
 Changes
 =========
 
-- Optimizations made in the CPU emulation core
+- Optimizations made in the CPU emulation core, including:
+  + Forced alignment at the start of a page to prevent crossing cache line boundaries
+  + Simplifying instruction decode
 - Minimize compiled code size to reduce pressure on L1i cache
 - Sound is no longer emulated during skip frames
 
