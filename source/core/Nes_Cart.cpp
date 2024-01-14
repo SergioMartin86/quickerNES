@@ -118,3 +118,24 @@ const char * Nes_Cart::load_ines( Auto_File_Reader in )
 	
 	return 0;
 }
+
+const char * Nes_Cart::load_ines( const uint8_t* buffer )
+{
+	ines_header_t h;
+
+	size_t bufferPos = 0;
+	{ size_t copySize = sizeof(ines_header_t); memcpy(&h, &buffer[bufferPos], copySize); bufferPos += copySize; }
+	if ( h.zero [7] )	h.flags2 = 0;
+	set_mapper( h.flags, h.flags2 );
+	
+	// skip trainer
+	if ( h.flags & 0x04 ) bufferPos += 512;
+	
+	resize_prg( h.prg_count * 16 * 1024L );
+	resize_chr( h.chr_count * 8 * 1024L );
+	
+	{ size_t copySize = prg_size(); memcpy(prg(), &buffer[bufferPos], copySize); bufferPos += copySize; }
+	{ size_t copySize = chr_size(); memcpy(chr(), &buffer[bufferPos], copySize); bufferPos += copySize; }
+
+	return 0;
+}

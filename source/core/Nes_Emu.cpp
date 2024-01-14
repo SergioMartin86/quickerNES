@@ -189,6 +189,13 @@ const char * Nes_Emu::emulate_frame( int joypad1, int joypad2 )
 
 // Extras
 
+const char * Nes_Emu::load_ines( const uint8_t* buffer )
+{
+	close();
+	private_cart.load_ines( buffer );
+	return set_cart( &private_cart );
+}
+
 const char * Nes_Emu::load_ines( Auto_File_Reader in )
 {
 	close();

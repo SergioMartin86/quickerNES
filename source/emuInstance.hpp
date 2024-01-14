@@ -46,10 +46,16 @@ class EmuInstance
   _romSHA1String = SHA1::GetHash((uint8_t*)romData.data(), romData.size());
 
   // Loading the rom into the emulator
-  Mem_File_Reader romReader(romData.data(), (int)romData.size());
-  Auto_File_Reader romFile(romReader);
-  auto result = _nes->load_ines(romFile);
-  if (result != 0) EXIT_WITH_ERROR("Could not initialize emulator with rom file: %s\n", romFilePath.c_str());
+  #ifdef USE_ORIGINAL_QUICKNES
+    Mem_File_Reader romReader(romData.data(), (int)romData.size());
+    Auto_File_Reader romFile(romReader);
+    auto result = _nes->load_ines(romFile);
+    if (result != 0) EXIT_WITH_ERROR("Could not initialize emulator with rom file: %s\n", romFilePath.c_str());
+  #else
+    auto result = _nes->load_ines((const uint8_t*) romData.data());
+    if (result != 0) EXIT_WITH_ERROR("Could not initialize emulator with rom file: %s\n", romFilePath.c_str());
+  #endif
+   
 
   // Getting state size to use
   _stateSize = getStateSizeImpl();

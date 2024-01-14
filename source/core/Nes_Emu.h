@@ -21,6 +21,7 @@ public:
 
 	// Load iNES file into emulator and clear recording
 	const char * load_ines( Auto_File_Reader );
+	const char * load_ines( const uint8_t* buffer );
 
 	// Set sample rate for sound generation
 	const char * set_sample_rate( long );

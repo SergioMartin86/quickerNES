@@ -16,6 +16,7 @@ public:
 	~Nes_Cart();
 	
 	// Load iNES file
+	const char * load_ines( const uint8_t* buffer );
 	const char * load_ines( Auto_File_Reader );
 	static const char not_ines_file [];
 	

@@ -11,6 +11,5 @@ option('CPUFunctionAlignment',
   value : 1024,
   description : '''Indicates the alignment for the main emulator CPU function.
                  This is a large function that may cross page boundaries, which impacts performance. 
-                 We recommend setting this value for the architecture own page size. 
                  This requires the GNU compiler to work.'''
 )
