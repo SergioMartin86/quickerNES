@@ -38,7 +38,6 @@ Nes_Core::Nes_Core() : ppu( this )
 	mapper = NULL;
 	memset( &nes, 0, sizeof nes );
 	memset( &joypad, 0, sizeof joypad );
-    _doRendering = true;
 }
 
 const char * Nes_Core::init()
@@ -498,8 +497,11 @@ nes_time_t Nes_Core::emulate_frame_()
 	}
 }
 
-nes_time_t Nes_Core::emulate_frame()
+nes_time_t Nes_Core::emulate_frame(int joypad1, int joypad2)
 {
+	current_joypad [0] = (joypad1 |= ~0xFF);
+	current_joypad [1] = (joypad2 |= ~0xFF);
+
 	joypad_read_count = 0;
 	
 	cpu_time_offset = ppu.begin_frame( nes.timestamp ) - 1;
@@ -508,10 +510,10 @@ nes_time_t Nes_Core::emulate_frame()
 	
 	// TODO: clean this fucking mess up
 	auto t0 = emulate_frame_();
-	if (_doRendering == true) impl->apu.run_until_( t0 );
+	impl->apu.run_until_( t0 );
 	clock_ = cpu_time_offset;
 	auto t1 = cpu_time();
-	if (_doRendering == true) impl->apu.run_until_( t1 );
+	impl->apu.run_until_( t1 );
 	
 	nes_time_t ppu_frame_length = ppu.frame_length();
 	nes_time_t length = cpu_time();

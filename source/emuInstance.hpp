@@ -171,6 +171,9 @@ class EmuInstance
   return moveString;
  }
 
+ void enableRendering()  { _doRendering = true; }
+ void disableRendering() { _doRendering = false; }
+
  void advanceState(const std::string& move)
  {
   if (move.find("r") != std::string::npos) _nes->reset(false); 
@@ -180,12 +183,16 @@ class EmuInstance
 
  void advanceState(const inputType controller1, const inputType controller2) 
  {
-  _nes->emulate_frame(controller1, controller2);
+  if (_doRendering == true)  _nes->emulate_frame(controller1, controller2);
+  if (_doRendering == false) _nes->emulate_skip_frame(controller1, controller2);
  }
 
  Nes_Emu* getInternalEmulator() const { return _nes; }
 
  private:
+
+ // Flag to determine whether to enable/disable rendering
+ bool _doRendering = true;
 
  inline size_t getStateSizeImpl() const
  {

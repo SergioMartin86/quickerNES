@@ -20,13 +20,10 @@ public:
 	Nes_Core();
 	~Nes_Core();
 	
-	// Flag to enable/disable rendering
-	bool _doRendering;
-
 	const char * init();
 	const char * open( Nes_Cart const* );
 	void reset( bool full_reset = true, bool erase_battery_ram = false );
-	blip_time_t emulate_frame();
+	blip_time_t emulate_frame(int joypad1, int joypad2);
 	void close();
 	
 	void save_state( Nes_State* ) const;

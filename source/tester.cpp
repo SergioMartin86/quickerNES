@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   auto e = EmuInstance(romFilePath, initialStateFilePath);
   
   // Disable rendering
-  e.getInternalEmulator()->disableRendering();
+  e.disableRendering();
 
   // Getting initial hash
   auto initialHash = e.getStateHash();

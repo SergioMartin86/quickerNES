@@ -8,7 +8,13 @@ quickerNES is an attempt to modernizing and improving the performance of quickNE
 - Add support for more mappers, controllers, and features supported by other emulators
 - Improve accuracy, if possible
 
-The main aim is to improve the exploration performance of my TASing bot, [JaffarPlus](https://github.com/SergioMartin86/jaffarPlus). However, if this work might help with homebrew emulation and other people having more fun, then much better!
+The main aim is to improve the performance of skip (non-rendering, no-audio) frame advances for brute force botting. (See: [JaffarPlus](https://github.com/SergioMartin86/jaffarPlus)). However, if this work might help with homebrew emulation and other people having more fun, then much better!
+
+Changes
+=========
+
+- Optimizations made in the CPU emulation core
+- Sound is no longer emulated during skip frames
 
 Credits
 =========
