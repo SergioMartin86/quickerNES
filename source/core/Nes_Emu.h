@@ -202,6 +202,10 @@ public:
 	enum { high_mem_size = 0x2000 };
 	uint8_t* high_mem()            { return emu.impl->sram; }
 
+	// Sprite memory
+	uint8_t* spr_mem()            { return emu.ppu.getSpriteRAM(); }
+	uint16_t spr_mem_size()       { return emu.ppu.getSpriteRAMSize(); }
+
 	// End of public interface
 public:
 	const char * set_sample_rate( long rate, class Nes_Buffer* );

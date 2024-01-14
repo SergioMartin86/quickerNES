@@ -38,7 +38,7 @@ public:
 	virtual void write( nes_time_t, nes_addr_t addr, int data )
 	{
 		bank = handle_bus_conflict( addr, data );
-		set_prg_bank( 0x8000, bank_16k, bank );
+		set_prg_bank( 0x8000, bank_16k, data );
 	}
 };
 

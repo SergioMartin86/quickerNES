@@ -14,6 +14,7 @@ Changes
 =========
 
 - Optimizations made in the CPU emulation core
+- Minimize compiled code size to reduce pressure on L1i cache
 - Sound is no longer emulated during skip frames
 
 Credits

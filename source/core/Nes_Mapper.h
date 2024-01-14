@@ -16,13 +16,6 @@ class Nes_Core;
 
 class Nes_Mapper {
 public:
-	// Register function that creates mapper for given code.
-	typedef Nes_Mapper* (*creator_func_t)();
-	static void register_mapper( int code, creator_func_t );
-	
-	// Register optional mappers included with Nes_Emu
-	void register_optional_mappers();
-	
 	// Create mapper appropriate for cartridge. Returns NULL if it uses unsupported mapper.
 	static Nes_Mapper* create( Nes_Cart const*, Nes_Core* );
 	
@@ -176,10 +169,7 @@ private:
 };
 
 
-#ifdef NDEBUG
 inline int Nes_Mapper::handle_bus_conflict( nes_addr_t addr, int data ) { return data; }
-#endif
-
 inline void Nes_Mapper::mirror_horiz(  int p ) { mirror_manual( p, p, p ^ 1, p ^ 1 ); }
 inline void Nes_Mapper::mirror_vert(   int p ) { mirror_manual( p, p ^ 1, p, p ^ 1 ); }
 inline void Nes_Mapper::mirror_single( int p ) { mirror_manual( p, p, p, p ); }

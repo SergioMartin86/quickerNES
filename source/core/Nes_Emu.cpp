@@ -3,7 +3,8 @@
 
 #include "Nes_Emu.h"
 
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "Nes_State.h"
 #include "Nes_Mapper.h"
 

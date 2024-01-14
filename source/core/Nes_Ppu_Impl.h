@@ -28,7 +28,8 @@ public:
 	static const uint16_t image_left = 8;
 	static const uint16_t buffer_width = image_width + 16;
 	static const uint16_t buffer_height = image_height;
-	
+	enum { spr_ram_size = 0x100 };
+
 	int write_2007( int );
 	
 	// Host palette
@@ -64,8 +65,11 @@ public:
 
 	static const uint16_t scanline_len = 341;
 	
+	uint8_t* getSpriteRAM () { return spr_ram; }
+	uint16_t getSpriteRAMSize () { return spr_ram_size; }
+
 protected:
-	uint8_t spr_ram [0x100];
+	uint8_t spr_ram [spr_ram_size];
 	void begin_frame();
 	void run_hblank( int );
 	int sprite_height() const { return (w2000 >> 2 & 8) + 8; }

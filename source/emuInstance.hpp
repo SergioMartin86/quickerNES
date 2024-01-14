@@ -52,6 +52,8 @@ class EmuInstance
  uint8_t* getHighMem() { return _nes->high_mem();};
  const uint8_t* getChrMem() { return _nes->chr_mem();};
  size_t getChrMemSize() { return _nes->chr_size();};
+ uint8_t* getSpriteRAM() { return _nes->spr_mem(); }
+ uint16_t getSpriteRAMSize() { return _nes->spr_mem_size(); }
 
  const std::string getRomSHA1() const { return _romSHA1String; }; 
 
