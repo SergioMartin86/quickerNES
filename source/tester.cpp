@@ -94,9 +94,17 @@ int main(int argc, char *argv[])
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
 
+  // Getting emulation core
+  #ifdef USE_ORIGINAL_QUICKNES
+  std::string emulationCore = "QuickNES";
+  #else
+  std::string emulationCore = "QuickerNES";
+  #endif
+
   // Printing test information
   printf("[] -----------------------------------------\n");
   printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
+  printf("[] Emulation Core:          '%s'\n", emulationCore.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
   printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
   printf("[] Verification State File: '%s'\n", verificationStateFilePath.c_str());

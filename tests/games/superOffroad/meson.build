@@ -1,4 +1,4 @@
 game = 'superOffroad'
 
 goal = 'anyPercent'
-test(goal, tester, workdir : meson.current_source_dir(), args : [ goal + '.test'], suite: [ game, goal ])
+test(goal, quickerNESTester, workdir : meson.current_source_dir(), args : [ goal + '.test'], suite: [ game, goal ])

@@ -35,7 +35,7 @@ executable('player',
 
 # Building tester tool for QuickerNES
 
-tester = executable('quickerNESTester',
+quickerNESTester = executable('quickerNESTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs, '-Werror' ],
   dependencies        : [ quickerNESCoreDependency, quickerNESApplicationDependency ],
@@ -44,7 +44,7 @@ tester = executable('quickerNESTester',
 
 # Building tester tool for the original QuickNES
 
-tester = executable('quickNESTester',
+quickNESTester = executable('quickNESTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs ],
   dependencies        : [ quickNESCoreDependency, quickerNESApplicationDependency ],

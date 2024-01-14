@@ -53,7 +53,7 @@ class EmuInstance
 
   // Getting state size to use
   _stateSize = getStateSizeImpl();
-  
+
   // Loading state file, if specified
   if (stateFilePath != "") loadStateFile(stateFilePath);
  }
