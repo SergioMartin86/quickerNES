@@ -16,9 +16,6 @@ class Nes_Core;
 
 class Nes_Mapper {
 public:
-	// Create mapper appropriate for cartridge. Returns NULL if it uses unsupported mapper.
-	static Nes_Mapper* create(const int mapperCode );
-	
 	virtual ~Nes_Mapper();
 	
 	// Reset mapper to power-up state.
