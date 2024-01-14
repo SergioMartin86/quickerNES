@@ -19,6 +19,15 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+#define st_n 0x80
+#define st_v 0x40
+#define st_r 0x20
+#define st_b 0x10
+#define st_d 0x08
+#define st_i 0x04
+#define st_z 0x02
+#define st_c 0x01
+
 // Macros
 
 #define GET_OPERAND( addr )   page [addr]
@@ -198,16 +207,6 @@ void Nes_Cpu::write( nes_addr_t addr, int value )
 
  // status flags
 
-enum {
-  st_n = 0x80,
-  st_v = 0x40,
-  st_r = 0x20,
-  st_b = 0x10,
-  st_d = 0x08,
-  st_i = 0x04,
-  st_z = 0x02,
-  st_c = 0x01,
-};
 
 constexpr uint8_t clock_table [256] = {
 //  0 1 2 3 4 5 6 7 8 9 A B C D E F
