@@ -152,3 +152,17 @@ void Nes_Mapper::mirror_manual( int page0, int page1, int page2, int page3 )
 }
 
 
+void Nes_Mapper::intercept_reads( nes_addr_t addr, unsigned size )
+{
+	emu().add_mapper_intercept( addr, size, true, false );
+}
+
+void Nes_Mapper::intercept_writes( nes_addr_t addr, unsigned size )
+{
+	emu().add_mapper_intercept( addr, size, false, true );
+}
+
+void Nes_Mapper::enable_sram( bool enabled, bool read_only )
+{
+	emu_->enable_sram( enabled, read_only );
+}

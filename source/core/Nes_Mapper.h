@@ -9,7 +9,6 @@
 #include "Nes_Cart.h"
 #include "Nes_Cpu.h"
 #include "nes_data.h"
-#include "Nes_Core.h"
 class Blip_Buffer;
 class blip_eq_t;
 class Nes_Core;
@@ -188,19 +187,6 @@ inline bool Nes_Mapper::write_intercepted( nes_time_t, nes_addr_t, int ) { retur
 
 inline int Nes_Mapper::read( nes_time_t, nes_addr_t ) { return -1; } // signal to caller
 
-inline void Nes_Mapper::intercept_reads( nes_addr_t addr, unsigned size )
-{
-	emu().add_mapper_intercept( addr, size, true, false );
-}
 
-inline void Nes_Mapper::intercept_writes( nes_addr_t addr, unsigned size )
-{
-	emu().add_mapper_intercept( addr, size, false, true );
-}
-
-inline void Nes_Mapper::enable_sram( bool enabled, bool read_only )
-{
-	emu_->enable_sram( enabled, read_only );
-}
 
 #endif

@@ -7,6 +7,7 @@
 #define NES_VRC7_H
 
 #include "emu2413_state.h"
+#include "Blip_Buffer.h"
 
 struct vrc7_snapshot_t;
 
