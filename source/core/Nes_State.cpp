@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "blargg_endian.h"
+#include "Nes_Apu.h"
 #include "Nes_Emu.h"
 #include "Nes_Mapper.h"
 
@@ -121,7 +122,7 @@ const char * Nes_State_::write_blocks( Nes_File_Writer& out ) const
 	
 	if ( apu_valid )
 	{
-		apu_state_t s = *apu;
+		Nes_Apu::apu_state_t s = *apu;
 		RETURN_ERR( write_nes_state( out, s ) );
 	}
 	
@@ -232,7 +233,7 @@ const char * Nes_State_::read_blocks( Nes_File_Reader& in )
 			ppu_valid = true;
 			break;
 		
-		case apu_state_t::tag:
+		case FOUR_CHAR('APUR'):
 			memset( apu, 0, sizeof *apu );
 			RETURN_ERR( read_nes_state( in, apu ) );
 			apu_valid = true;

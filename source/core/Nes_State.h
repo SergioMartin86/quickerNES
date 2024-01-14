@@ -8,6 +8,7 @@
 
 #include "Nes_File.h"
 #include "Nes_Cpu.h"
+#include "Nes_Apu.h"
 class Nes_Emu;
 class Nes_State;
 
@@ -63,7 +64,7 @@ public:
 	nes_state_t             nes;
 	Nes_Cpu::registers_t*   cpu;
 	joypad_state_t*         joypad;
-	apu_state_t*            apu;
+	Nes_Apu::apu_state_t*   apu;
 	ppu_state_t*            ppu;
 	mapper_state_t*         mapper;
 	
@@ -96,7 +97,7 @@ public:
 private:
 	Nes_Cpu::registers_t    cpu;
 	joypad_state_t          joypad;
-	apu_state_t             apu;
+	Nes_Apu::apu_state_t    apu;
 	ppu_state_t             ppu;
 	mapper_state_t          mapper;
 	uint8_t ram [ram_size];

@@ -1,10 +1,8 @@
+#pragma once
 
 // CPU Byte Order Utilities
 
 // Nes_Emu 0.7.0
-
-#ifndef BLARGG_ENDIAN
-#define BLARGG_ENDIAN
 
 #include "blargg_common.h"
 
@@ -105,4 +103,5 @@ inline void set_be( uint32_t* p, unsigned long n ) { SET_BE32( p, n ); }
 inline unsigned      get_be( uint16_t* p ) { return GET_BE16( p ); }
 inline unsigned long get_be( uint32_t* p ) { return GET_BE32( p ); }
 
-#endif
+#define SWAP_BE( n )    (void) (set_be( &(n), (n) ))
+#define SWAP_LE( n )    (void) (set_le( &(n), (n) ))

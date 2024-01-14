@@ -5,17 +5,95 @@
 // Nes_Snd_Emu 0.1.7
 
 #include <cstdint>
+#include "blargg_source.h"
+#include "blargg_endian.h"
 
 typedef long     nes_time_t; // CPU clock cycle count
 typedef unsigned nes_addr_t; // 16-bit memory address
 
 #include "Nes_Oscs.h"
 
-struct apu_state_t;
-class Nes_Buffer;
-
 class Nes_Apu {
 public:
+
+	typedef uint8_t env_t [3];
+	/*struct env_t {
+		uint8_t delay;
+		uint8_t env;
+		uint8_t written;
+	};*/
+
+	struct apu_t {
+		uint8_t w40xx [0x14]; // $4000-$4013
+		uint8_t w4015; // enables
+		uint8_t w4017; // mode
+		uint16_t frame_delay;
+		uint8_t frame_step;
+		uint8_t irq_flag;
+	};
+
+	struct square_t {
+		uint16_t delay;
+		env_t env;
+		uint8_t length_counter;
+		uint8_t phase;
+		uint8_t swp_delay;
+		uint8_t swp_reset;
+		uint8_t unused2 [1];
+	};
+
+	struct triangle_t {
+		uint16_t delay;
+		uint8_t length_counter;
+		uint8_t phase;
+		uint8_t linear_counter;
+		uint8_t linear_mode;
+	};
+
+	struct noise_t {
+		uint16_t delay;
+		env_t env;
+		uint8_t length_counter;
+		uint16_t shift_reg;
+	};
+
+	struct dmc_t {
+		uint16_t delay;
+		uint16_t remain;
+		uint16_t addr;
+		uint8_t buf;
+		uint8_t bits_remain;
+		uint8_t bits;
+		uint8_t buf_full;
+		uint8_t silence;
+		uint8_t irq_flag;
+	};
+
+	struct apu_state_t
+	{
+		apu_t apu;
+		square_t square1;
+		square_t square2;
+		triangle_t triangle;
+		noise_t noise;
+		dmc_t dmc;
+		
+		enum { tag = 0x41505552 }; // 'APUR'
+		void swap()
+		{
+			SWAP_LE( apu.frame_delay );
+			SWAP_LE( square1.delay );
+			SWAP_LE( square2.delay );
+			SWAP_LE( triangle.delay );
+			SWAP_LE( noise.delay );
+			SWAP_LE( noise.shift_reg );
+			SWAP_LE( dmc.delay );
+			SWAP_LE( dmc.remain );
+			SWAP_LE( dmc.addr );
+	}
+	};
+	BOOST_STATIC_ASSERT( sizeof (apu_state_t) == 72 );
+
 	Nes_Apu();
 	~Nes_Apu();
 	
@@ -172,3 +250,125 @@ inline nes_time_t Nes_Dmc::next_read_time() const
 
 inline nes_time_t Nes_Apu::next_dmc_read_time() const { return dmc.next_read_time(); }
 
+
+template<int mode>
+struct apu_reflection
+{
+	#define REFLECT( apu, state ) (mode ? void (apu = state) : void (state = apu))
+
+	static void reflect_env( Nes_Apu::env_t* state, Nes_Envelope& osc )
+	{
+		REFLECT( (*state) [0],  osc.env_delay );
+		REFLECT( (*state) [1],  osc.envelope );
+		REFLECT( (*state) [2],  osc.reg_written [3] );
+	}
+	
+	static void reflect_square( Nes_Apu::square_t& state, Nes_Square& osc )
+	{
+		reflect_env( &state.env, osc );
+		REFLECT( state.delay,           osc.delay );
+		REFLECT( state.length_counter,  osc.length_counter );
+		REFLECT( state.phase,           osc.phase );
+		REFLECT( state.swp_delay,       osc.sweep_delay );
+		REFLECT( state.swp_reset,       osc.reg_written [1] );
+	}
+	
+	static void reflect_triangle( Nes_Apu::triangle_t& state, Nes_Triangle& osc )
+	{
+		REFLECT( state.delay,           osc.delay );
+		REFLECT( state.length_counter,  osc.length_counter );
+		REFLECT( state.linear_counter,  osc.linear_counter );
+		REFLECT( state.phase,           osc.phase );
+		REFLECT( state.linear_mode,     osc.reg_written [3] );
+	}
+	
+	static void reflect_noise( Nes_Apu::noise_t& state, Nes_Noise& osc )
+	{
+		reflect_env( &state.env, osc );
+		REFLECT( state.delay,           osc.delay );
+		REFLECT( state.length_counter,  osc.length_counter );
+		REFLECT( state.shift_reg,       osc.noise );
+	}
+	
+	static void reflect_dmc( Nes_Apu::dmc_t& state, Nes_Dmc& osc )
+	{
+		REFLECT( state.delay,           osc.delay );
+		REFLECT( state.remain,          osc.length_counter );
+		REFLECT( state.buf,             osc.buf );
+		REFLECT( state.bits_remain,     osc.bits_remain );
+		REFLECT( state.bits,            osc.bits );
+		REFLECT( state.buf_full,        osc.buf_full );
+		REFLECT( state.silence,         osc.silence );
+		REFLECT( state.irq_flag,        osc.irq_flag );
+		if ( mode )
+			state.addr = osc.address | 0x8000;
+		else
+			osc.address = state.addr & 0x7fff;
+	}
+};
+
+
+inline void Nes_Apu::save_state( apu_state_t* state ) const
+{
+	for ( int i = 0; i < osc_count * 4; i++ )
+	{
+		int index = i >> 2;
+		state->apu.w40xx [i] = oscs [index]->regs [i & 3];
+		//if ( index < 4 )
+		//  state->length_counters [index] = oscs [index]->length_counter;
+	}
+	state->apu.w40xx [0x11] = dmc.dac;
+	
+	state->apu.w4015       = osc_enables;
+	state->apu.w4017       = frame_mode;
+	state->apu.frame_delay = frame_delay;
+	state->apu.frame_step  = frame;
+	state->apu.irq_flag    = irq_flag;
+	
+	typedef apu_reflection<1> refl;
+	Nes_Apu& apu = *(Nes_Apu*) this; // const_cast
+	refl::reflect_square  ( state->square1,     apu.square1 );
+	refl::reflect_square  ( state->square2,     apu.square2 );
+	refl::reflect_triangle( state->triangle,    apu.triangle );
+	refl::reflect_noise   ( state->noise,       apu.noise );
+	refl::reflect_dmc     ( state->dmc,         apu.dmc );
+}
+
+inline void Nes_Apu::load_state( apu_state_t const& state )
+{
+	reset();
+	
+	write_register( 0, 0x4017, state.apu.w4017 );
+	write_register( 0, 0x4015, state.apu.w4015 );
+	osc_enables = state.apu.w4015; // DMC clears bit 4
+	
+	for ( int i = 0; i < osc_count * 4; i++ )
+	{
+		int n = state.apu.w40xx [i];
+		int index = i >> 2;
+		oscs [index]->regs [i & 3] = n;
+		write_register( 0, 0x4000 + i, n );
+		//if ( index < 4 )
+		//  oscs [index]->length_counter = state.length_counters [index];
+	}
+	
+	frame_delay = state.apu.frame_delay;
+	frame       = state.apu.frame_step;
+	irq_flag    = state.apu.irq_flag;
+	
+	typedef apu_reflection<0> refl;
+	apu_state_t& st = (apu_state_t&) state; // const_cast
+	refl::reflect_square  ( st.square1,     square1 );
+	refl::reflect_square  ( st.square2,     square2 );
+	refl::reflect_triangle( st.triangle,    triangle );
+	refl::reflect_noise   ( st.noise,       noise );
+	refl::reflect_dmc     ( st.dmc,         dmc );
+	dmc.recalc_irq();
+
+	//force channels to have correct last_amp levels after load state
+	square1.run(last_time, last_time);
+	square2.run(last_time, last_time);
+	triangle.run(last_time, last_time);
+	noise.run(last_time, last_time);
+	dmc.run(last_time, last_time);
+}

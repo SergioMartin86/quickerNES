@@ -1,13 +1,21 @@
+#pragma once
 
 // NES data file block formats
+/* Copyright (C) 2004-2006 Shay Green. This module is free software; you
+can redistribute it and/or modify it under the terms of the GNU Lesser
+General Public License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version. This
+module is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+more details. You should have received a copy of the GNU Lesser General
+Public License along with this module; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Nes_Emu 0.7.0
 
-#ifndef NES_DATA_H
-#define NES_DATA_H
-
 #include "blargg_common.h"
-#include "apu_state.h"
+#include "blargg_endian.h"
 
 typedef long nes_tag_t;
 
@@ -48,7 +56,11 @@ struct nes_block_t
 	uint32_t tag; // ** stored in big-endian
 	uint32_t size;
 	
-	void swap();
+	void swap()
+	{
+ 	 SWAP_BE( tag );
+ 	 SWAP_LE( size );
+  } 
 };
 BOOST_STATIC_ASSERT( sizeof (nes_block_t) == 8 );
 
@@ -63,7 +75,11 @@ struct nes_state_t
 	uint32_t frame_count; // number of frames emulated since power-up
 	
 	enum { tag = FOUR_CHAR('TIME') };
-	void swap();
+	void swap()
+	{
+	 SWAP_LE( timestamp );
+	 SWAP_LE( frame_count );
+  }
 };
 BOOST_STATIC_ASSERT( sizeof (nes_state_t) == 8 );
 
@@ -74,7 +90,11 @@ struct joypad_state_t
 	uint8_t unused [3];
 	
 	enum { tag = FOUR_CHAR('CTRL') };
-	void swap();
+	void swap()
+	{
+	 SWAP_LE( joypad_latches [0] );
+	 SWAP_LE( joypad_latches [1] );
+  }
 };
 BOOST_STATIC_ASSERT( sizeof (joypad_state_t) == 12 );
 
@@ -104,7 +124,10 @@ struct cpu_state_t
 	uint8_t unused [1];
 	
 	enum { tag = FOUR_CHAR('CPUR') };
-	void swap();
+	void swap()
+	{
+  	SWAP_LE( pc );
+  }
 };
 BOOST_STATIC_ASSERT( sizeof (cpu_state_t) == 8 );
 
@@ -127,7 +150,13 @@ struct ppu_state_t
 	uint8_t unused2[3];
 	
 	enum { tag = FOUR_CHAR('PPUR') };
-	void swap();
+	void swap()
+	{
+	SWAP_LE( vram_addr );
+	SWAP_LE( vram_temp );
+	SWAP_LE( decay_low );
+	SWAP_LE( decay_high );
+ }
 };
 BOOST_STATIC_ASSERT( sizeof (ppu_state_t) == 20 + 0x20 );
 
@@ -151,5 +180,3 @@ struct mmc3_state_t
 	uint8_t irq_flag;
 };
 BOOST_STATIC_ASSERT( sizeof (mmc3_state_t) == 15 );
-
-#endif
