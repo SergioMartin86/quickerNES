@@ -1,10 +1,15 @@
 #pragma once
 
-#include <core/Nes_Emu.h>
-#include <core/Nes_State.h>
+#include <Nes_Emu.h>
+#include <Nes_State.h>
 #include <string>
 #include <utils.hpp> 
 #include "sha1/sha1.hpp"
+
+#ifdef USE_ORIGINAL_QUICKNES
+  extern void register_misc_mappers();
+  extern void register_extra_mappers();
+#endif
 
 #define _LOW_MEM_SIZE 0x800
 #define _HIGH_MEM_SIZE 0x2000
@@ -26,6 +31,12 @@ class EmuInstance
   // Creating new emulator
   _nes = new Nes_Emu;
 
+  // If running the original QuickNES, register extra mappers now
+  #ifdef USE_ORIGINAL_QUICKNES
+   register_misc_mappers();
+   register_extra_mappers();
+  #endif
+
   // Loading ROM
   std::string romData;
   bool status = loadStringFromFile(romData, romFilePath.c_str());
@@ -42,7 +53,7 @@ class EmuInstance
 
   // Getting state size to use
   _stateSize = getStateSizeImpl();
-
+  
   // Loading state file, if specified
   if (stateFilePath != "") loadStateFile(stateFilePath);
  }
@@ -52,8 +63,8 @@ class EmuInstance
  uint8_t* getHighMem() { return _nes->high_mem();};
  const uint8_t* getChrMem() { return _nes->chr_mem();};
  size_t getChrMemSize() { return _nes->chr_size();};
- uint8_t* getSpriteRAM() { return _nes->spr_mem(); }
- uint16_t getSpriteRAMSize() { return _nes->spr_mem_size(); }
+//  uint8_t* getSpriteRAM() { return _nes->spr_mem(); }
+//  uint16_t getSpriteRAMSize() { return _nes->spr_mem_size(); }
 
  const std::string getRomSHA1() const { return _romSHA1String; }; 
 
@@ -62,6 +73,7 @@ class EmuInstance
   // Loading state data
   std::string stateData;
   bool status = loadStringFromFile(stateData, stateFilePath.c_str());
+
   if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
   Mem_File_Reader stateReader(stateData.data(), (int)stateData.size());
   Auto_File_Reader stateFile(stateReader);
@@ -198,11 +210,20 @@ class EmuInstance
 
  inline size_t getStateSizeImpl() const
  {
-  // Using dry writer to just obtain the state size
-  Dry_Writer w;
-  Auto_File_Writer a(w);
-  _nes->save_state(a);
-  return w.size();
+  #ifdef USE_ORIGINAL_QUICKNES
+   #define _DUMMY_SIZE 65536
+   uint8_t data[_DUMMY_SIZE];
+   Mem_Writer w(data, _DUMMY_SIZE);
+   Auto_File_Writer a(w);
+   _nes->save_state(a);
+   return w.size();
+  #else
+    // Using dry writer to just obtain the state size
+    Dry_Writer w;
+    Auto_File_Writer a(w);
+    _nes->save_state(a);
+    return w.size();
+  #endif
  }
 
  // Emulator instance

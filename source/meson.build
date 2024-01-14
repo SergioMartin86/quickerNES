@@ -5,6 +5,5 @@ subdir('core')
 
  quickerNESApplicationDependency = declare_dependency(
   include_directories : include_directories(['.', '../extern']),
-  sources             : [ '../extern/metrohash128/metrohash128.cpp' ],
-  dependencies        : [ quickerNESCoreDependency ]
+  sources             : [ '../extern/metrohash128/metrohash128.cpp' ]
  )
