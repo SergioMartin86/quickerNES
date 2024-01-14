@@ -4,6 +4,10 @@ project('quickerNES','c','cpp',
   default_options : ['cpp_std=c++20', 'default_library=shared', 'buildtype=release']
 )
 
+# Getting page alignment
+getConfCommand = run_command('getconf', 'PAGESIZE', check: true)
+pageSize = getConfCommand.stdout().strip()
+
 # quickerNES Core sources
 
 quickerNESCoreSrc = [
@@ -41,7 +45,7 @@ quickerNESCoreSrc = [
 # quickerNES Core Configuration
 
  quickerNESCoreDependency = declare_dependency(
-  compile_args        : [ '-Wfatal-errors', '-Wall', '-Werror', '-Wno-multichar' ],
+  compile_args        : [ '-Wfatal-errors', '-Wall', '-Werror', '-Wno-multichar', '-D_PAGE_SIZE="' + pageSize + '"'],
   include_directories : include_directories(['source', 'source/core', 'extern']),
   sources             : [ quickerNESCoreSrc, 'extern/metrohash128/metrohash128.cpp' ]
  )

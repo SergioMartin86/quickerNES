@@ -231,11 +231,8 @@ constexpr uint8_t clock_table [256] = {
  3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7 // F
 };
 
-#pragma GCC push_options
-#pragma GCC optimize ("align-functions=1024")
-
-
-Nes_Cpu::result_t Nes_Cpu::run ( nes_time_t end ) 
+__attribute__((optimize("align-functions=" _PAGE_SIZE)))
+ Nes_Cpu::result_t Nes_Cpu::run ( nes_time_t end ) 
 {
  set_end_time_( end );
  clock_count = 0;
@@ -1180,5 +1177,3 @@ end:
 
  return result;
 }
-
- #pragma GCC pop_options
