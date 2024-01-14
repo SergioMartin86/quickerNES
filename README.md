@@ -17,7 +17,6 @@ Changes
   + Forced alignment at the start of a page to prevent crossing cache line boundaries
   + Simplifying instruction decode
 - Minimize compiled code size to reduce pressure on L1i cache
-- Sound is no longer emulated during skip frames
 
 Credits
 =========

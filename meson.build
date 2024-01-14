@@ -5,8 +5,7 @@ project('quickerNES','c','cpp',
 )
 
 # Getting page alignment
-getConfCommand = run_command('getconf', 'PAGESIZE', check: true)
-pageSize = getConfCommand.stdout().strip()
+pageSize = get_option('CPUFunctionAlignment')
 
 # quickerNES Core sources
 
@@ -45,7 +44,7 @@ quickerNESCoreSrc = [
 # quickerNES Core Configuration
 
  quickerNESCoreDependency = declare_dependency(
-  compile_args        : [ '-Wfatal-errors', '-Wall', '-Werror', '-Wno-multichar', '-D_PAGE_SIZE="' + pageSize + '"'],
+  compile_args        : [ '-Wfatal-errors', '-Wall', '-Werror', '-Wno-multichar', '-D_PAGE_SIZE="' + pageSize.to_string() + '"'],
   include_directories : include_directories(['source', 'source/core', 'extern']),
   sources             : [ quickerNESCoreSrc, 'extern/metrohash128/metrohash128.cpp' ]
  )
