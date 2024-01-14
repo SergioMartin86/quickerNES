@@ -17,7 +17,7 @@ class Nes_Core;
 class Nes_Mapper {
 public:
 	// Create mapper appropriate for cartridge. Returns NULL if it uses unsupported mapper.
-	static Nes_Mapper* create( Nes_Cart const*, Nes_Core* );
+	static Nes_Mapper* create(const int mapperCode );
 	
 	virtual ~Nes_Mapper();
 	
@@ -159,11 +159,17 @@ protected:
 	virtual void reset_state() { }
 	
 	// End of general interface
+
+	public:
+
+	Nes_Cart const* cart_;
+  Nes_Core* emu_;
+
 private:
-	Nes_Core* emu_;
+	
 	void* state;
 	unsigned state_size;
-	Nes_Cart const* cart_;
+	
 	
 	void default_reset_state();
 };

@@ -66,12 +66,18 @@ void Nes_Core::close()
 const char * Nes_Core::open( Nes_Cart const* new_cart )
 {
 	close();
-	
 	RETURN_ERR( init() );
-	
-	mapper = Nes_Mapper::create( new_cart, this );
+
+  // Getting cartdrige mapper code
+  auto mapperCode = new_cart->mapper_code();
+
+	mapper = Nes_Mapper::create(mapperCode);
 	if ( !mapper ) 
 		return unsupported_mapper;
+
+  // Assigning backwards pointers to cartdrige and emulator now
+  mapper->cart_ = new_cart;
+  mapper->emu_ = this;
 
 	RETURN_ERR( ppu.open_chr( new_cart->chr(), new_cart->chr_size() ) );
 	

@@ -41,7 +41,7 @@ quickerNESCoreSrc = [
 # quickerNES Core Configuration
 
  quickerNESCoreDependency = declare_dependency(
-  compile_args        : [ '-Wfatal-errors', '-Wall', '-Werror', '-Wno-multichar', '-DNDEBUG'  ],
+  compile_args        : [ '-Wfatal-errors', '-Wall', '-Werror', '-Wno-multichar', '-D_NES_MAPPER_002'  ],
   include_directories : include_directories(['source', 'source/core', 'extern']),
   sources             : [ quickerNESCoreSrc, 'extern/metrohash128/metrohash128.cpp' ]
  )

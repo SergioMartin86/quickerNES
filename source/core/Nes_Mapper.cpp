@@ -214,11 +214,8 @@ void Nes_Mapper::mirror_manual( int page0, int page1, int page2, int page3 )
 }
 
 
-Nes_Mapper* Nes_Mapper::create( Nes_Cart const* cart, Nes_Core* emu )
+Nes_Mapper* Nes_Mapper::create(const int mapperCode)
 {
-  // Getting cartdrige mapper code
-  auto mapperCode = cart->mapper_code();
-	
   // Storage for the mapper, NULL by default	
   Nes_Mapper* mapper = NULL;
 
@@ -285,10 +282,6 @@ Nes_Mapper* Nes_Mapper::create( Nes_Cart const* cart, Nes_Core* emu )
 	fprintf(stderr, "Could not find mapper for code: %u\n", mapperCode);
     return NULL;
   } 
-
-  // Assigning backwards pointers to cartdrige and emulator now
-  mapper->cart_ = cart;
-  mapper->emu_ = emu;
 
   // Returning successfully created mapper
   return mapper;
