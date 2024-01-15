@@ -87,6 +87,12 @@ int main(int argc, char *argv[])
   auto e = QuickerNESInstance();
   #endif
 
+  // Loading ROM File
+  e.loadROMFile(romFilePath);
+
+  // If an initial state is provided, load it now
+  if (stateFilePath != "") e.loadStateFile(stateFilePath);
+
   // Creating playback instance
   auto p = PlaybackInstance(&e, sequence);
 

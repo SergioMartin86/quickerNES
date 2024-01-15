@@ -123,10 +123,6 @@ imm##op:                                \
  goto loop;          \
 }
 
-inline void Nes_Cpu::set_code_page( int i, uint8_t const* p )
-{
- code_map [i] = p - (unsigned) i * page_size;
-}
 
 void Nes_Cpu::reset( void const* unmapped_page )
 {
@@ -143,12 +139,12 @@ void Nes_Cpu::reset( void const* unmapped_page )
  irq_time_ = LONG_MAX / 2 + 1;
  end_time_ = LONG_MAX / 2 + 1;
 
- set_code_page( 0, low_mem );
- set_code_page( 1, low_mem );
- set_code_page( 2, low_mem );
- set_code_page( 3, low_mem );
+ code_map [0] = low_mem;
+ code_map [1] = low_mem - 1 * page_size;
+ code_map [2] = low_mem - 2 * page_size;
+ code_map [3] = low_mem - 3 * page_size;
  for ( int i = 4; i < page_count + 1; i++ )
-  set_code_page( i, (uint8_t*) unmapped_page );
+   code_map [i] = (uint8_t*) unmapped_page;
 
  isCorrectExecution = true;
 }
@@ -156,8 +152,8 @@ void Nes_Cpu::reset( void const* unmapped_page )
 void Nes_Cpu::map_code( nes_addr_t start, unsigned size, const void* data )
 {
  unsigned first_page = start / page_size;
- for ( unsigned i = size / page_size; i--; )
-  set_code_page( first_page + i, (uint8_t*) data + i * page_size );
+ const uint8_t* newPtr =  (uint8_t*) data - start;
+ for ( unsigned i = size / page_size; i--; ) code_map [first_page + i] = newPtr;
 }
 
 // Note: 'addr' is evaulated more than once in the following macros, so it

@@ -73,7 +73,6 @@ public:
 	unsigned long error_count_;
 	
 	enum { irq_inhibit = 0x04 };
-	void set_code_page( int, uint8_t const* );
 	void update_clock_limit();
 	
 	registers_t r;
