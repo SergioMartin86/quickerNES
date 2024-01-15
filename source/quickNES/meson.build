@@ -1,6 +1,6 @@
 # quickNES Core sources
 
-quickNESCoreSrc = [
+quickNESSrc = [
 	'QuickNES_Core/nes_emu/abstract_file.cpp',
 	'QuickNES_Core/nes_emu/apu_state.cpp',
 	'QuickNES_Core/nes_emu/Blip_Buffer.cpp',
@@ -64,13 +64,15 @@ quickNESCoreSrc = [
 	'QuickNES_Core/nes_emu/Mapper_TaitoX1005.cpp',
 	'QuickNES_Core/nes_emu/Mapper_TaitoTC0190.cpp',
 	'QuickNES_Core/nes_emu/Mapper_Un1rom.cpp',
-	'QuickNES_Core/nes_emu/nes_ntsc.cpp'
+	'QuickNES_Core/nes_emu/nes_ntsc.cpp',
+	'Mapper_70.cpp',
+	'quickNESInstance.hpp'
 ]
 
 # quickNES Core Configuration
 
- quickNESCoreDependency = declare_dependency(
-  compile_args        : [ '-DUSE_ORIGINAL_QUICKNES'],
-  include_directories : include_directories(['QuickNES_Core/nes_emu']),
-  sources             : [ quickNESCoreSrc ]
+ quickNESDependency = declare_dependency(
+  compile_args        : [ '-D_USE_QUICKNES' ],
+  include_directories : include_directories(['.', 'QuickNES_Core/nes_emu']),
+  sources             : [ quickNESSrc ]
  )

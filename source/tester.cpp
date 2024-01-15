@@ -4,7 +4,14 @@
 #include "sha1/sha1.hpp"
 #include "utils.hpp"
 #include "nlohmann/json.hpp"
-#include "emuInstance.hpp"
+
+#ifdef _USE_QUICKNES
+#include "quickNESInstance.hpp"
+#endif
+
+#ifdef _USE_QUICKERNES
+#include "quickerNESInstance.hpp"
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -24,7 +31,7 @@ int main(int argc, char *argv[])
 
   // Loading script file
   std::string scriptJsonRaw;
-  if (loadStringFromFile(scriptJsonRaw, scriptFilePath.c_str()) == false)  EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
+  if (loadStringFromFile(scriptJsonRaw, scriptFilePath) == false)  EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
 
   // Parsing script 
   const auto scriptJson = nlohmann::json::parse(scriptJsonRaw);
@@ -55,7 +62,19 @@ int main(int argc, char *argv[])
   std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
 
   // Creating emulator instance
-  auto e = EmuInstance(romFilePath, initialStateFilePath);
+  #ifdef _USE_QUICKNES
+  auto e = QuickNESInstance();
+  #endif
+
+  #ifdef _USE_QUICKERNES
+  auto e = QuickerNESInstance();
+  #endif
+
+  // Loading ROM File
+  e.loadROMFile(romFilePath);
+
+  // If an initial state is provided, load it now
+  if (initialStateFilePath != "") e.loadStateFile(initialStateFilePath);
   
   // Disable rendering
   e.disableRendering();
@@ -94,17 +113,13 @@ int main(int argc, char *argv[])
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
 
-  // Getting emulation core
-  #ifdef USE_ORIGINAL_QUICKNES
-  std::string emulationCore = "QuickNES";
-  #else
-  std::string emulationCore = "QuickerNES";
-  #endif
+  // Getting emulation core name
+  std::string emulationCoreName = e.getCoreName();
 
   // Printing test information
   printf("[] -----------------------------------------\n");
   printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
-  printf("[] Emulation Core:          '%s'\n", emulationCore.c_str());
+  printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
   printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
   printf("[] Verification State File: '%s'\n", verificationStateFilePath.c_str());
@@ -118,7 +133,7 @@ int main(int argc, char *argv[])
   
   // Actually running the sequence
   auto t0 = std::chrono::high_resolution_clock::now();
-  for (const auto& input : sequence) e.advanceState(input);
+  for (const std::string& input : sequence) e.advanceState(input);
   auto tf = std::chrono::high_resolution_clock::now();
 
   // Calculating running time

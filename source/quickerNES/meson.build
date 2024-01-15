@@ -1,6 +1,6 @@
 # quickerNES Core sources
 
-quickerNESCoreSrc = [
+quickerNESSrc = [
  'Nes_Apu.cpp', 
  'Nes_File.cpp', 
  'Nes_Oscs.cpp', 
@@ -27,12 +27,13 @@ quickerNESCoreSrc = [
  'Nes_Mapper.cpp', 
  'Nes_Core.cpp', 
  'Nes_Cpu.cpp', 
+ 'quickerNESInstance.hpp'
 ]
 
 # quickerNES Core Configuration
 
- quickerNESCoreDependency = declare_dependency(
-  compile_args        : [ '-D_PAGE_SIZE="' + pageSize.to_string() + '"'],
+ quickerNESDependency = declare_dependency(
+  compile_args        : [ '-D_USE_QUICKERNES', '-D_PAGE_SIZE="' + pageSize.to_string() + '"'],
   include_directories : include_directories(['.']),
-  sources             : [ quickerNESCoreSrc ]
+  sources             : [ quickerNESSrc ]
  )

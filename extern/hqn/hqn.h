@@ -1,7 +1,7 @@
 #ifndef __HQN_H__
 #define __HQN_H__
 
-#include <core/Nes_Emu.h>
+#include <Nes_Emu.h>
 #include <cstdint>
 #include <stdio.h>
 
@@ -45,6 +45,8 @@ public:
      */
     HQNState();
     ~HQNState();
+
+    void setEmulatorPointer(void* const emuPtr) { m_emu = (Nes_Emu*)emuPtr; }
 
     /*
     The joypad data for the two joypads available to an NES.
@@ -148,7 +150,7 @@ void printUsage(const char *filename);
 } // end namespace hqn
 
 // Copied from bizinterface.cpp in BizHawk/quicknes
-inline void saveBlit(const Nes_Emu *e, int32_t *dest, const int32_t *colors, int cropleft, int croptop, int cropright, int cropbottom)
+inline void saveBlit(const void *ePtr, int32_t *dest, const int32_t *colors, int cropleft, int croptop, int cropright, int cropbottom)
 {
     // what is the point of the 256 color bitmap and the dynamic color allocation to it?
     // why not just render directly to a 512 color bitmap with static palette positions?
@@ -172,10 +174,11 @@ inline void saveBlit(const Nes_Emu *e, int32_t *dest, const int32_t *colors, int
 //        }
 //    }
 
+ const Nes_Emu *e = (Nes_Emu*) ePtr;
  const unsigned char *in_pixels = e->frame().pixels;
  if (in_pixels == NULL) return;
  int32_t *out_pixels = dest;
- 
+
  for (unsigned h = 0; h < Nes_Emu::image_height;  h++, in_pixels += e->frame().pitch, out_pixels += Nes_Emu::image_width)
   for (unsigned w = 0; w < Nes_Emu::image_width; w++)
   {

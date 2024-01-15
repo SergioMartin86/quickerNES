@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <vector>
 #include <stdarg.h>
 #include <stdexcept>
@@ -149,7 +148,7 @@ inline  void exitWithError [[noreturn]] (const char *fileName, const int lineNum
 }
 
 // Loads a string from a given file
-inline bool loadStringFromFile(std::string &dst, std::string path)
+inline bool loadStringFromFile(std::string &dst, const std::string path)
 {
   std::ifstream fi(path);
 
