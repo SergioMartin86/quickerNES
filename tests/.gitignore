@@ -3,4 +3,6 @@
 *.zip
 *.fds
 test.sol
+*.hash
+*.out
 
