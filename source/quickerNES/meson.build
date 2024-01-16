@@ -14,7 +14,6 @@ quickerNESSrc = [
  'Effects_Buffer.cpp', 
  'Nes_State.cpp', 
  'emu2413.cpp', 
- 'nes_util.cpp', 
  'emu2413_state.cpp', 
  'Nes_Effects_Buffer.cpp', 
  'Nes_Namco_Apu.cpp', 
