@@ -18,7 +18,7 @@ class EmuInstance
  typedef uint8_t inputType;
 
  // Deleting default constructors
- ~EmuInstance() = default;
+ virtual ~EmuInstance() = default;
 
  // Controller input bits
  // 0 - A / 1

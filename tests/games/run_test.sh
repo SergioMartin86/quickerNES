@@ -17,17 +17,25 @@ testerArgs=${@:4}
 mode="normal"
 if [ "${4}" = "--fullCycle" ]; then mode="fullCycle"; fi
 
+# Hash files
+quickerNESHashFile="quickerNES.${script}.${mode}.hash"
+quickNESHashFile="quickNES.${script}.${mode}.hash"
+
+# Removing them if already present
+rm -f ${quickerNESHashFile}
+rm -f ${quickNESHashFile}
+
 # Running script on quickerNES
-${quickerNESExecutable} ${script} --hashOutputFile quickerNES.${script}.${mode}.hash ${testerArgs}
+${quickerNESExecutable} ${script} --hashOutputFile ${quickerNESHashFile} ${testerArgs}
 
 # Running script on quickNES
-${quickNESExecutable} ${script} --hashOutputFile quickNES.${script}.${mode}.hash ${testerArgs}
+${quickNESExecutable} ${script} --hashOutputFile ${quickNESHashFile} ${testerArgs}
 
 # Comparing hashes
-quickerNESHash=`cat quickerNES.hash`
+quickerNESHash=`cat ${quickerNESHashFile}`
  
 # Comparing hashes
-quickNESHash=`cat quickNES.hash`
+quickNESHash=`cat ${quickNESHashFile}`
 
 # Compare hashes
 if [ "${quickerNESHash}" = "${quickNESHash}" ]; then
