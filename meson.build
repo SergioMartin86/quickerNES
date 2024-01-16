@@ -23,14 +23,16 @@ quickerNESPlayerSrc = [
   'extern/hqn/options.cpp',
 ]
 
-executable('player',
-  'source/player.cpp',
-  cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
-  dependencies        : [ quickerNESDependency, toolDependency, dependency('sdl2'), dependency('SDL2_image') ],
-  include_directories : include_directories(['source']),
-  link_args           : [ '-lncurses' ],
-  sources             : quickerNESPlayerSrc
-)
+if get_option('buildPlayer') == true
+  executable('player',
+    'source/player.cpp',
+    cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
+    dependencies        : [ quickerNESDependency, toolDependency, dependency('sdl2'), dependency('SDL2_image') ],
+    include_directories : include_directories(['source']),
+    link_args           : [ '-lncurses' ],
+    sources             : quickerNESPlayerSrc
+  )
+endif
 
 # Building tester tool for QuickerNES
 
@@ -51,6 +53,4 @@ quickNESTester = executable('qTester',
 )
 
 # Building tests
-if get_option('buildTests') == true
-  subdir('tests')
-endif
+subdir('tests')

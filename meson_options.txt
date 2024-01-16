@@ -1,7 +1,7 @@
-option('buildTests',
+option('buildPlayer',
   type : 'boolean',
   value : false,
-  description : 'Build test suite',
+  description : 'Build playback tool',
   yield: true
 )
 
