@@ -50,7 +50,6 @@ public: private: friend class Nes_Emu;
 
 public:
 	unsigned long current_joypad [2];
-	int joypad_read_count;
 	Nes_Cart const* cart;
 	Nes_Mapper* mapper;
 	nes_state_t nes;

@@ -369,7 +369,6 @@ void Nes_Core::write_io( nes_addr_t addr, int data )
 		// if strobe goes low, latch data
 		if ( joypad.w4016 & 1 & ~data )
 		{
-			joypad_read_count++;
 			joypad.joypad_latches [0] = current_joypad [0];
 			joypad.joypad_latches [1] = current_joypad [1];
 		}
@@ -614,8 +613,6 @@ nes_time_t Nes_Core::emulate_frame(int joypad1, int joypad2)
 	current_joypad [0] = (joypad1 |= ~0xFF);
 	current_joypad [1] = (joypad2 |= ~0xFF);
 
-	joypad_read_count = 0;
-	
 	cpu_time_offset = ppu.begin_frame( nes.timestamp ) - 1;
 	ppu_2002_time = 0;
 	clock_ = cpu_time_offset;

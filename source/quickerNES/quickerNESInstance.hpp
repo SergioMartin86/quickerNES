@@ -22,9 +22,7 @@ class QuickerNESInstance : public EmuInstance
  virtual bool loadROMFileImpl(const std::string& romData) override
  {
   // Loading rom data
-  Mem_File_Reader romReader(romData.data(), (int)romData.size());
-  Auto_File_Reader romFile(romReader);
-  auto result = _nes->load_ines(romFile);
+  auto result = _nes->load_ines((uint8_t*)romData.data());
   return result == 0;
  }
 

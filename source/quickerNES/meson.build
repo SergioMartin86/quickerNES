@@ -8,7 +8,6 @@ quickerNESSrc = [
  'Nes_Fme7_Apu.cpp', 
  'Nes_Ppu.cpp', 
  'Blip_Buffer.cpp', 
- 'Nes_Cart.cpp', 
  'Nes_Ppu_Impl.cpp', 
  'Data_Reader.cpp', 
  'Nes_Ppu_Rendering.cpp', 

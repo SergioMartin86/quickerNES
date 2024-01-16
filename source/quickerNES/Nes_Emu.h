@@ -20,7 +20,6 @@ public:
 // Basic setup
 
 	// Load iNES file into emulator and clear recording
-	const char * load_ines( Auto_File_Reader );
 	const char * load_ines( const uint8_t* buffer );
 
 	// Set sample rate for sound generation
@@ -90,10 +89,6 @@ public:
 
 	// Pointer to current cartridge, or NULL if none is loaded
 	Nes_Cart const* cart() const { return emu.cart; }
-
-	// Free any memory and close cartridge, if one was currently open. A new cartridge
-	// must be opened before further emulation can take place.
-	void close();
 
 	// Emulate powering NES off and then back on. If full_reset is false, emulates
 	// pressing the reset button only, which doesn't affect memory, otherwise
@@ -223,7 +218,6 @@ private:
 	virtual void loading_state( Nes_State const& ) { }
 	void load_state( Nes_State_ const& );
 	void save_state( Nes_State_* s ) const { emu.save_state( s ); }
-	int joypad_read_count() const { return emu.joypad_read_count; }
 	long timestamp() const { return emu.nes.frame_count; }
 	void set_timestamp( long t ) { emu.nes.frame_count = t; }
 

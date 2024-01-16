@@ -58,11 +58,6 @@ public:
     inline Nes_Emu *emu() const
     { return m_emu; }
 
-    /*
-    Load a NES rom from the named file.
-    Returns NULL or error string.
-    */
-	error_t loadROM(const char *filename);
 
     /*
     Advance the emulator by one frame. If sleep is true and there is a frame
@@ -120,9 +115,6 @@ public:
     { return m_keyboard; }
 
 private:
-    // Safely unload the currently loaded rom
-    void unloadRom();
-
     /* ROM file stored in memory because reasons */
     uint8_t *m_romData;
     size_t m_romSize;

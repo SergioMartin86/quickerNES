@@ -84,20 +84,8 @@ inline void Nes_Emu::clear_sound_buf()
 	sound_buf->clear();
 }
 
-// Emulation
-
-void Nes_Emu::close()
-{
-	if ( cart() )
-	{
-		emu.close();
-		private_cart.clear();
-	}
-}
-
 const char * Nes_Emu::set_cart( Nes_Cart const* new_cart )
 {
-	close();
 	RETURN_ERR( auto_init() );
 	RETURN_ERR( emu.open( new_cart ) );
 
@@ -173,7 +161,6 @@ const char * Nes_Emu::emulate_frame( int joypad1, int joypad2 )
 		f->chan_count        = sound_buf->samples_per_frame();
 		f->palette_begin     = emu.ppu.palette_begin;
 		f->palette_size      = emu.ppu.palette_size;
-		f->joypad_read_count = emu.joypad_read_count;
 		f->burst_phase       = emu.ppu.burst_phase;
 		f->pitch             = emu.ppu.host_row_bytes;
 		f->pixels            = emu.ppu.host_pixels + f->left;
@@ -191,15 +178,7 @@ const char * Nes_Emu::emulate_frame( int joypad1, int joypad2 )
 
 const char * Nes_Emu::load_ines( const uint8_t* buffer )
 {
-	close();
 	private_cart.load_ines( buffer );
-	return set_cart( &private_cart );
-}
-
-const char * Nes_Emu::load_ines( Auto_File_Reader in )
-{
-	close();
-	RETURN_ERR( private_cart.load_ines( in ) );
 	return set_cart( &private_cart );
 }
 
