@@ -2,6 +2,7 @@ nomalloc = environment({'MALLOC_PERTURB_': '0'})
 
 bash = find_program('bash')
 testCommands = ['../run_test.sh', quickerNESTester.path(), quickNESTester.path() ]
+testTimeout = 120
 
 subdir('arkanoid')
 subdir('castlevania1')

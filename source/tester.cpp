@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
   // Printing test information
   printf("[] -----------------------------------------\n");
   printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
-  printf("[] Cycle Type:              '%s'\n", isFullCycle ? "Load / Advance / Save" : "Advance Only");
+  printf("[] Cycle Type:              '%s'\n", isFullCycle ? "Load / Advance / Save / Advance" : "Advance Only");
   printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
   printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
@@ -140,6 +140,7 @@ int main(int argc, char *argv[])
     if (isFullCycle == true) e.deserializeState(currentState);
     e.advanceState(input);
     if (isFullCycle == true) e.serializeState(currentState);
+    if (isFullCycle == true) e.advanceState(input);
   } 
   auto tf = std::chrono::high_resolution_clock::now();
 
