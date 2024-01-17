@@ -68,25 +68,6 @@ error_t HQNState::setSampleRate(int rate)
 	return ret;
 }
 
-// Load a ROM image
-error_t HQNState::loadROM(const char *filename)
-{
-    // unload any existing rom data
-    unloadRom();
-
-    if (!load_file(filename, (char**)(&m_romData), &m_romSize))
-    {
-        return "Failed to open file";
-    }
-
-    // Now finally load the rom. Ugh
-    Mem_File_Reader r(m_romData, (int)m_romSize);
-    Auto_File_Reader a(r);
-    error_t result = m_emu->load_ines(a);
-    if (m_listener)
-        m_listener->onLoadROM(this, filename);
-    return result;
-}
 
 error_t HQNState::saveState(void *dest, size_t size, size_t *size_out)
 {
@@ -118,16 +99,6 @@ error_t HQNState::loadState(const char *data, size_t size)
     if (m_listener)
         m_listener->onLoadState(this);
     return result;
-}
-
-void HQNState::unloadRom()
-{
-    if (m_romData)
-    {
-        delete[] m_romData;
-        m_romData = nullptr;
-        m_romSize = 0;
-    }
 }
 
 // Advance the emulator

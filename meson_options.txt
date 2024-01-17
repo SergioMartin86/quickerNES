@@ -1,16 +1,15 @@
-option('buildTests',
+option('buildPlayer',
   type : 'boolean',
   value : false,
-  description : 'Build test suite',
+  description : 'Build playback tool',
   yield: true
 )
 
 option('CPUFunctionAlignment',
   type : 'integer',
   min : 1,
-  value : 4096,
+  value : 1024,
   description : '''Indicates the alignment for the main emulator CPU function.
                  This is a large function that may cross page boundaries, which impacts performance. 
-                 We recommend setting this value for the architecture own page size. 
                  This requires the GNU compiler to work.'''
 )

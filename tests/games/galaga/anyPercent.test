@@ -2,6 +2,5 @@
   "Rom File": "Galaga - Demons of Death (U) [!].nes",
   "Expected ROM SHA1": "DA54C223D79FA59EB95437854B677CF69B5CAC8A",
   "Initial State File": "",
-  "Verification State File": "anyPercent.final.state",
   "Sequence File": "anyPercent.sol"
 }

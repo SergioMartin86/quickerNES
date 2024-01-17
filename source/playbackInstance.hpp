@@ -11,6 +11,8 @@
 
 #define _INVERSE_FRAME_RATE 16667
 
+class Nes_Emu;
+
 struct stepData_t
 {
   std::string input;
@@ -37,8 +39,11 @@ class PlaybackInstance
   // Initializes the playback module instance
  PlaybackInstance(EmuInstance* emu, const std::vector<std::string>& sequence, const std::string& overlayPath = "") : _emu(emu)
  {
+   // Enabling emulation rendering
+   _emu->enableRendering();
+
    // Loading Emulator instance HQN
-  _hqnState.m_emu = _emu->getInternalEmulator();
+  _hqnState.setEmulatorPointer(_emu->getInternalEmulatorPointer());
   static uint8_t video_buffer[Nes_Emu::image_width * Nes_Emu::image_height];
   _hqnState.m_emu->set_pixels(video_buffer, Nes_Emu::image_width+8);
 
@@ -149,7 +154,7 @@ class PlaybackInstance
   // Since we do not store the blit information (too much memory), we need to load the previous frame and re-run the input
 
   // If its the first step, then simply reset
-  if (stepId == 0) _emu->getInternalEmulator()->reset();
+  if (stepId == 0) _emu->doHardReset();
 
   // Else we load the previous frame
   if (stepId > 0)
@@ -161,7 +166,7 @@ class PlaybackInstance
   
   // Updating image
    int32_t curBlit[BLIT_SIZE];
-   saveBlit(_emu->getInternalEmulator(), curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
+   saveBlit(_emu->getInternalEmulatorPointer(), curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
   _hqnGUI->update_blit(curBlit, _overlayBaseSurface, overlayButtonASurface, overlayButtonBSurface, overlayButtonSelectSurface, overlayButtonStartSurface, overlayButtonLeftSurface, overlayButtonRightSurface, overlayButtonUpSurface, overlayButtonDownSurface);
  }
 

@@ -2,6 +2,5 @@
   "Rom File": "Saint Seiya - Ougon Densetsu Kanketsu Hen (J) [!].nes",
   "Expected ROM SHA1": "F871D9B3DAFDDCDAD5F2ACD71044292E5169064E",
   "Initial State File": "",
-  "Verification State File": "anyPercent.final.state",
   "Sequence File": "anyPercent.sol"
 }

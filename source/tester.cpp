@@ -4,16 +4,32 @@
 #include "sha1/sha1.hpp"
 #include "utils.hpp"
 #include "nlohmann/json.hpp"
-#include "emuInstance.hpp"
+
+#ifdef _USE_QUICKNES
+#include "quickNESInstance.hpp"
+#endif
+
+#ifdef _USE_QUICKERNES
+#include "quickerNESInstance.hpp"
+#endif
 
 int main(int argc, char *argv[])
 {
    // Parsing command line arguments
-  argparse::ArgumentParser program("player", "1.0");
+  argparse::ArgumentParser program("tester", "1.0");
 
   program.add_argument("scriptFile")
     .help("Path to the test script file to run.")
     .required();
+
+  program.add_argument("--fullCycle")
+    .help("Performs the full load / advance frame / save cycle, as opposed to just advance frame")
+    .default_value(false)
+    .implicit_value(true);
+
+  program.add_argument("--hashOutputFile")
+    .help("Path to write the hash output to.")
+    .default_value(std::string(""));
 
   // Try to parse arguments
   try { program.parse_args(argc, argv);  }
@@ -22,9 +38,15 @@ int main(int argc, char *argv[])
   // Getting test script file path
   std::string scriptFilePath = program.get<std::string>("scriptFile");
 
+  // Getting path where to save the hash output (if any)
+  std::string hashOutputFile = program.get<std::string>("--hashOutputFile");
+
+  // Getting reproduce flag
+  bool isFullCycle = program.get<bool>("--fullCycle");
+
   // Loading script file
   std::string scriptJsonRaw;
-  if (loadStringFromFile(scriptJsonRaw, scriptFilePath.c_str()) == false)  EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
+  if (loadStringFromFile(scriptJsonRaw, scriptFilePath) == false)  EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
 
   // Parsing script 
   const auto scriptJson = nlohmann::json::parse(scriptJsonRaw);
@@ -39,11 +61,6 @@ int main(int argc, char *argv[])
   if (scriptJson["Initial State File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Initial State File' entry is not a string\n");
   std::string initialStateFilePath = scriptJson["Initial State File"].get<std::string>();
 
-  // Getting verification state file path
-  if (scriptJson.contains("Verification State File") == false) EXIT_WITH_ERROR("Script file missing 'Verification State File' entry\n");
-  if (scriptJson["Verification State File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Verification State File' entry is not a string\n");
-  std::string verificationStateFilePath = scriptJson["Verification State File"].get<std::string>();
-
   // Getting sequence file path
   if (scriptJson.contains("Sequence File") == false) EXIT_WITH_ERROR("Script file missing 'Sequence File' entry\n");
   if (scriptJson["Sequence File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Sequence File' entry is not a string\n");
@@ -55,7 +72,19 @@ int main(int argc, char *argv[])
   std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
 
   // Creating emulator instance
-  auto e = EmuInstance(romFilePath, initialStateFilePath);
+  #ifdef _USE_QUICKNES
+  auto e = QuickNESInstance();
+  #endif
+
+  #ifdef _USE_QUICKERNES
+  auto e = QuickerNESInstance();
+  #endif
+
+  // Loading ROM File
+  e.loadROMFile(romFilePath);
+
+  // If an initial state is provided, load it now
+  if (initialStateFilePath != "") e.loadStateFile(initialStateFilePath);
   
   // Disable rendering
   e.disableRendering();
@@ -72,18 +101,6 @@ int main(int argc, char *argv[])
   // Checking with the expected SHA1 hash
   if (romSHA1 != expectedROMSHA1) EXIT_WITH_ERROR("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
 
-  // Loading state file for verication, if provided
-  std::string verificationState;
-  if (verificationStateFilePath != "")
-  {
-    // Loading file
-    if (loadStringFromFile(verificationState, verificationStateFilePath) == false)
-     EXIT_WITH_ERROR("[ERROR] Could not find or read from verification state file: %s\n", verificationStateFilePath.c_str());
-
-    // Checking size
-    if (verificationState.length() != stateSize) EXIT_WITH_ERROR("[ERROR] The provided verification state has different size from expected: %lu vs %lu\n", verificationState.length(), stateSize);
-  }
-
   // Loading sequence file
   std::string sequenceRaw;
   if (loadStringFromFile(sequenceRaw, sequenceFilePath) == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
@@ -94,20 +111,16 @@ int main(int argc, char *argv[])
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
 
-  // Getting emulation core
-  #ifdef USE_ORIGINAL_QUICKNES
-  std::string emulationCore = "QuickNES";
-  #else
-  std::string emulationCore = "QuickerNES";
-  #endif
+  // Getting emulation core name
+  std::string emulationCoreName = e.getCoreName();
 
   // Printing test information
   printf("[] -----------------------------------------\n");
   printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
-  printf("[] Emulation Core:          '%s'\n", emulationCore.c_str());
+  printf("[] Cycle Type:              '%s'\n", isFullCycle ? "Advance / Load / Advance / Save" : "Advance Only");
+  printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
   printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
-  printf("[] Verification State File: '%s'\n", verificationStateFilePath.c_str());
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
   printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
@@ -116,9 +129,19 @@ int main(int argc, char *argv[])
   
   fflush(stdout);
   
+  // Serializing initial state
+  uint8_t* currentState = (uint8_t*) malloc (stateSize);
+  e.serializeState(currentState);
+
   // Actually running the sequence
   auto t0 = std::chrono::high_resolution_clock::now();
-  for (const auto& input : sequence) e.advanceState(input);
+  for (const std::string& input : sequence)
+  {
+    if (isFullCycle == true) e.advanceState(input);
+    if (isFullCycle == true) e.deserializeState(currentState);
+    e.advanceState(input);
+    if (isFullCycle == true) e.serializeState(currentState);
+  } 
   auto tf = std::chrono::high_resolution_clock::now();
 
   // Calculating running time
@@ -128,29 +151,19 @@ int main(int argc, char *argv[])
   // Calculating final state hash
   const auto finalStateHash = e.getStateHash();
 
-  // If provided, verify result against the passed verification movie
-  bool verificationPassed = true;
-  hash_t verificationStateHash;
-  if (verificationStateFilePath != "") 
-  {
-    // Loading verification state into the emulator
-    e.deserializeState((uint8_t*)verificationState.data());
-
-    // Calculating hash for the verification state
-    verificationStateHash = e.getStateHash();
-
-    // Comparing hashes
-    if (verificationStateHash != finalStateHash) verificationPassed = false;
-  }
+  // Creating hash string
+  char hashStringBuffer[256];
+  sprintf(hashStringBuffer, "0x%lX%lX", finalStateHash.first, finalStateHash.second);
 
   // Printing time information
   printf("[] Elapsed time:            %3.3fs\n", (double)dt * 1.0e-9);
-  printf("[] Performance:             %.3f steps / s\n", (double)sequenceLength / elapsedTimeSeconds);
-  printf("[] Final State Hash:        0x%lX%lX\n", finalStateHash.first, finalStateHash.second);
-  if (verificationStateFilePath != "")
-  printf("[] Verification Hash:       0x%lX%lX (%s)\n", verificationStateHash.first, verificationStateHash.second, verificationPassed ? "Passed" : "Failed");
+  printf("[] Performance:             %.3f inputs / s\n", (double)sequenceLength / elapsedTimeSeconds);
+  printf("[] Final State Hash:        %s\n", hashStringBuffer);
 
-  // Fail if verification didn't pass
-  return verificationPassed ? 0 : -1;
+  // If saving hash, do it now
+  if (hashOutputFile != "") saveStringToFile(std::string(hashStringBuffer), hashOutputFile.c_str());
+
+  // If reached this point, everything ran ok
+  return 0;
 }
 

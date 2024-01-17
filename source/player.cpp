@@ -4,6 +4,14 @@
 #include "emuInstance.hpp"
 #include "playbackInstance.hpp"
 
+#ifdef _USE_QUICKNES
+#include "quickNESInstance.hpp"
+#endif
+
+#ifdef _USE_QUICKERNES
+#include "quickerNESInstance.hpp"
+#endif
+
 int main(int argc, char *argv[])
 {
   // Parsing command line arguments
@@ -71,7 +79,19 @@ int main(int argc, char *argv[])
   refreshTerminal();
 
   // Creating emulator instance
-  auto e = EmuInstance(romFilePath, stateFilePath);
+  #ifdef _USE_QUICKNES
+  auto e = QuickNESInstance();
+  #endif
+
+  #ifdef _USE_QUICKERNES
+  auto e = QuickerNESInstance();
+  #endif
+
+  // Loading ROM File
+  e.loadROMFile(romFilePath);
+
+  // If an initial state is provided, load it now
+  if (stateFilePath != "") e.loadStateFile(stateFilePath);
 
   // Creating playback instance
   auto p = PlaybackInstance(&e, sequence);

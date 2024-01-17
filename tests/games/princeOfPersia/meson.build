@@ -1,4 +1,4 @@
 game = 'princeOfPersia'
 
-goal = 'lvl7'
-test(goal, quickerNESTester, workdir : meson.current_source_dir(), args : [ goal + '.test'], suite: [ game, goal ])
+goal = 'anyPercent'
+test(goal + '-FullCycle', bash, workdir : meson.current_source_dir(), timeout: testTimeout, args : [ testCommands, goal + '.test', '--fullCycle'], suite: [ game, goal ] )

@@ -1,70 +1,27 @@
-gitBranch=`git branch --show-current`
-gitCommit=`git rev-parse HEAD`
+#!/bin/bash
 
-echo "Git revision: ${gitBranch}:${gitCommit}" 
+# Finding all test scripts
+testScriptList=`find . -type f -name *.test`
 
-echo "Getting system information"
-lscpu
-lsmem
-echo "Running Tests sequentially..."
+# Iterating over the scripts
+for script in ${testScriptList}; do
+  
+  # Getting base folder
+  folder=`dirname ${script}`
 
-pushd arkanoid
-tester warps.test
-tester warpless.test
-popd
+  # Getting filename
+  fileName=`basename ${script}`
+ 
+  # Going to folder
+  pushd ${folder}
 
-pushd ninjaGaiden2
-tester pacifist.test
-tester anyPercent.test
-popd
+  # Running script on quickerNES
+  quickerNESTester ${fileName} 
 
-pushd superOffroad
-tester anyPercent.test
-popd
+  # Running script on quickerNES
+  quickNESTester ${fileName}
 
-pushd nigelMansell
-tester anyPercent.test
-popd
+  # Coming back
+  popd
+done
 
-pushd castlevania1
-tester pacifist.test
-tester anyPercent.test
-popd 
-
-pushd saintSeiyaKanketsuHen
-tester anyPercent.test
-popd
-
-pushd tennis
-tester anyPercent.test
-popd
-
-pushd superMarioBros
-tester warps.test
-tester warpless.test
-popd 
-
-pushd ninjaGaiden
-tester pacifist.test
-tester anyPercent.test
-popd 
-
-pushd ironSword
-tester anyPercent.test
-popd 
-
-pushd saintSeiyaOugonDensetsu
-tester anyPercent.test
-popd 
-
-pushd princeOfPersia
-tester lvl7.test
-popd
-
-pushd solarJetman
-tester anyPercent.test
-popd 
-
-pushd galaga
-tester anyPercent.test
-popd

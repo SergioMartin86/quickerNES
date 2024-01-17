@@ -1,19 +1,15 @@
 #pragma once
 
-#include <Nes_Emu.h>
-#include <Nes_State.h>
-#include <string>
 #include <utils.hpp> 
 #include "sha1/sha1.hpp"
-
-#ifdef USE_ORIGINAL_QUICKNES
-  extern void register_misc_mappers();
-  extern void register_extra_mappers();
-#endif
 
 #define _LOW_MEM_SIZE 0x800
 #define _HIGH_MEM_SIZE 0x2000
 #define _NAMETABLES_MEM_SIZE 0x1000
+
+// Size of image generated in graphics buffer
+static const uint16_t image_width   = 256;
+static const uint16_t image_height  = 240;
 
 class EmuInstance
 {
@@ -22,110 +18,7 @@ class EmuInstance
  typedef uint8_t inputType;
 
  // Deleting default constructors
- EmuInstance() = delete;
- EmuInstance(EmuInstance& e) = delete;
- ~EmuInstance() = default;
-
- EmuInstance(const std::string& romFilePath, const std::string& stateFilePath)
- {
-  // Creating new emulator
-  _nes = new Nes_Emu;
-
-  // If running the original QuickNES, register extra mappers now
-  #ifdef USE_ORIGINAL_QUICKNES
-   register_misc_mappers();
-   register_extra_mappers();
-  #endif
-
-  // Loading ROM
-  std::string romData;
-  bool status = loadStringFromFile(romData, romFilePath.c_str());
-  if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", romFilePath.c_str());
-
-  // Calculating ROM hash value
-  _romSHA1String = SHA1::GetHash((uint8_t*)romData.data(), romData.size());
-
-  // Loading the rom into the emulator
-  Mem_File_Reader romReader(romData.data(), (int)romData.size());
-  Auto_File_Reader romFile(romReader);
-  auto result = _nes->load_ines(romFile);
-  if (result != 0) EXIT_WITH_ERROR("Could not initialize emulator with rom file: %s\n", romFilePath.c_str());
-
-  // Getting state size to use
-  _stateSize = getStateSizeImpl();
-
-  // Loading state file, if specified
-  if (stateFilePath != "") loadStateFile(stateFilePath);
- }
-
- uint8_t* getLowMem() { return _nes->low_mem(); };
- uint8_t* getNametableMem() { return _nes->nametable_mem(); };
- uint8_t* getHighMem() { return _nes->high_mem();};
- const uint8_t* getChrMem() { return _nes->chr_mem();};
- size_t getChrMemSize() { return _nes->chr_size();};
-//  uint8_t* getSpriteRAM() { return _nes->spr_mem(); }
-//  uint16_t getSpriteRAMSize() { return _nes->spr_mem_size(); }
-
- const std::string getRomSHA1() const { return _romSHA1String; }; 
-
- void loadStateFile(const std::string& stateFilePath) 
- {
-  // Loading state data
-  std::string stateData;
-  bool status = loadStringFromFile(stateData, stateFilePath.c_str());
-
-  if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
-  Mem_File_Reader stateReader(stateData.data(), (int)stateData.size());
-  Auto_File_Reader stateFile(stateReader);
-
-  // Loading state data into state object
-  Nes_State state;
-  state.read(stateFile);
-
-  // Loading state object into the emulator
-  _nes->load_state(state);
- }
-
- inline size_t getStateSize() const { return _stateSize; }
-
- inline hash_t getStateHash() 
- {
-  MetroHash128 hash;
-
-  uint8_t stateData[_stateSize];
-  serializeState(stateData);
-
-  hash.Update(getLowMem(), _LOW_MEM_SIZE);
-  hash.Update(getHighMem(), _HIGH_MEM_SIZE);
-  hash.Update(getNametableMem(), _NAMETABLES_MEM_SIZE);
-  hash.Update(getChrMem(), getChrMemSize());
-
-  hash_t result;
-  hash.Finalize(reinterpret_cast<uint8_t *>(&result));
-  return result;
- }
-
- void saveStateFile(const std::string& stateFilePath) const 
- {
-  std::string stateData;
-  stateData.resize(_stateSize);
-  serializeState((uint8_t*)stateData.data());
-  saveStringToFile(stateData, stateFilePath.c_str());
- }
-
- void serializeState(uint8_t* state) const 
- {
-  Mem_Writer w(state, _stateSize, 0);
-  Auto_File_Writer a(w);
-  _nes->save_state(a);
- }
-
- void deserializeState(const uint8_t* state) 
- {
-  Mem_File_Reader r(state, _stateSize);
-  Auto_File_Reader a(r);
-  _nes->load_state(a);
- }
+ virtual ~EmuInstance() = default;
 
  // Controller input bits
  // 0 - A / 1
@@ -184,55 +77,102 @@ class EmuInstance
   moveString += "|";
   return moveString;
  }
-
- void enableRendering()  { _doRendering = true; }
- void disableRendering() { _doRendering = false; }
-
- void advanceState(const std::string& move)
+ 
+ inline void advanceState(const std::string& move)
  {
-  if (move.find("r") != std::string::npos) _nes->reset(false); 
+  if (move.find("r") != std::string::npos) doSoftReset(); 
 
-  advanceState(moveStringToCode(move), 0);
+  advanceStateImpl(moveStringToCode(move), 0);
  }
 
- void advanceState(const inputType controller1, const inputType controller2) 
+ inline size_t getStateSize() const { return _stateSize; }
+ inline std::string getRomSHA1() const { return _romSHA1String; }
+
+ inline hash_t getStateHash() const
  {
-  if (_doRendering == true)  _nes->emulate_frame(controller1, controller2);
-  if (_doRendering == false) _nes->emulate_skip_frame(controller1, controller2);
+  MetroHash128 hash;
+
+  uint8_t stateData[_stateSize];
+  serializeState(stateData);
+
+  hash.Update(getLowMem(), _LOW_MEM_SIZE);
+  hash.Update(getHighMem(), _HIGH_MEM_SIZE);
+  hash.Update(getNametableMem(), _NAMETABLES_MEM_SIZE);
+  hash.Update(getChrMem(), getChrMemSize());
+
+  hash_t result;
+  hash.Finalize(reinterpret_cast<uint8_t *>(&result));
+  return result;
  }
 
- Nes_Emu* getInternalEmulator() const { return _nes; }
+ inline void enableRendering() { _doRendering = true; };
+ inline void disableRendering() { _doRendering = false; };
 
- private:
+ inline void loadStateFile(const std::string& stateFilePath) 
+ {
+  std::string stateData;
+  bool status = loadStringFromFile(stateData, stateFilePath);
+  if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
+  deserializeState((uint8_t*)stateData.data());
+ }
+
+ inline void saveStateFile(const std::string& stateFilePath) const 
+ {
+  std::string stateData;
+  stateData.resize(_stateSize);
+  serializeState((uint8_t*)stateData.data());
+  saveStringToFile(stateData, stateFilePath.c_str());
+ }
+
+inline void loadROMFile(const std::string& romFilePath) 
+{
+  // Loading ROM data
+  bool status = loadStringFromFile(_romData, romFilePath);
+  if (status == false) EXIT_WITH_ERROR("Could not find/read ROM file: %s\n", romFilePath.c_str());
+
+  // Calculating ROM hash value
+  _romSHA1String = SHA1::GetHash((uint8_t*)_romData.data(), _romData.size());
+
+  // Actually loading rom file
+  status = loadROMFileImpl(_romData);
+  if (status == false) EXIT_WITH_ERROR("Could not process ROM file: %s\n", romFilePath.c_str());
+
+  // Detecting state size
+  _stateSize = getStateSizeImpl();
+}
+
+ // Virtual functions
+
+ virtual bool loadROMFileImpl(const std::string& romFilePath) = 0;
+ virtual void advanceStateImpl(const inputType controller1, const inputType controller2) = 0;
+ virtual uint8_t* getLowMem() const = 0;
+ virtual uint8_t* getNametableMem() const = 0;
+ virtual uint8_t* getHighMem() const = 0;
+ virtual const uint8_t* getChrMem() const = 0;
+ virtual size_t getChrMemSize() const = 0;
+ virtual void serializeState(uint8_t* state) const = 0;
+ virtual void deserializeState(const uint8_t* state) = 0;
+ virtual size_t getStateSizeImpl() const = 0;
+ virtual void doSoftReset() = 0;
+ virtual void doHardReset() = 0;
+ virtual std::string getCoreName() const = 0;
+ virtual void* getInternalEmulatorPointer() const = 0;
+ 
+ protected:
+
+ EmuInstance() = default;
+
+ // Storage for the state
+ size_t _stateSize;
 
  // Flag to determine whether to enable/disable rendering
  bool _doRendering = true;
+ 
+ private: 
 
- inline size_t getStateSizeImpl() const
- {
-  #ifdef USE_ORIGINAL_QUICKNES
-   #define _DUMMY_SIZE 65536
-   uint8_t data[_DUMMY_SIZE];
-   Mem_Writer w(data, _DUMMY_SIZE);
-   Auto_File_Writer a(w);
-   _nes->save_state(a);
-   return w.size();
-  #else
-    // Using dry writer to just obtain the state size
-    Dry_Writer w;
-    Auto_File_Writer a(w);
-    _nes->save_state(a);
-    return w.size();
-  #endif
- }
-
- // Emulator instance
- Nes_Emu* _nes;
-
- // State size for the given rom
- size_t _stateSize;
+ // Storage for the ROM data
+ std::string _romData;
 
  // SHA1 rom hash 
  std::string _romSHA1String;
-
 };

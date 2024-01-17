@@ -2,6 +2,5 @@
   "Rom File": "Ivan 'Ironman' Stewart's Super Off Road (USA).nes",
   "Expected ROM SHA1": "57919B685B55EE3ED3AD98FB1D25626B98BE7D39",
   "Initial State File": "",
-  "Verification State File": "anyPercent.final.state",
   "Sequence File": "anyPercent.sol"
 }

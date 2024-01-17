@@ -9,7 +9,6 @@ pageSize = get_option('CPUFunctionAlignment')
 
 # Loading dependencies
 subdir('source')
-subdir('extern')
 
 # Common application flags
 commonCompileArgs = [ '-Wfatal-errors', '-Wall', '-Wno-multichar' ]
@@ -24,21 +23,23 @@ quickerNESPlayerSrc = [
   'extern/hqn/options.cpp',
 ]
 
-executable('player',
-  'source/player.cpp',
-  cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
-  dependencies        : [ quickerNESCoreDependency, quickerNESApplicationDependency, dependency('sdl2'), dependency('SDL2_image') ],
-  include_directories : include_directories(['source']),
-  link_args           : [ '-lncurses' ],
-  sources             : quickerNESPlayerSrc
-)
+if get_option('buildPlayer') == true
+  executable('player',
+    'source/player.cpp',
+    cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
+    dependencies        : [ quickerNESDependency, toolDependency, dependency('sdl2'), dependency('SDL2_image') ],
+    include_directories : include_directories(['source']),
+    link_args           : [ '-lncurses' ],
+    sources             : quickerNESPlayerSrc
+  )
+endif
 
 # Building tester tool for QuickerNES
 
 quickerNESTester = executable('quickerNESTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs, '-Werror' ],
-  dependencies        : [ quickerNESCoreDependency, quickerNESApplicationDependency ],
+  dependencies        : [ quickerNESDependency, toolDependency ],
   include_directories : include_directories(['../extern/json'])
 )
 
@@ -47,11 +48,9 @@ quickerNESTester = executable('quickerNESTester',
 quickNESTester = executable('quickNESTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs ],
-  dependencies        : [ quickNESCoreDependency, quickerNESApplicationDependency ],
+  dependencies        : [ quickNESDependency, toolDependency ],
   include_directories : include_directories(['../extern/json'])
 )
 
 # Building tests
-if get_option('buildTests') == true
-  subdir('tests')
-endif
+subdir('tests')
