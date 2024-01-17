@@ -42,6 +42,8 @@ public:
 
    const uint8_t* getHostPixels () const { return emu.ppu.host_pixels; }
     
+	size_t getLightweightStateSize() { return emu.getLightweightStateSize(); }
+
 // Basic emulation
 
 	// Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image

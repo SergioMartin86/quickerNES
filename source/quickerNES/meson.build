@@ -23,7 +23,6 @@ quickerNESSrc = [
  'nes_ntsc.cpp', 
  'Nes_Vrc7.cpp',
  'Nes_Mapper.cpp', 
- 'Nes_Core.cpp', 
  'Nes_Cpu.cpp', 
  'quickerNESInstance.hpp'
 ]

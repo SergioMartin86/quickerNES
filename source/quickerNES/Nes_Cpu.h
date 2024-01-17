@@ -22,8 +22,14 @@ public:
 	enum { page_bits = 11 };
 	enum { page_count = 0x10000 >> page_bits };
 	enum { page_size = 1L << page_bits };
-	void map_code( nes_addr_t start, unsigned size, void const* code );
 	
+	inline void map_code( nes_addr_t start, unsigned size, const void* data )
+	{
+		unsigned first_page = start / page_size;
+		const uint8_t* newPtr =  (uint8_t*) data - start;
+		for ( unsigned i = size / page_size; i--; ) code_map [first_page + i] = newPtr;
+	}
+
 	// Access memory as the emulated CPU does.
 	int  read( nes_addr_t );
 	void write( nes_addr_t, int data );

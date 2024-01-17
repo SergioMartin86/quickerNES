@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #define st_d 0x08
 #define st_i 0x04
 #define st_z 0x02
-#define st_c 0x01
+#define st_c 0x01 
 
 // Macros
 
@@ -154,13 +154,6 @@ void Nes_Cpu::reset( void const* unmapped_page )
  isCorrectExecution = true;
 }
 
-void Nes_Cpu::map_code( nes_addr_t start, unsigned size, const void* data )
-{
- unsigned first_page = start / page_size;
- const uint8_t* newPtr =  (uint8_t*) data - start;
- for ( unsigned i = size / page_size; i--; ) code_map [first_page + i] = newPtr;
-}
-
 // Note: 'addr' is evaulated more than once in the following macros, so it
 // must not contain side-effects.
 
@@ -196,12 +189,12 @@ void Nes_Cpu::map_code( nes_addr_t start, unsigned size, const void* data )
   nz |= ~in & st_z;                       \
  } while ( 0 )
 
-int Nes_Cpu::read( nes_addr_t addr )
+inline int Nes_Cpu::read( nes_addr_t addr )
 {
  return READ( addr );
 }
 
-void Nes_Cpu::write( nes_addr_t addr, int value )
+inline void Nes_Cpu::write( nes_addr_t addr, int value )
 {
  WRITE( addr, value );
 }

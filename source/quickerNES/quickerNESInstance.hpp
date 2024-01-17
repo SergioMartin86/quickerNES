@@ -26,6 +26,9 @@ class QuickerNESInstance : public EmuInstance
  {
   // Loading rom data
   auto result = _nes->load_ines((uint8_t*)romData.data());
+
+  // printf("Lightweight size: %lu vs Full Size: %lu\n", _nes->getLightweightStateSize(), getStateSizeImpl());
+  // exit(0);
   return result == 0;
  }
 
