@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
   fflush(stdout);
   
   // Serializing initial state
-  uint8_t currentState[stateSize];
+  uint8_t* currentState = (uint8_t*) malloc (stateSize);
   e.serializeState(currentState);
 
   // Actually running the sequence
