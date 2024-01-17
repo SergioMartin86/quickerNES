@@ -2,6 +2,5 @@
   "Rom File": "Ironsword - Wizards & Warriors II (U) [!].nes",
   "Expected ROM SHA1": "97B79E432F62403FB9F877090850C41112A9A168",
   "Initial State File": "",
-  "Verification State File": "anyPercent.final.state",
   "Sequence File": "anyPercent.sol"
 }

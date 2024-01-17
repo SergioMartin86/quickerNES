@@ -25,9 +25,6 @@ class QuickNESInstance : public EmuInstance
   // Setting video buffer
   _nes->set_pixels(video_buffer, image_width+8);
 
-  // Setting video buffer
-  _nes->set_pixels(video_buffer, image_width+8);
-
   // If running the original QuickNES, register extra mappers now
   register_misc_mappers();
   register_extra_mappers();
