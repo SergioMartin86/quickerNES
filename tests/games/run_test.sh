@@ -37,6 +37,9 @@ quickerNESHash=`cat ${quickerNESHashFile}`
 # Comparing hashes
 quickNESHash=`cat ${quickNESHashFile}`
 
+# Removing temporary files
+rm -f ${quickerNESHashFile} ${quickNESHashFile}
+
 # Compare hashes
 if [ "${quickerNESHash}" = "${quickNESHash}" ]; then
  echo "[] Test Passed"
