@@ -36,7 +36,7 @@ endif
 
 # Building tester tool for QuickerNES
 
-quickerNESTester = executable('qrTester',
+quickerNESTester = executable('quickerNESTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs, '-Werror' ],
   dependencies        : [ quickerNESDependency, toolDependency ],
@@ -45,7 +45,7 @@ quickerNESTester = executable('qrTester',
 
 # Building tester tool for the original QuickNES
 
-quickNESTester = executable('qTester',
+quickNESTester = executable('quickNESTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs ],
   dependencies        : [ quickNESDependency, toolDependency ],

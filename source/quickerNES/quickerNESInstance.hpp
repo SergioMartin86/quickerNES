@@ -13,6 +13,9 @@ class QuickerNESInstance : public EmuInstance
   // Creating new emulator
   _nes = new Nes_Emu;
 
+  // Allocating video buffer
+  video_buffer = (uint8_t*) malloc(image_width * image_height);
+
   // Setting video buffer
   _nes->set_pixels(video_buffer, image_width+8);
  }
@@ -70,7 +73,7 @@ class QuickerNESInstance : public EmuInstance
  }
 
  // Video buffer
- uint8_t video_buffer[image_width * image_height];
+ uint8_t* video_buffer;
 
  // Emulator instance
  Nes_Emu* _nes;
