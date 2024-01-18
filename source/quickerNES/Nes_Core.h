@@ -16,13 +16,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 // Nes_Emu 0.7.0
 
 
+#include <cstdio>
+#include <string>
 #include "blargg_common.h"
 #include "Nes_Apu.h"
 #include "Nes_Cpu.h"
 #include "Nes_Ppu.h"
 #include "Nes_Mapper.h"
 #include "Nes_State.h"
-#include <cstdio>
 
 /*
   New mapping distribution by Sergio Martin (eien86)
@@ -216,12 +217,321 @@ public:
 		return 0;
 	}
 
-	size_t getLightweightStateSize()
+	size_t getLiteStateSize() const
 	{
     size_t size = 0;
+
+    size += sizeof(nes_state_t);
+    size += sizeof(registers_t);
+    size += sizeof(ppu_state_t);
+    size += sizeof(Nes_Apu::apu_state_t);
+    size += sizeof(joypad_state_t);
+    size += mapper->state_size;
+    size += low_ram_size;
+		size += Nes_Ppu::spr_ram_size;
+		size_t nametable_size = 0x800;
+		if (ppu.nt_banks [3] >= &ppu.impl->nt_ram [0xC00] ) nametable_size = 0x1000;
+		size += nametable_size;
+    if ( ppu.chr_is_writable ) size += ppu.chr_size;
+		if ( sram_present )	size += impl->sram_size;
+
 		return size;
 	}
 	
+	size_t getStateSize() const
+	{
+    size_t size = 0;
+
+	  size += sizeof(char[4]); // NESS Block
+		size += sizeof(uint32_t); // Block Size
+  
+	  size += sizeof(char[4]); // TIME Block
+		size += sizeof(uint32_t); // Block Size
+    size += sizeof(nes_state_t);
+
+    size += sizeof(char[4]); // CPUR Block
+		size += sizeof(uint32_t); // Block Size
+    size += sizeof(registers_t);
+
+    size += sizeof(char[4]); // PPUR Block
+		size += sizeof(uint32_t); // Block Size
+    size += sizeof(ppu_state_t);
+
+    size += sizeof(char[4]); // APUR Block
+		size += sizeof(uint32_t); // Block Size
+    size += sizeof(Nes_Apu::apu_state_t);
+
+    size += sizeof(char[4]); // CTRL Block
+		size += sizeof(uint32_t); // Block Size
+    size += sizeof(joypad_state_t);
+
+		size += sizeof(char[4]); // MAPR Block
+		size += sizeof(uint32_t); // Block Size
+    size += mapper->state_size;
+
+    size += sizeof(char[4]); // LRAM Block
+		size += sizeof(uint32_t); // Block Size
+    size += low_ram_size;
+
+    size += sizeof(char[4]); // SPRT Block
+		size += sizeof(uint32_t); // Block Size
+		size += Nes_Ppu::spr_ram_size;
+
+		size += sizeof(char[4]); // NTAB Block
+		size += sizeof(uint32_t); // Block Size
+		size_t nametable_size = 0x800;
+		if (ppu.nt_banks [3] >= &ppu.impl->nt_ram [0xC00] ) nametable_size = 0x1000;
+		size += nametable_size;
+
+    if ( ppu.chr_is_writable )
+		{
+			size += sizeof(char[4]); // CHRR Block
+			size += sizeof(uint32_t); // Block Size
+			size += ppu.chr_size;
+		}
+
+		if ( sram_present )
+		{
+			size += sizeof(char[4]); // SRAM Block
+			size += sizeof(uint32_t); // Block Size
+			size += impl->sram_size;
+		}
+
+		size += sizeof(char[4]);  // gend Block
+		size += sizeof(uint32_t); // Block Size
+
+		return size;
+	}
+
+	size_t serializeState(uint8_t* buffer) const
+	{
+    size_t pos = 0;
+    std::string headerCode;
+		const uint32_t headerSize = sizeof(char) * 4;
+    uint32_t blockSize = 0;
+		void* dataSource;
+
+    headerCode = "NESS"; // NESS Block
+		blockSize = 0xFFFFFFFF; 
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+  
+	  headerCode = "TIME"; // TIME Block
+		nes_state_t state = nes;
+		state.timestamp *= 5;
+		blockSize = sizeof(nes_state_t); 
+		dataSource = (void*) &state;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+	  headerCode = "CPUR"; // CPUR Block
+		cpu_state_t s;
+		memset( &s, 0, sizeof s );
+		s.pc = r.pc;
+		s.s = r.sp;
+		s.a = r.a;
+		s.x = r.x;
+		s.y = r.y;
+		s.p = r.status;
+		blockSize = sizeof(cpu_state_t); 
+		dataSource = (void*) &s;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+	  headerCode = "PPUR"; // PPUR Block
+		blockSize = sizeof(ppu_state_t); 
+		dataSource = (void*) &ppu;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+	  headerCode = "APUR"; // APUR Block
+		Nes_Apu::apu_state_t apuState;
+		impl->apu.save_state(&apuState);
+		blockSize = sizeof(Nes_Apu::apu_state_t); 
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &apuState, blockSize);   pos += blockSize;
+
+	  headerCode = "CTRL"; // CTRL Block
+		blockSize = sizeof(joypad_state_t); 
+		dataSource = (void*) &joypad;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+	  headerCode = "MAPR"; // MAPR Block
+		blockSize = mapper->state_size; 
+		dataSource = (void*) mapper->state;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+	  headerCode = "LRAM"; // LRAM Block
+		blockSize = low_ram_size; 
+		dataSource = (void*) low_mem;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+	  headerCode = "SPRT"; // SPRT Block
+		blockSize = Nes_Ppu::spr_ram_size; 
+		dataSource = (void*) ppu.spr_ram;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+	  headerCode = "NTAB"; // NTAB Block
+		size_t nametable_size = 0x800;
+		if (ppu.nt_banks [3] >= &ppu.impl->nt_ram [0xC00] ) nametable_size = 0x1000;
+		blockSize = nametable_size; 
+		dataSource = (void*) ppu.impl->nt_ram;
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+		memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+
+    if ( ppu.chr_is_writable )
+		{
+		  headerCode = "CHRR"; // CHRR Block
+			blockSize = ppu.chr_size; 
+			dataSource = (void*) ppu.impl->chr_ram;
+			memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+			memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+			memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+		}
+
+		if ( sram_present )
+		{
+			headerCode = "SRAM"; // SRAM Block
+			blockSize = impl->sram_size; 
+			dataSource = (void*) impl->sram;
+			memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+			memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+			memcpy(&buffer[pos], dataSource, blockSize);   pos += blockSize;
+		}
+
+		headerCode = "gend"; // gend Block
+		blockSize = 0; 
+		memcpy(&buffer[pos], headerCode.data(), headerSize); pos += headerSize;
+		memcpy(&buffer[pos], &blockSize,  headerSize); pos += headerSize;
+
+		return pos; // Bytes written
+	}
+
+  size_t deserializeState(const uint8_t* buffer)
+	{
+		disable_rendering();
+		error_count = 0;
+    ppu.burst_phase = 0; // avoids shimmer when seeking to same time over and over
+
+    size_t pos = 0;
+		const uint32_t headerSize = sizeof(char) * 4;
+    uint32_t blockSize = 0;
+
+    // NESS Block
+		pos += headerSize;
+		pos += headerSize;
+  
+	  // TIME Block
+		nes_state_t nesState;
+		pos += headerSize;
+		pos += headerSize;
+		blockSize = sizeof(nes_state_t);
+		memcpy(&nesState, &buffer[pos], blockSize);  pos += blockSize;
+		nes = nesState;
+	  nes.timestamp /= 5;
+
+	  // CPUR Block
+		cpu_state_t s;
+		blockSize = sizeof(cpu_state_t); 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy((void*) &s, &buffer[pos], blockSize); pos += blockSize;
+		r.pc = s.pc; 
+		r.sp = s.s; 
+		r.a = s.a; 
+		r.x = s.x; 
+		r.y = s.y; 
+		r.status = s.p; 
+
+	  // PPUR Block
+		blockSize = sizeof(ppu_state_t); 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy((void*) &ppu, &buffer[pos], blockSize);   pos += blockSize;
+
+	  // APUR Block
+		Nes_Apu::apu_state_t apuState;
+		blockSize = sizeof(Nes_Apu::apu_state_t); 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy(&apuState, &buffer[pos], blockSize); 
+		pos += blockSize;
+		impl->apu.load_state(apuState);
+    impl->apu.end_frame( -(int) nes.timestamp / ppu_overclock );
+
+	  // CTRL Block
+		blockSize = sizeof(joypad_state_t); 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy((void*) &joypad, &buffer[pos], blockSize); pos += blockSize;
+
+	  // MAPR Block
+		mapper->default_reset_state();
+		blockSize = mapper->state_size; 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy((void*) mapper->state, &buffer[pos], blockSize); pos += blockSize;
+    mapper->apply_mapping();
+
+	  // LRAM Block
+		blockSize = low_ram_size; 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy((void*) low_mem, &buffer[pos], blockSize); pos += blockSize;
+
+	  // SPRT Block
+		blockSize = Nes_Ppu::spr_ram_size; 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy((void*) ppu.spr_ram, &buffer[pos], blockSize);  pos += blockSize;
+
+	  // NTAB Block
+		size_t nametable_size = 0x800;
+		if (ppu.nt_banks [3] >= &ppu.impl->nt_ram [0xC00] ) nametable_size = 0x1000;
+		blockSize = nametable_size; 
+		pos += headerSize;
+		pos += headerSize;
+		memcpy((void*) ppu.impl->nt_ram, &buffer[pos], blockSize); pos += blockSize;
+
+    if ( ppu.chr_is_writable )
+		{
+		  // CHRR Block
+			blockSize = ppu.chr_size; 
+			pos += headerSize;
+			pos += headerSize;
+			memcpy((void*) ppu.impl->chr_ram, &buffer[pos], blockSize);  pos += blockSize;
+		}
+
+		if ( sram_present )
+		{
+			// SRAM Block
+			blockSize = impl->sram_size; 
+			pos += headerSize;
+			pos += headerSize;
+			memcpy((void*) impl->sram, &buffer[pos], blockSize);  pos += blockSize;
+			enable_sram(true);
+		}
+   
+		// headerCode = "gend"; // gend Block
+		pos += headerSize;
+		pos += headerSize;
+
+		return pos; // Bytes read
+	}
+
 	void reset( bool full_reset, bool erase_battery_ram )
 	{
 		if ( full_reset )
@@ -347,50 +657,50 @@ public:
 		
 	void load_state( Nes_State_ const& in )
 	{
-		disable_rendering();
-		error_count = 0;
+		// disable_rendering();
+		// error_count = 0;
 		
-		if ( in.nes_valid )
-			nes = in.nes;
+		// if ( in.nes_valid )
+		// 	nes = in.nes;
 		
-		// always use frame count
-		ppu.burst_phase = 0; // avoids shimmer when seeking to same time over and over
-		nes.frame_count = in.nes.frame_count;
-		if ( (frame_count_t) nes.frame_count == invalid_frame_count )
-			nes.frame_count = 0;
+		// // always use frame count
+		// ppu.burst_phase = 0; // avoids shimmer when seeking to same time over and over
+		// nes.frame_count = in.nes.frame_count;
+		// if ( (frame_count_t) nes.frame_count == invalid_frame_count )
+		// 	nes.frame_count = 0;
 		
-		if ( in.cpu_valid )
-			cpu::r = *in.cpu;
+		// if ( in.cpu_valid )
+		// 	cpu::r = *in.cpu;
 		
-		if ( in.joypad_valid )
-			joypad = *in.joypad;
+		// if ( in.joypad_valid )
+		// 	joypad = *in.joypad;
 		
-		if ( in.apu_valid )
-		{
-			impl->apu.load_state( *in.apu );
-			// prevent apu from running extra at beginning of frame
-			impl->apu.end_frame( -(int) nes.timestamp / ppu_overclock );
-		}
-		else
-		{
-			impl->apu.reset();
-		}
+		// if ( in.apu_valid )
+		// {
+		// 	impl->apu.load_state( *in.apu );
+		// 	// prevent apu from running extra at beginning of frame
+		// 	impl->apu.end_frame( -(int) nes.timestamp / ppu_overclock );
+		// }
+		// else
+		// {
+		// 	impl->apu.reset();
+		// }
 		
-		ppu.load_state( in );
+		// ppu.load_state( in );
 		
-		if ( in.ram_valid )
-			memcpy( cpu::low_mem, in.ram, in.ram_size );
+		// if ( in.ram_valid )
+		// 	memcpy( cpu::low_mem, in.ram, in.ram_size );
 		
-		sram_present = false;
-		if ( in.sram_size )
-		{
-			sram_present = true;
-			memcpy( impl->sram, in.sram, min( (int) in.sram_size, (int) sizeof impl->sram ) );
-			enable_sram( true ); // mapper can override (read-only, unmapped, etc.)
-		}
+		// sram_present = false;
+		// if ( in.sram_size )
+		// {
+		// 	sram_present = true;
+		// 	// memcpy( impl->sram, in.sram, min( (int) in.sram_size, (int) sizeof impl->sram ) );
+		// 	enable_sram( true ); // mapper can override (read-only, unmapped, etc.)
+		// }
 		
-		if ( in.mapper_valid ) // restore last since it might reconfigure things
-			mapper->load_state( *in.mapper );
+		// if ( in.mapper_valid ) // restore last since it might reconfigure things
+		// 	mapper->load_state( *in.mapper );
 	}
 	
 	void irq_changed()

@@ -68,6 +68,9 @@ public:
 	// $2006 and $2007 accesses (but not due to PPU scanline rendering).
 	virtual void a12_clocked();
 	
+	void* state;
+	unsigned state_size;
+
 protected:
 	// Services provided for derived mapper classes
 	Nes_Mapper();
@@ -147,9 +150,7 @@ protected:
 	// apply_mapping().
 	virtual void read_state( mapper_state_t const& );
 	
-	// Apply current mapping state to hardware. Called after reading mapper state
-	// from a snapshot.
-	virtual void apply_mapping() = 0;
+
 	
 	// Called by default reset() before apply_mapping() is called.
 	virtual void reset_state() { }
@@ -161,11 +162,9 @@ protected:
 	Nes_Cart const* cart_;
   Nes_Core* emu_;
 
-private:
-	
-	void* state;
-	unsigned state_size;
-	
+	// Apply current mapping state to hardware. Called after reading mapper state
+	// from a snapshot.
+	virtual void apply_mapping() = 0;
 	
 	void default_reset_state();
 };

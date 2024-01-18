@@ -92,8 +92,11 @@ int main(int argc, char *argv[])
   // Getting initial hash
   auto initialHash = e.getStateHash();
 
-  // Getting state size
+  // Getting full state size
   const auto stateSize = e.getStateSize();
+
+  // Getting lite state size
+  const auto liteStateSize = e.getLiteStateSize();
 
   // Getting actual ROM SHA1
   auto romSHA1 = e.getRomSHA1();
@@ -124,7 +127,8 @@ int main(int argc, char *argv[])
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
   printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
-  printf("[] State Size:              %lu bytes\n", stateSize);
+  printf("[] Full State Size:         %lu bytes\n", stateSize);
+  printf("[] Lite State Size:         %lu bytes\n", liteStateSize);
   printf("[] ********** Running Test **********\n");
   
   fflush(stdout);

@@ -26,9 +26,6 @@ class QuickerNESInstance : public EmuInstance
  {
   // Loading rom data
   auto result = _nes->load_ines((uint8_t*)romData.data());
-
-  // printf("Lightweight size: %lu vs Full Size: %lu\n", _nes->getLightweightStateSize(), getStateSizeImpl());
-  // exit(0);
   return result == 0;
  }
 
@@ -40,16 +37,12 @@ class QuickerNESInstance : public EmuInstance
 
  void serializeState(uint8_t* state) const 
  {
-  Mem_Writer w(state, _stateSize, 0);
-  Auto_File_Writer a(w);
-  _nes->save_state(a);
+    _nes->serializeState(state);
  }
 
  void deserializeState(const uint8_t* state) 
  {
-  Mem_File_Reader r(state, _stateSize);
-  Auto_File_Reader a(r);
-  _nes->load_state(a);
+  _nes->deserializeState(state);
  }
 
  void advanceStateImpl(const inputType controller1, const inputType controller2) override
@@ -66,13 +59,14 @@ class QuickerNESInstance : public EmuInstance
 
  private:
 
- inline size_t getStateSizeImpl() const
+ inline size_t getStateSizeImpl() const override
  {
-    // Using dry writer to just obtain the state size
-    Dry_Writer w;
-    Auto_File_Writer a(w);
-    _nes->save_state(a);
-    return w.size();
+    return _nes->getStateSize();
+ }
+
+ inline size_t getLiteStateSizeImpl() const override
+ {
+    return _nes->getLiteStateSize();
  }
 
  // Video buffer

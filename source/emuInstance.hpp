@@ -86,14 +86,12 @@ class EmuInstance
  }
 
  inline size_t getStateSize() const { return _stateSize; }
+ inline size_t getLiteStateSize() const { return _liteStateSize; }
  inline std::string getRomSHA1() const { return _romSHA1String; }
 
  inline hash_t getStateHash() const
  {
   MetroHash128 hash;
-
-  uint8_t stateData[_stateSize];
-  serializeState(stateData);
 
   hash.Update(getLowMem(), _LOW_MEM_SIZE);
   hash.Update(getHighMem(), _HIGH_MEM_SIZE);
@@ -137,8 +135,11 @@ inline void loadROMFile(const std::string& romFilePath)
   status = loadROMFileImpl(_romData);
   if (status == false) EXIT_WITH_ERROR("Could not process ROM file: %s\n", romFilePath.c_str());
 
-  // Detecting state size
+  // Detecting full state size
   _stateSize = getStateSizeImpl();
+
+  // Detecting lite state size
+  _liteStateSize = getLiteStateSizeImpl();
 }
 
  // Virtual functions
@@ -153,16 +154,20 @@ inline void loadROMFile(const std::string& romFilePath)
  virtual void serializeState(uint8_t* state) const = 0;
  virtual void deserializeState(const uint8_t* state) = 0;
  virtual size_t getStateSizeImpl() const = 0;
+ virtual size_t getLiteStateSizeImpl() const { return getStateSizeImpl(); };
  virtual void doSoftReset() = 0;
  virtual void doHardReset() = 0;
  virtual std::string getCoreName() const = 0;
  virtual void* getInternalEmulatorPointer() const = 0;
- 
+
  protected:
 
  EmuInstance() = default;
 
- // Storage for the state
+ // Storage for the light state size
+ size_t _liteStateSize;
+
+ // Storage for the full state size
  size_t _stateSize;
 
  // Flag to determine whether to enable/disable rendering

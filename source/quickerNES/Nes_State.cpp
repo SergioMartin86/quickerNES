@@ -113,7 +113,7 @@ const char * Nes_State_::write_blocks( Nes_File_Writer& out ) const
 		s.p = cpu->status;
 		RETURN_ERR( write_nes_state( out, s ) );
 	}
-	
+
 	if ( ppu_valid )
 	{
 		ppu_state_t s = *ppu;

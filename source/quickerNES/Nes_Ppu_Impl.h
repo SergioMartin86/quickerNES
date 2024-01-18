@@ -30,6 +30,10 @@ public:
 	static const uint16_t buffer_height = image_height;
 	enum { spr_ram_size = 0x100 };
 
+	uint8_t* nt_banks [4];
+	bool chr_is_writable;
+	long chr_size;
+	
 	int write_2007( int );
 	
 	// Host palette
@@ -67,9 +71,10 @@ public:
 	
 	uint8_t* getSpriteRAM () { return spr_ram; }
 	uint16_t getSpriteRAMSize () { return spr_ram_size; }
-
-protected:
 	uint8_t spr_ram [spr_ram_size];
+			void all_tiles_modified();
+protected:
+
 	void begin_frame();
 	void run_hblank( int );
 	int sprite_height() const { return (w2000 >> 2 & 8) + 8; }
@@ -90,7 +95,6 @@ protected: //friend class Nes_Ppu_Rendering; private:
 	void capture_palette();
 	
 	bool any_tiles_modified;
-	bool chr_is_writable;
 	void update_tiles( int first_tile );
 	
 	typedef uint32_t cache_t;
@@ -128,7 +132,7 @@ private:
 
 		return ret;
 	}
-	uint8_t* nt_banks [4];
+
 
 	bool mmc24_enabled;
 	uint8_t mmc24_latched [2];
@@ -136,7 +140,6 @@ private:
 	// CHR data
 	uint8_t const* chr_data; // points to chr ram when there is no read-only data
 	uint8_t* chr_ram; // always points to impl->chr_ram; makes write_2007() faster
-	long chr_size;
 	uint8_t const* map_chr( int addr ) { return &chr_data [map_chr_addr( addr )]; }
 	
 	// CHR cache
@@ -147,7 +150,7 @@ private:
 		uint8_t modified_tiles [chr_tile_count / 8];
 		uint32_t align_;
 	};
-	void all_tiles_modified();
+
 	void update_tile( int index );
 };
 

@@ -1,32 +1,33 @@
 quickerNES
-============
+-----------
 
-quickerNES is an attempt to modernizing and improving the performance of quickNES, the fastest NES emulator in the interwebs (as far as I know). The goals for this project are, in order of importance:
+quickerNES is an attempt to modernizing and improving the performance of [quickNES](https://github.com/kode54/QuickNES). The goals for this project are, in order of importance:
 
-- Improve overall emulation performance even more
+- Improve overall emulation performance for modern (x86) CPUs
 - Modernize the code base with best programming practices, including CI tests, benchmarks, and coverage analysis
 - Add support for more mappers, controllers, and features supported by other emulators
 - Improve accuracy, if possible
 
-The main aim is to improve the performance of skip (non-rendering, no-audio) frame advances for brute force botting. (See: [JaffarPlus](https://github.com/SergioMartin86/jaffarPlus)). However, if this work might help with homebrew emulation and other people having more fun, then much better!
+The main aim is to improve the performance of headless re-recording for TASing and botting (See: [JaffarPlus](https://github.com/SergioMartin86/jaffarPlus)) purposes. However, if this work can help regular play emulation, then much better.
 
 Changes
-=========
+--------
 
 - Optimizations made in the CPU emulation core, including:
   + Forced alignment at the start of a page to prevent crossing cache line boundaries
-  + Simplifying instruction decode
+  + Simplifying the 6502 CPU instruction fetching and decoding
 - Minimize compiled code size to reduce pressure on L1i cache
 - Reduce heap allocations
+- General code reorganization (make it header only to help compiler optimizations)
 
 Credits
-=========
+---------
 
 - quickNES was originally by Shay Green (a.k.a. [Blaarg](http://www.slack.net/~ant/)) under the GNU GPLv2 license. The source code is still located [here](https://github.com/kode54/QuickNES) 
 - The code was later improved and maintained by Christopher Snowhill (a.k.a. [kode54](https://kode54.net/))
 - I could trace further contributions (e.g., new mappers) by retrowertz, CaH4e3, some adaptations from the [FCEUX emulator](https://github.com/TASEmulators/fceux) (see mapper021)
 - The latest version of the code is maintained by Libretro's community [here](https://github.com/libretro/QuickNES_Core)
-- For the interactive player, this project uses a modified version of [HeadlessQuickNES (HQN)](https://github.com/Bindernews/HeadlessQuickNes) by Drew (Binder News)
+- For the interactive player, this project drew some code from [HeadlessQuickNES (HQN)](https://github.com/Bindernews/HeadlessQuickNes) by Drew (Binder News)
 - We use some of the [NES test rom set](https://github.com/christopherpow/nes-test-roms) made by multiple authors and gathered by Christopher Pow et al.
 - We also use some movies from the [TASVideos](tasvideos.org) website for testing. These movies are copied into this repository with authorization under the Creative Commons Attribution 2.0 license.
 

@@ -3,6 +3,7 @@
 
 #include "Nes_Ppu_Impl.h"
 
+#include <cstdio>
 #include <string.h>
 #include "blargg_endian.h"
 #include "Nes_State.h"

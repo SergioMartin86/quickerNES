@@ -42,7 +42,8 @@ public:
 
    const uint8_t* getHostPixels () const { return emu.ppu.host_pixels; }
     
-	size_t getLightweightStateSize() { return emu.getLightweightStateSize(); }
+	size_t getLiteStateSize() const { return emu.getLiteStateSize(); }
+	size_t getStateSize() const { return emu.getStateSize(); }
 
 // Basic emulation
 
@@ -140,6 +141,8 @@ public:
 	// Save emulator state
 	void save_state( Nes_State* s ) const { emu.save_state( s ); }
 	const char * save_state( Auto_File_Writer ) const;
+  size_t serializeState (uint8_t* buffer) const { return emu.serializeState(buffer); }
+	size_t deserializeState (const uint8_t* buffer) { return emu.deserializeState(buffer); }
 
 	// Load state into emulator
 	void load_state( Nes_State const& );
