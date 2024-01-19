@@ -7,7 +7,6 @@ quickerNESSrc = quickerNESAudioSrc + [
  'Nes_Ppu_Impl.cpp', 
  'Nes_Ppu_Rendering.cpp', 
  'Nes_Emu.cpp', 
- 'nes_ntsc.cpp', 
  'Nes_Mapper.cpp', 
  'Nes_Cpu.cpp'
 ]

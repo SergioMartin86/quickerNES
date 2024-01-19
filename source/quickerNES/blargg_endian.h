@@ -4,8 +4,6 @@
 
 // Nes_Emu 0.7.0
 
-#include "blargg_common.h"
-
 // BLARGG_CPU_CISC: Defined if CPU has very few general-purpose registers (< 16)
 #if defined (_M_IX86) || defined (_M_IA64) || defined (__i486__) || \
 		defined (__x86_64__) || defined (__ia64__)
@@ -93,15 +91,3 @@ inline void set_be32( void* p, unsigned long n ) {
 	#define SET_BE16( addr, data )  set_be16( addr, data )
 	#define SET_BE32( addr, data )  set_be32( addr, data )
 #endif
-
-// auto-selecting versions
-
-inline void set_le( uint16_t* p, unsigned      n ) { SET_LE16( p, n ); }
-inline void set_le( uint32_t* p, unsigned long n ) { SET_LE32( p, n ); }
-inline void set_be( uint16_t* p, unsigned      n ) { SET_BE16( p, n ); }
-inline void set_be( uint32_t* p, unsigned long n ) { SET_BE32( p, n ); }
-inline unsigned      get_be( uint16_t* p ) { return GET_BE16( p ); }
-inline unsigned long get_be( uint32_t* p ) { return GET_BE32( p ); }
-
-#define SWAP_BE( n )    (void) (set_be( &(n), (n) ))
-#define SWAP_LE( n )    (void) (set_le( &(n), (n) ))

@@ -1,12 +1,8 @@
+#pragma once 
 
 // NES PPU misc functions and setup
-
 // Nes_Emu 0.7.0
 
-#ifndef NES_PPU_IMPL_H
-#define NES_PPU_IMPL_H
-
-#include <blargg_common.h>
 #include <cstdint>
 
 class Nes_State_;
@@ -245,5 +241,3 @@ inline void Nes_Ppu_Impl::begin_frame()
 	palette_offset = palette_begin * 0x01010101;
 	addr_inc = w2000 & 4 ? 32 : 1;
 }
-
-#endif

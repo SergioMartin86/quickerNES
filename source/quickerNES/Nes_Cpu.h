@@ -1,13 +1,9 @@
+#pragma once
 
 // NES 6502 CPU emulator
-
 // Nes_Emu 0.7.0
 
-#ifndef NES_CPU_H
-#define NES_CPU_H
-
 #include <cstdint>
-#include "blargg_common.h"
 
 typedef long     nes_time_t; // clock cycle count
 typedef unsigned nes_addr_t; // 16-bit address
@@ -126,5 +122,3 @@ inline void Nes_Cpu::push_byte( int data )
 	r.sp = (sp - 1) & 0xFF;
 	low_mem [0x100 + sp] = data;
 }
-
-#endif

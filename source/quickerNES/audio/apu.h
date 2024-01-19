@@ -74,20 +74,6 @@ public:
 		triangle_t triangle;
 		noise_t noise;
 		dmc_t dmc;
-		
-		enum { tag = 0x41505552 }; // 'APUR'
-		void swap()
-		{
-			SWAP_LE( apu.frame_delay );
-			SWAP_LE( square1.delay );
-			SWAP_LE( square2.delay );
-			SWAP_LE( triangle.delay );
-			SWAP_LE( noise.delay );
-			SWAP_LE( noise.shift_reg );
-			SWAP_LE( dmc.delay );
-			SWAP_LE( dmc.remain );
-			SWAP_LE( dmc.addr );
-	}
 	};
 	static_assert( sizeof (apu_state_t) == 72 );
 

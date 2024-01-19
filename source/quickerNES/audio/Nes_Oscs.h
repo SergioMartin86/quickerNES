@@ -6,7 +6,6 @@
 #ifndef NES_OSCS_H
 #define NES_OSCS_H
 
-#include "blargg_common.h"
 #include "Blip_Buffer.h"
 
 class Nes_Apu;

@@ -6,7 +6,6 @@
 #ifndef NES_EMU_H
 #define NES_EMU_H
 
-#include "blargg_common.h"
 #include "audio/Multi_Buffer.h"
 #include "Nes_Cart.h"
 #include "Nes_Core.h"
