@@ -65,8 +65,7 @@ quickNESSrc = [
 	'QuickNES_Core/nes_emu/Mapper_TaitoTC0190.cpp',
 	'QuickNES_Core/nes_emu/Mapper_Un1rom.cpp',
 	'QuickNES_Core/nes_emu/nes_ntsc.cpp',
-	'Mapper_70.cpp',
-	'quickNESInstance.hpp'
+	'Mapper_70.cpp'
 ]
 
 # quickNES Core Configuration

@@ -1,5 +1,4 @@
-#ifndef EMU2413_STATE_H
-#define EMU2413_STATE_H
+#pragma once
 
 #include "emu2413.h"
 
@@ -32,6 +31,4 @@ void OPLL_state_byteswap(OPLL_STATE *state);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

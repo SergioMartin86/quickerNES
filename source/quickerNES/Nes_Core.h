@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include <cstdio>
 #include <string>
 #include "blargg_common.h"
-#include "Nes_Apu.h"
+#include "audio/apu.h"
 #include "Nes_Cpu.h"
 #include "Nes_Ppu.h"
 #include "Nes_Mapper.h"

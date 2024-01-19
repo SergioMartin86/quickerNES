@@ -1,7 +1,7 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "Nes_Buffer.h"
-#include "Nes_Apu.h"
+#include "audio/Nes_Buffer.h"
+#include "audio/apu.h"
 
 /* Library Copyright (C) 2003-2006 Shay Green. This library is free software;
 you can redistribute it and/or modify it under the terms of the GNU Lesser

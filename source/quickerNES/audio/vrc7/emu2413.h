@@ -1,5 +1,4 @@
-#ifndef EMU2413_H
-#define EMU2413_H
+#pragma once 
 
 typedef signed int     e_int;
 typedef unsigned int   e_uint;
@@ -215,4 +214,3 @@ EMU2413_API e_uint32 OPLL_toggleMask(OPLL *, e_uint32 mask) ;
 }
 #endif
 
-#endif

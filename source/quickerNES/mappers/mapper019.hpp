@@ -7,7 +7,7 @@
 #include "Nes_Mapper.h"
 
 #include "blargg_endian.h"
-#include "Nes_Namco_Apu.h"
+#include "audio/namco/apu.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

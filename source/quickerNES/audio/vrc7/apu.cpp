@@ -1,7 +1,7 @@
 #include "Nes_Mapper.h"
-#include "Nes_Vrc7.h"
-#include "emu2413.h"
-#include <string.h>
+#include "audio/vrc7/apu.h"
+#include "audio/vrc7/emu2413.h"
+#include <cstring>
 
 #define BYTESWAP(xxxx) {uint32_t _temp = (uint32_t)(xxxx);\
 ((uint8_t*)&(xxxx))[0] = (uint8_t)((_temp) >> 24);\

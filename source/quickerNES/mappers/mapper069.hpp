@@ -5,9 +5,8 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
 
 #include "Nes_Mapper.h"
-
 #include "blargg_endian.h"
-#include "Nes_Fme7_Apu.h"
+#include "audio/fme7/apu.h"
 
 /* Copyright (C) 2005 Chris Moeller */
 /* Copyright (C) 2005-2006 Shay Green. This module is free software; you

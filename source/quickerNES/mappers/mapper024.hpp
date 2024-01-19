@@ -6,7 +6,7 @@
 #include "Nes_Mapper.h"
 
 #include <string.h>
-#include "Nes_Vrc6_Apu.h"
+#include "audio/vrc6/apu.h"
 #include "blargg_endian.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you

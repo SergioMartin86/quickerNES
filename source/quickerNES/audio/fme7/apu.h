@@ -1,14 +1,11 @@
+#pragma once
 
 // Sunsoft FME-7 sound emulator
-
 // Nes_Emu 0.7.0
 
-#ifndef NES_FME7_APU_H
-#define NES_FME7_APU_H
-
-#include <stdint.h>
+#include <cstdint>
 #include "blargg_common.h"
-#include "Blip_Buffer.h"
+#include "audio/Blip_Buffer.h"
 
 struct fme7_apu_state_t
 {
@@ -133,4 +130,3 @@ inline void Nes_Fme7_Apu::load_state( fme7_apu_state_t const& in )
 	run_until(last_time);
 }
 
-#endif

@@ -1,13 +1,11 @@
 
-// Konami VRC7 sound chip emulator
+#pragma once 
 
+// Konami VRC7 sound chip emulator
 // Nes_Snd_Emu 0.1.7. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
 
-#ifndef NES_VRC7_H
-#define NES_VRC7_H
-
-#include "emu2413_state.h"
-#include "Blip_Buffer.h"
+#include "audio/vrc7/emu2413_state.h"
+#include "audio/Blip_Buffer.h"
 
 struct vrc7_snapshot_t;
 
@@ -69,4 +67,3 @@ inline void Nes_Vrc7::osc_output( int i, Blip_Buffer* buf )
 	oscs [i].output = buf;
 }
 
-#endif

@@ -1,15 +1,20 @@
+#pragma once 
 
 // Namco 106 sound chip emulator
-
 // Nes_Snd_Emu 0.1.7
 
-#ifndef NES_NAMCO_APU_H
-#define NES_NAMCO_APU_H
+#include <cstdint>
+#include "audio/apu.h"
 
-#include <stdint.h>
-#include "Nes_Apu.h"
-
-struct namco_state_t;
+struct namco_state_t
+{
+	uint8_t regs [0x80];
+	uint8_t addr;
+	uint8_t unused;
+	uint8_t positions [8];
+	uint32_t delays [8];
+};
+static_assert( sizeof (namco_state_t) == 172 );
 
 class Nes_Namco_Apu {
 public:
@@ -63,17 +68,6 @@ private:
 	void run_until( nes_time_t );
 };
 
-struct namco_state_t
-{
-	uint8_t regs [0x80];
-	uint8_t addr;
-	uint8_t unused;
-	uint8_t positions [8];
-	uint32_t delays [8];
-};
-
-BOOST_STATIC_ASSERT( sizeof (namco_state_t) == 172 );
-
 inline uint8_t& Nes_Namco_Apu::access()
 {
 	int addr = addr_reg & 0x7f;
@@ -101,4 +95,3 @@ inline void Nes_Namco_Apu::write_data( nes_time_t time, int data )
 	access() = data;
 }
 
-#endif

@@ -1,15 +1,12 @@
 
-// Konami VRC6 sound chip emulator
+#pragma once 
 
+// Konami VRC6 sound chip emulator
 // Nes_Snd_Emu 0.1.7
 
-#ifndef NES_VRC6_APU_H
-#define NES_VRC6_APU_H
-
-#include <stdint.h>
-
-#include "Nes_Apu.h"
-#include "Blip_Buffer.h"
+#include <cstdint>
+#include "audio/apu.h"
+#include "audio/Blip_Buffer.h"
 
 struct vrc6_apu_state_t;
 
@@ -95,5 +92,3 @@ inline void Nes_Vrc6_Apu::treble_eq( blip_eq_t const& eq )
 	saw_synth.treble_eq( eq );
 	square_synth.treble_eq( eq );
 }
-
-#endif

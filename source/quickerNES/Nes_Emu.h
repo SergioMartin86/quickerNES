@@ -7,9 +7,10 @@
 #define NES_EMU_H
 
 #include "blargg_common.h"
-#include "Multi_Buffer.h"
+#include "audio/Multi_Buffer.h"
 #include "Nes_Cart.h"
 #include "Nes_Core.h"
+
 class Nes_State;
 
 class Nes_Emu {
