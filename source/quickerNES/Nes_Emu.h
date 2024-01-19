@@ -252,7 +252,6 @@ inline void Nes_Emu::set_pixels( void* p, long n )
 	emu.ppu.host_row_bytes = n;
 }
 
-
 inline uint8_t const* Nes_Emu::chr_mem()
 {
 	return cart()->chr_size() ? (uint8_t*) cart()->chr() : emu.ppu.impl->chr_ram;

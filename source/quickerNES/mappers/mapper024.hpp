@@ -39,13 +39,6 @@ struct vrc6_state_t
 	uint8_t unused;
 	
 	vrc6_apu_state_t sound_state;
-	
-	void swap()
-	{
-		set_le16( &next_time, next_time );
-		for ( unsigned i = 0; i < sizeof sound_state.delays / sizeof sound_state.delays [0]; i++ )
-			set_le16( &sound_state.delays [i], sound_state.delays [i] );
-	}
 };
 static_assert( sizeof (vrc6_state_t) == 26 + sizeof (vrc6_apu_state_t) );
 
@@ -74,9 +67,7 @@ public:
 	virtual void save_state( mapper_state_t& out )
 	{
 		sound.save_state( &sound_state );
-		vrc6_state_t::swap();
 		Nes_Mapper::save_state( out );
-		vrc6_state_t::swap(); // to do: kind of hacky to swap in place
 	}
 	
 	virtual void apply_mapping()
@@ -153,7 +144,6 @@ public:
 void read_state( mapper_state_t const& in )
 {
 	Nes_Mapper::read_state( in );
-	vrc6_state_t::swap();
 	
 	// to do: eliminate when format is updated
 	// old-style registers

@@ -1,9 +1,9 @@
 quickerNES
 -----------
 
-quickerNES is an attempt to modernizing and improving the performance of [quickNES](https://github.com/kode54/QuickNES). The goals for this project are, in order of importance:
+quickerNES is an attempt to modernizing [quickNES](https://github.com/kode54/QuickNES). The goals for this project are, in order of importance:
 
-- Improve overall emulation performance for modern (x86) CPUs
+- Improve overall emulation performance for modern (x86) CPUs (portability to other systems not guaranteed)
 - Modernize the code base with best programming practices, including CI tests, benchmarks, and coverage analysis
 - Add support for more mappers, controllers, and features supported by other emulators
 - Improve accuracy, if possible
@@ -17,6 +17,7 @@ Changes
   + Forced alignment at the start of a page to prevent crossing cache line boundaries
   + Simplifying the 6502 CPU instruction fetching and decoding
 - Minimize compiled code size to reduce pressure on L1i cache
+- Assuming little endiannes to reduce unnecessary conversion operations (not portable to big endian systems)
 - Reduce heap allocations
 - General code reorganization (make it header only to help compiler optimizations)
 

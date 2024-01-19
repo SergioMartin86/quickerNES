@@ -30,13 +30,6 @@ struct fme7_state_t
 	uint8_t command;
 	uint8_t irq_pending;
 	fme7_apu_state_t sound_state; // only used when saving/restoring state
-	
-	void swap()
-	{
-		set_le16( &irq_count, irq_count );
-		for ( unsigned i = 0; i < sizeof sound_state.delays / sizeof sound_state.delays [0]; i++ )
-			set_le16( &sound_state.delays [i], sound_state.delays [i] );
-	}
 };
 static_assert( sizeof (fme7_state_t) == 18 + sizeof (fme7_apu_state_t) );
 
@@ -66,15 +59,12 @@ public:
 	virtual void save_state( mapper_state_t& out )
 	{
 		sound.save_state( &sound_state );
-		fme7_state_t::swap();
 		Nes_Mapper::save_state( out );
-		fme7_state_t::swap(); // to do: kind of hacky to swap in place
 	}
 	
 	virtual void read_state( mapper_state_t const& in )
 	{
 		Nes_Mapper::read_state( in );
-		fme7_state_t::swap();
 		sound.load_state( sound_state );
 	}
 	

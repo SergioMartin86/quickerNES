@@ -55,18 +55,12 @@ public:
 	virtual void save_state( mapper_state_t & out )
 	{
 		sound.save_snapshot( &sound_state );
-		
-		set_le16( &next_time, next_time );
-		
 		Nes_Mapper::save_state( out );
 	}
 	
 	virtual void load_state( mapper_state_t const& in )
 	{
 		Nes_Mapper::load_state( in );
-		
-		next_time = get_le16( &next_time );
-		
 		sound.load_snapshot( sound_state, in.size );
 	}
 	

@@ -28,13 +28,6 @@ struct namco106_state_t
 	uint8_t irq_pending;
 	uint8_t unused1 [1];
 	namco_state_t sound_state;
-
-	void swap()
-	{
-		set_le16( &irq_ctr, irq_ctr );
-		for ( unsigned i = 0; i < sizeof sound_state.delays / sizeof sound_state.delays [0]; i++ )
-			set_le16( &sound_state.delays [i], sound_state.delays [i] );
-	}
 };
 static_assert( sizeof (namco106_state_t) == 20 + sizeof (namco_state_t) );
 
@@ -187,25 +180,15 @@ public:
 		}
 	}
 
-	void swap()
-	{
-		set_le16( &irq_ctr, irq_ctr );
-		for ( unsigned i = 0; i < sizeof sound_state.delays / sizeof sound_state.delays [0]; i++ )
-			set_le16( &sound_state.delays [i], sound_state.delays [i] );
-	}
-
 	void save_state( mapper_state_t& out )
 	{
 		sound.save_state( &sound_state );
-		namco106_state_t::swap();
 		Nes_Mapper::save_state( out );
-		namco106_state_t::swap();
 	}
 
 	void read_state( mapper_state_t const& in )
 	{
 		Nes_Mapper::read_state( in );
-		namco106_state_t::swap();
 		sound.load_state( sound_state );
 	}
 
