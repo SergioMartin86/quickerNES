@@ -6,7 +6,6 @@
 #include <cstdio>
 #include <string.h>
 #include "blargg_endian.h"
-#include "Nes_State.h"
 #include <stdint.h>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
@@ -60,7 +59,6 @@ const char *Nes_Ppu_Impl::open_chr( uint8_t const* new_chr, long chr_data_size )
 	if ( !impl )
 	{
 		impl = new impl_t;
-		CHECK_ALLOC( impl );
 		chr_ram = impl->chr_ram;
 	}
 	
@@ -79,7 +77,6 @@ const char *Nes_Ppu_Impl::open_chr( uint8_t const* new_chr, long chr_data_size )
 	// allocate aligned memory for cache
 	long tile_count = chr_size / bytes_per_tile;
 	tile_cache_mem  = new uint8_t [tile_count * sizeof (cached_tile_t) * 2 + cache_line_size];
-	CHECK_ALLOC( tile_cache_mem );
 	tile_cache = (cached_tile_t*) (tile_cache_mem + cache_line_size -
 			(uintptr_t) tile_cache_mem % cache_line_size);
 	flipped_tiles = tile_cache + tile_count;
@@ -137,56 +134,6 @@ void Nes_Ppu_Impl::set_chr_bank_ex( int addr, int size, long data )
 		chr_pages_ex [page] = data - page * chr_page_size;
 		page++;
 		data += chr_page_size;
-	}
-}
-
-void Nes_Ppu_Impl::save_state( Nes_State_* out ) const
-{
-	*out->ppu = *this;
-	out->ppu_valid = true;
-	
-	memcpy( out->spr_ram, spr_ram, out->spr_ram_size );
-	out->spr_ram_valid = true;
-	
-	out->nametable_size = 0x800;
-	memcpy( out->nametable, impl->nt_ram, 0x800 );
-	if ( nt_banks [3] >= &impl->nt_ram [0xC00] )
-	{
-		// save extra nametable data in chr
-		out->nametable_size = 0x1000;
-		memcpy( out->chr, &impl->nt_ram [0x800], 0x800 );
-	}
-	
-	out->chr_size = 0;
-	if ( chr_is_writable )
-	{
-		out->chr_size = chr_size;
-		memcpy( out->chr, impl->chr_ram, out->chr_size );
-	}
-}
-
-void Nes_Ppu_Impl::load_state( Nes_State_ const& in )
-{
-	set_nt_banks( 0, 0, 0, 0 );
-	set_chr_bank( 0, 0x2000, 0 );
-	
-	if ( in.ppu_valid )
-		STATIC_CAST(ppu_state_t&,*this) = *in.ppu;
-	
-	if ( in.spr_ram_valid )
-		memcpy( spr_ram, in.spr_ram, sizeof spr_ram );
-	
-	if ( in.nametable_size >= 0x800 )
-	{
-		if ( in.nametable_size > 0x800 )
-			memcpy( &impl->nt_ram [0x800], in.chr, 0x800 );
-		memcpy( impl->nt_ram, in.nametable, 0x800 );
-	}
-	
-	if ( chr_is_writable && in.chr_size )
-	{
-		memcpy( impl->chr_ram, in.chr, in.chr_size );
-		all_tiles_modified();
 	}
 }
 

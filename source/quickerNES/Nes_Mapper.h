@@ -8,10 +8,24 @@
 
 #include "Nes_Cart.h"
 #include "Nes_Cpu.h"
-#include "nes_data.h"
 class Blip_Buffer;
 class blip_eq_t;
 class Nes_Core;
+
+// Increase this (and let me know) if your mapper requires more state. This only
+// sets the size of the in-memory buffer; it doesn't affect the file format at all.
+static unsigned const max_mapper_state_size = 512;   //was 256, needed more for VRC7 audio state
+struct mapper_state_t
+{
+	int size;
+	union {
+		double align;
+		uint8_t data [max_mapper_state_size];
+	};
+	
+	void write( const void* p, unsigned long s );
+	int read( void* p, unsigned long s ) const;
+};
 
 class Nes_Mapper {
 public:

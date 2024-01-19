@@ -6,7 +6,6 @@
 #include "Nes_Ppu.h"
 
 #include <string.h>
-#include "Nes_State.h"
 #include "Nes_Mapper.h"
 #include "Nes_Core.h"
 

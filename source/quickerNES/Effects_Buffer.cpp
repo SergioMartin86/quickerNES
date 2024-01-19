@@ -91,13 +91,11 @@ const char *Effects_Buffer::set_sample_rate( long rate, int msec )
 	if ( !echo_buf )
 	{
 		echo_buf = new blip_sample_t [echo_size];
-		CHECK_ALLOC( echo_buf );
 	}
 	
 	if ( !reverb_buf )
 	{
 		reverb_buf = new blip_sample_t [reverb_size];
-		CHECK_ALLOC( reverb_buf );
 	}
 	
 	for ( int i = 0; i < buf_count; i++ )

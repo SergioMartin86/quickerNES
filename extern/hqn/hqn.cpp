@@ -22,20 +22,6 @@ int32_t *_initF_VideoPalette()
 // Initialize the video palette
 const int32_t *HQNState::NES_VIDEO_PALETTE = _initF_VideoPalette();
 
-// simulate the write so we'll know how long the buffer needs to be
-class Sim_Writer : public Data_Writer
-{
-	long size_;
-public:
-	Sim_Writer() :size_(0) { }
-	error_t write(const void *, long size)
-	{
-		size_ += size;
-		return 0;
-	}
-	long size() const { return size_; }
-};
-
 // Constructor
 HQNState::HQNState()
 {
@@ -71,34 +57,17 @@ error_t HQNState::setSampleRate(int rate)
 
 error_t HQNState::saveState(void *dest, size_t size, size_t *size_out)
 {
-    Mem_Writer w(dest, size, 0);
-    Auto_File_Writer a(w);
-    auto ret = m_emu->save_state(a);
-	if (size_out)
-		*size_out = w.size();
-    if (!ret && w.size() != size)
-        return "Buffer Underrun!";
-    return ret;
+    return 0;
 }
 
 error_t HQNState::saveStateSize(size_t *size) const
 {
-    Sim_Writer w;
-    Auto_File_Writer a(w);
-    const char *ret = m_emu->save_state(a);
-    if (size)
-        *size = w.size();
-    return ret;
+    return 0;
 }
 
 error_t HQNState::loadState(const char *data, size_t size)
 {
-    Mem_File_Reader r(data, size);
-    Auto_File_Reader a(r);
-    error_t result = m_emu->load_state(a);
-    if (m_listener)
-        m_listener->onLoadState(this);
-    return result;
+    return 0;
 }
 
 // Advance the emulator

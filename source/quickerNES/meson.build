@@ -2,17 +2,14 @@
 
 quickerNESSrc = [
  'Nes_Apu.cpp', 
- 'Nes_File.cpp', 
  'Nes_Oscs.cpp', 
  'Nes_Buffer.cpp', 
  'Nes_Fme7_Apu.cpp', 
  'Nes_Ppu.cpp', 
  'Blip_Buffer.cpp', 
  'Nes_Ppu_Impl.cpp', 
- 'Data_Reader.cpp', 
  'Nes_Ppu_Rendering.cpp', 
  'Effects_Buffer.cpp', 
- 'Nes_State.cpp', 
  'emu2413.cpp', 
  'emu2413_state.cpp', 
  'Nes_Effects_Buffer.cpp', 

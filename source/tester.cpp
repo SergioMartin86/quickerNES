@@ -22,10 +22,9 @@ int main(int argc, char *argv[])
     .help("Path to the test script file to run.")
     .required();
 
-  program.add_argument("--fullCycle")
-    .help("Performs the full load / advance frame / save cycle, as opposed to just advance frame")
-    .default_value(false)
-    .implicit_value(true);
+  program.add_argument("--cycleType")
+    .help("Specifies the emulation actions to be performed per each input. Possible values: 'Simple': performs only advance state, 'Rerecord': performs load/advance/save, and 'Full': performs load/advance/save/advance.")
+    .default_value(std::string("Simple"));
 
   program.add_argument("--hashOutputFile")
     .help("Path to write the hash output to.")
@@ -42,7 +41,7 @@ int main(int argc, char *argv[])
   std::string hashOutputFile = program.get<std::string>("--hashOutputFile");
 
   // Getting reproduce flag
-  bool isFullCycle = program.get<bool>("--fullCycle");
+  std::string cycleType = program.get<std::string>("--cycleType");
 
   // Loading script file
   std::string scriptJsonRaw;
@@ -120,7 +119,7 @@ int main(int argc, char *argv[])
   // Printing test information
   printf("[] -----------------------------------------\n");
   printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
-  printf("[] Cycle Type:              '%s'\n", isFullCycle ? "Advance / Load / Advance / Save" : "Advance Only");
+  printf("[] Cycle Type:              '%s'\n", cycleType.c_str());
   printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
   printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
@@ -137,14 +136,19 @@ int main(int argc, char *argv[])
   uint8_t* currentState = (uint8_t*) malloc (stateSize);
   e.serializeState(currentState);
 
+  // Check whether to perform each action
+  bool doPreAdvance = cycleType == "Full";
+  bool doDeserialize = cycleType == "Rerecord" || cycleType == "Full";
+  bool doSerialize = cycleType == "Rerecord" || cycleType == "Full";
+
   // Actually running the sequence
   auto t0 = std::chrono::high_resolution_clock::now();
   for (const std::string& input : sequence)
   {
-    if (isFullCycle == true) e.advanceState(input);
-    if (isFullCycle == true) e.deserializeState(currentState);
+    if (doPreAdvance == true) e.advanceState(input);
+    if (doDeserialize == true) e.deserializeState(currentState);
     e.advanceState(input);
-    if (isFullCycle == true) e.serializeState(currentState);
+    if (doSerialize == true) e.serializeState(currentState);
   } 
   auto tf = std::chrono::high_resolution_clock::now();
 

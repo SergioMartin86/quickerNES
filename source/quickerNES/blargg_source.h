@@ -24,14 +24,6 @@ otherwise continues normally. */
 			return blargg_return_err_;\
 	} while ( 0 )
 
-/* If ptr is NULL, returns out-of-memory error, otherwise continues normally. */
-#undef  CHECK_ALLOC
-#define CHECK_ALLOC( ptr ) \
-	do {\
-		if ( !(ptr) )\
-			return "Out of memory";\
-	} while ( 0 )
-
 template<typename T> T min( T x, T y ) { return x < y ? x : y; }
 template<typename T> T max( T x, T y ) { return x > y ? x : y; }
 

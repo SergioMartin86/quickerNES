@@ -6,8 +6,30 @@
 #ifndef NES_PPU_IMPL_H
 #define NES_PPU_IMPL_H
 
-#include "nes_data.h"
+#include <blargg_common.h>
+#include <cstdint>
+
 class Nes_State_;
+
+struct ppu_state_t
+{
+	uint8_t w2000;                 // control
+	uint8_t w2001;                 // control
+	uint8_t r2002;                 // status
+	uint8_t w2003;                 // sprite ram addr
+	uint8_t r2007;                 // vram read buffer
+	uint8_t second_write;          // next write to $2005/$2006 is second since last $2002 read
+	uint16_t vram_addr;  // loopy_v
+	uint16_t vram_temp;  // loopy_t
+	uint8_t pixel_x;               // fine-scroll (0-7)
+	uint8_t unused;
+	uint8_t palette [0x20];        // entries $10, $14, $18, $1c should be ignored
+	uint16_t decay_low;
+	uint16_t decay_high;
+	uint8_t open_bus;
+	uint8_t unused2[3];
+};
+BOOST_STATIC_ASSERT( sizeof (ppu_state_t) == 20 + 0x20 );
 
 class Nes_Ppu_Impl : public ppu_state_t {
 public:

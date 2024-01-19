@@ -5,7 +5,6 @@
 
 #include <cstdio>
 #include <cstring>
-#include "Nes_State.h"
 #include "Nes_Mapper.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
@@ -182,53 +181,6 @@ const char * Nes_Emu::load_ines( const uint8_t* buffer )
 	return set_cart( &private_cart );
 }
 
-const char * Nes_Emu::save_battery_ram( Auto_File_Writer out )
-{
-	RETURN_ERR( out.open() );
-	return out->write( emu.impl->sram, emu.impl->sram_size );
-}
-
-const char * Nes_Emu::load_battery_ram( Auto_File_Reader in )
-{
-	RETURN_ERR( in.open() );
-	emu.sram_present = true;
-	return in->read( emu.impl->sram, emu.impl->sram_size );
-}
-
-void Nes_Emu::load_state( Nes_State_ const& in )
-{
-	clear_sound_buf();
-	emu.load_state( in );
-}
-
-void Nes_Emu::load_state( Nes_State const& in )
-{
-	loading_state( in );
-	load_state( STATIC_CAST(Nes_State_ const&,in) );
-}
-
-const char * Nes_Emu::load_state( Auto_File_Reader in )
-{
-	Nes_State* state = new Nes_State;
-	state->clear();  //initialize it
-	CHECK_ALLOC( state );
-	const char * err = state->read( in );
-	if ( !err )
-		load_state( *state );
-	delete state;
-	return err;
-}
-
-const char * Nes_Emu::save_state( Auto_File_Writer out ) const
-{
-	Nes_State* state = new Nes_State;
-	CHECK_ALLOC( state );
-	save_state( state );
-	const char * err = state->write( out );
-	delete state;
-	return err;
-}
-
 void Nes_Emu::write_chr( void const* p, long count, long offset )
 {
 	long end = offset + count;
@@ -275,8 +227,7 @@ const char * Nes_Emu::set_sample_rate( long rate, Multi_Buffer* new_buf )
 
 const char * Nes_Emu::set_sample_rate( long rate )
 {
-	if ( !default_sound_buf )
-		CHECK_ALLOC( default_sound_buf = new Mono_Buffer );
+	if ( !default_sound_buf ) default_sound_buf = new Mono_Buffer;
 	return set_sample_rate( rate, default_sound_buf );
 }
 

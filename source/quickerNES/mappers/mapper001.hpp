@@ -21,6 +21,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // MMC1
 
+struct mmc1_state_t
+{
+	uint8_t regs [4]; // current registers (5 bits each)
+	uint8_t bit;      // number of bits in buffer (0 to 4)
+	uint8_t buf;      // currently buffered bits (new bits added to bottom)
+};
+BOOST_STATIC_ASSERT( sizeof (mmc1_state_t) == 6 );
+
 class Mapper001 : public Nes_Mapper, mmc1_state_t {
 public:
 	Mapper001()

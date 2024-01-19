@@ -139,23 +139,11 @@ public:
 // File save/load
 
 	// Save emulator state
-	void save_state( Nes_State* s ) const { emu.save_state( s ); }
-	const char * save_state( Auto_File_Writer ) const;
   size_t serializeState (uint8_t* buffer) const { return emu.serializeState(buffer); }
 	size_t deserializeState (const uint8_t* buffer) { return emu.deserializeState(buffer); }
 
-	// Load state into emulator
-	void load_state( Nes_State const& );
-	const char * load_state( Auto_File_Reader );
-
 	// True if current cartridge claims it uses battery-backed memory
 	bool has_battery_ram() const { return cart()->has_battery_ram(); }
-
-	// Save current battery RAM
-	const char * save_battery_ram( Auto_File_Writer );
-
-	// Load battery RAM from file. Best called just after reset() or loading cartridge.
-	const char * load_battery_ram( Auto_File_Reader );
 
 // Graphics
 
@@ -221,8 +209,6 @@ private:
 	virtual const char * init_();
 
 	virtual void loading_state( Nes_State const& ) { }
-	void load_state( Nes_State_ const& );
-	void save_state( Nes_State_* s ) const { emu.save_state( s ); }
 	long timestamp() const { return emu.nes.frame_count; }
 	void set_timestamp( long t ) { emu.nes.frame_count = t; }
 

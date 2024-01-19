@@ -28,6 +28,19 @@ nes_time_t const last_scanline = first_scanline + 240 * Nes_Ppu::scanline_len;
 
 // MMC3
 
+struct mmc3_state_t
+{
+	uint8_t banks [8]; // last writes to $8001 indexed by (mode & 7)
+	uint8_t mode;      // $8000
+	uint8_t mirror;    // $a000
+	uint8_t sram_mode; // $a001
+	uint8_t irq_ctr;   // internal counter
+	uint8_t irq_latch; // $c000
+	uint8_t irq_enabled;// last write was to 0) $e000, 1) $e001
+	uint8_t irq_flag;
+};
+BOOST_STATIC_ASSERT( sizeof (mmc3_state_t) == 15 );
+
 class Mapper004 : public Nes_Mapper, mmc3_state_t {
 public:
 	Mapper004()

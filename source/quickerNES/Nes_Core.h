@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include "Nes_Cpu.h"
 #include "Nes_Ppu.h"
 #include "Nes_Mapper.h"
-#include "Nes_State.h"
 
 /*
   New mapping distribution by Sergio Martin (eien86)
@@ -100,6 +99,34 @@ unsigned const low_ram_end  = 0x2000;
 unsigned const sram_end     = 0x8000;
 const int irq_inhibit_mask = 0x04;
 
+struct nes_state_t
+{
+	uint16_t timestamp; // CPU clocks * 15 (for NTSC)
+	uint8_t pal;
+	uint8_t unused [1];
+	uint32_t frame_count; // number of frames emulated since power-up
+};
+
+struct joypad_state_t
+{
+	uint32_t joypad_latches [2]; // joypad 1 & 2 shift registers
+	uint8_t w4016;             // strobe
+	uint8_t unused [3];
+};
+BOOST_STATIC_ASSERT( sizeof (joypad_state_t) == 12 );
+
+struct cpu_state_t
+{
+	uint16_t pc;
+	uint8_t s;
+	uint8_t p;
+	uint8_t a;
+	uint8_t x;
+	uint8_t y;
+	uint8_t unused [1];
+};
+BOOST_STATIC_ASSERT( sizeof (cpu_state_t) == 8 );
+
 class Nes_Core : private Nes_Cpu {
 	typedef Nes_Cpu cpu;
 public:
@@ -124,7 +151,7 @@ public:
 	{
 		if ( !impl )
 		{
-			CHECK_ALLOC( impl = new impl_t );
+			impl = new impl_t;
 			impl->apu.dmc_reader( read_dmc, this );
 			impl->apu.irq_notifier( apu_irq_changed, this );
 		}
@@ -617,92 +644,7 @@ public:
 		disable_rendering();
 	}
 	
-	void save_state( Nes_State* out ) const
-	{
-		save_state( reinterpret_cast<Nes_State_*>(out) );
-	}
-
-	void save_state( Nes_State_* out ) const
-	{
-		out->clear();
 		
-		out->nes = nes;
-		out->nes_valid = true;
-		
-		*out->cpu = cpu::r;
-		out->cpu_valid = true;
-		
-		*out->joypad = joypad;
-		out->joypad_valid = true;
-		
-		impl->apu.save_state( out->apu );
-		out->apu_valid = true;
-		
-		ppu.save_state( out );
-		
-		memcpy( out->ram, cpu::low_mem, out->ram_size );
-		out->ram_valid = true;
-		
-		out->sram_size = 0;
-		if ( sram_present )
-		{
-			out->sram_size = sizeof impl->sram;
-			memcpy( out->sram, impl->sram, out->sram_size );
-		}
-		
-		out->mapper->size = 0;
-		mapper->save_state( *out->mapper );
-		out->mapper_valid = true;
-	}
-		
-	void load_state( Nes_State_ const& in )
-	{
-		// disable_rendering();
-		// error_count = 0;
-		
-		// if ( in.nes_valid )
-		// 	nes = in.nes;
-		
-		// // always use frame count
-		// ppu.burst_phase = 0; // avoids shimmer when seeking to same time over and over
-		// nes.frame_count = in.nes.frame_count;
-		// if ( (frame_count_t) nes.frame_count == invalid_frame_count )
-		// 	nes.frame_count = 0;
-		
-		// if ( in.cpu_valid )
-		// 	cpu::r = *in.cpu;
-		
-		// if ( in.joypad_valid )
-		// 	joypad = *in.joypad;
-		
-		// if ( in.apu_valid )
-		// {
-		// 	impl->apu.load_state( *in.apu );
-		// 	// prevent apu from running extra at beginning of frame
-		// 	impl->apu.end_frame( -(int) nes.timestamp / ppu_overclock );
-		// }
-		// else
-		// {
-		// 	impl->apu.reset();
-		// }
-		
-		// ppu.load_state( in );
-		
-		// if ( in.ram_valid )
-		// 	memcpy( cpu::low_mem, in.ram, in.ram_size );
-		
-		// sram_present = false;
-		// if ( in.sram_size )
-		// {
-		// 	sram_present = true;
-		// 	// memcpy( impl->sram, in.sram, min( (int) in.sram_size, (int) sizeof impl->sram ) );
-		// 	enable_sram( true ); // mapper can override (read-only, unmapped, etc.)
-		// }
-		
-		// if ( in.mapper_valid ) // restore last since it might reconfigure things
-		// 	mapper->load_state( *in.mapper );
-	}
-	
 	void irq_changed()
 	{
 		cpu_set_irq_time( earliest_irq( cpu_time() ) );
@@ -1032,12 +974,8 @@ private:
 	unsigned char data_writer_mapped [page_count + 1];
 };
 
-int mem_differs( void const* p, int cmp, unsigned long s );
-
 inline int Nes_Core::cpu_read( nes_addr_t addr, nes_time_t time )
 {
-	//LOG_FREQ( "cpu_read", 16, addr >> 12 );
-	
 	{
 		int result = cpu::low_mem [addr & 0x7FF];
 		if ( !(addr & 0xE000) )

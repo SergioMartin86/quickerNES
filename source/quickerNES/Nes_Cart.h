@@ -18,9 +18,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #ifndef NES_CART_H
 #define NES_CART_H
 
-#include <stdint.h>
+#include <cstring>
+#include <cstdint>
 #include "blargg_common.h"
-#include "abstract_file.h"
 
 
 class Nes_Cart {

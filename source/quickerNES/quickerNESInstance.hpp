@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Nes_Emu.h>
-#include <Nes_State.h>
 #include <emuInstance.hpp>
 
 class QuickerNESInstance : public EmuInstance
