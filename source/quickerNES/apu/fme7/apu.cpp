@@ -1,7 +1,7 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "audio/fme7/apu.h"
+#include "apu/fme7/apu.h"
 #include <cstring>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you

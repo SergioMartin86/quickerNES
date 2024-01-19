@@ -1,19 +1,19 @@
 # quickerNES Core sources
 
 quickerNESAudioSrc = [
- 'audio/apu.cpp', 
- 'audio/Nes_Oscs.cpp', 
- 'audio/Nes_Buffer.cpp', 
- 'audio/Blip_Buffer.cpp', 
- 'audio/Effects_Buffer.cpp', 
- 'audio/Nes_Effects_Buffer.cpp', 
- 'audio/Multi_Buffer.cpp',
- 'audio/namco/apu.cpp', 
- 'audio/vrc6/apu.cpp', 
- 'audio/vrc7/emu2413.cpp', 
- 'audio/vrc7/emu2413_state.cpp', 
- 'audio/vrc7/apu.cpp',
- 'audio/fme7/apu.cpp', 
+ 'apu/apu.cpp', 
+ 'apu/Nes_Oscs.cpp', 
+ 'apu/Nes_Buffer.cpp', 
+ 'apu/Blip_Buffer.cpp', 
+ 'apu/Effects_Buffer.cpp', 
+ 'apu/Nes_Effects_Buffer.cpp', 
+ 'apu/Multi_Buffer.cpp',
+ 'apu/namco/apu.cpp', 
+ 'apu/vrc6/apu.cpp', 
+ 'apu/vrc7/emu2413.cpp', 
+ 'apu/vrc7/emu2413_state.cpp', 
+ 'apu/vrc7/apu.cpp',
+ 'apu/fme7/apu.cpp', 
 ]
 
 quickerNESSrc = quickerNESAudioSrc + [

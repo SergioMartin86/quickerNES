@@ -4,7 +4,7 @@
 // Nes_Snd_Emu 0.1.7
 
 #include <cstdint>
-#include "audio/apu.h"
+#include "apu/apu.h"
 
 struct namco_state_t
 {

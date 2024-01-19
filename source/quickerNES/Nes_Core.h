@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 #include <cstdio>
 #include <string>
-#include "audio/apu.h"
+#include "apu/apu.h"
 #include "Nes_Cpu.h"
 #include "Nes_Ppu.h"
 #include "mappers/mapper.h"

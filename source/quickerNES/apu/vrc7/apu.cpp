@@ -1,5 +1,5 @@
-#include "audio/vrc7/apu.h"
-#include "audio/vrc7/emu2413.h"
+#include "apu/vrc7/apu.h"
+#include "apu/vrc7/emu2413.h"
 #include <cstring>
 
 #define BYTESWAP(xxxx) {uint32_t _temp = (uint32_t)(xxxx);\

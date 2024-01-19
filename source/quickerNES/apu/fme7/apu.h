@@ -4,7 +4,7 @@
 // Nes_Emu 0.7.0
 
 #include <cstdint>
-#include "audio/Blip_Buffer.h"
+#include "apu/Blip_Buffer.h"
 
 struct fme7_apu_state_t
 {
