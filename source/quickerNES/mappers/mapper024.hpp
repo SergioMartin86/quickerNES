@@ -47,9 +47,7 @@ struct vrc6_state_t
 			set_le16( &sound_state.delays [i], sound_state.delays [i] );
 	}
 };
-BOOST_STATIC_ASSERT( sizeof (vrc6_state_t) == 26 + sizeof (vrc6_apu_state_t) );
-
-
+static_assert( sizeof (vrc6_state_t) == 26 + sizeof (vrc6_apu_state_t) );
 
 template <int swapMask>
 class Mapper_Vrc6 : public Nes_Mapper, vrc6_state_t {

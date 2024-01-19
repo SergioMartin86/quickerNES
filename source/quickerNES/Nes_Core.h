@@ -113,7 +113,7 @@ struct joypad_state_t
 	uint8_t w4016;             // strobe
 	uint8_t unused [3];
 };
-BOOST_STATIC_ASSERT( sizeof (joypad_state_t) == 12 );
+static_assert( sizeof (joypad_state_t) == 12 );
 
 struct cpu_state_t
 {
@@ -125,7 +125,7 @@ struct cpu_state_t
 	uint8_t y;
 	uint8_t unused [1];
 };
-BOOST_STATIC_ASSERT( sizeof (cpu_state_t) == 8 );
+static_assert( sizeof (cpu_state_t) == 8 );
 
 class Nes_Core : private Nes_Cpu {
 	typedef Nes_Cpu cpu;
@@ -1085,18 +1085,18 @@ inline void Nes_Core::cpu_write( nes_addr_t addr, int data, nes_time_t time )
 }
 
 #define NES_CPU_READ_PPU( cpu, addr, time ) \
-	STATIC_CAST(Nes_Core&,*cpu).cpu_read_ppu( addr, time )
+	static_cast<Nes_Core&>(*cpu).cpu_read_ppu( addr, time )
 
 #define NES_CPU_READ( cpu, addr, time ) \
-	STATIC_CAST(Nes_Core&,*cpu).cpu_read( addr, time )
+	static_cast<Nes_Core&>(*cpu).cpu_read( addr, time )
 
 #define NES_CPU_WRITEX( cpu, addr, data, time ){\
-	STATIC_CAST(Nes_Core&,*cpu).cpu_write( addr, data, time );\
+	static_cast<Nes_Core&>(*cpu).cpu_write( addr, data, time );\
 }
 
 #define NES_CPU_WRITE( cpu, addr, data, time ){\
 	if ( addr < 0x800 ) cpu->low_mem [addr] = data;\
-	else if ( addr == 0x2007 ) STATIC_CAST(Nes_Core&,*cpu).cpu_write_2007( data );\
-	else STATIC_CAST(Nes_Core&,*cpu).cpu_write( addr, data, time );\
+	else if ( addr == 0x2007 ) static_cast<Nes_Core&>(*cpu).cpu_write_2007( data );\
+	else static_cast<Nes_Core&>(*cpu).cpu_write( addr, data, time );\
 }
 

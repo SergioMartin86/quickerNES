@@ -7,7 +7,7 @@
 #include "Nes_Mapper.h"
 
 #include "Nes_Core.h"
-#include <string.h>
+#include <cstring>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -26,8 +26,7 @@ struct mmc5_state_t
 	uint8_t regs [0x30];
 	uint8_t irq_enabled;
 };
-// to do: finalize state format
-BOOST_STATIC_ASSERT( sizeof (mmc5_state_t) == 0x31 );
+static_assert( sizeof (mmc5_state_t) == 0x31 );
 
 // MMC5
 

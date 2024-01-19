@@ -73,7 +73,7 @@ struct vrc6_apu_state_t
 	uint8_t phases [3];
 	uint8_t unused;
 };
-BOOST_STATIC_ASSERT( sizeof (vrc6_apu_state_t) == 20 );
+static_assert( sizeof (vrc6_apu_state_t) == 20 );
 
 inline void Nes_Vrc6_Apu::osc_output( int i, Blip_Buffer* buf )
 {

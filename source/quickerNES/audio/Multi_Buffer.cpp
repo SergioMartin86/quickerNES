@@ -2,6 +2,7 @@
 // Blip_Buffer 0.4.0. http://www.slack.net/~ant/
 
 #include "Multi_Buffer.h"
+#include <cstdint>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -67,9 +68,9 @@ void Mono_Buffer::RestoreAudioBufferState()
 
 Silent_Buffer::Silent_Buffer() : Multi_Buffer( 1 ) // 0 channels would probably confuse
 {
-	chan.left   = NULL;
-	chan.center = NULL;
-	chan.right  = NULL;
+	chan.left   = 0;
+	chan.center = 0;
+	chan.right  = 0;
 }
 
 void Silent_Buffer::SaveAudioBufferState()
@@ -192,7 +193,7 @@ void Stereo_Buffer::mix_stereo( blip_sample_t* out, long count )
 	right.begin( bufs [2] );
 	int bass = center.begin( bufs [0] );
 	
-	if (out != NULL)
+	if (out != 0)
 	{
 		while ( count-- )
 		{
@@ -235,7 +236,7 @@ void Stereo_Buffer::mix_mono( blip_sample_t* out, long count )
 	Blip_Reader in;
 	int bass = in.begin( bufs [0] );
 	
-	if (out != NULL)
+	if (out != 0)
 	{
 		while ( count-- )
 		{

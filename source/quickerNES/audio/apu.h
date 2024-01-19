@@ -5,11 +5,9 @@
 // Nes_Snd_Emu 0.1.7
 
 #include <cstdint>
+#include <cstdint>
+#include <climits>
 #include "blargg_endian.h"
-
-typedef long     nes_time_t; // CPU clock cycle count
-typedef unsigned nes_addr_t; // 16-bit memory address
-
 #include "Nes_Oscs.h"
 
 class Nes_Apu {
@@ -91,7 +89,7 @@ public:
 			SWAP_LE( dmc.addr );
 	}
 	};
-	BOOST_STATIC_ASSERT( sizeof (apu_state_t) == 72 );
+	static_assert( sizeof (apu_state_t) == 72 );
 
 	Nes_Apu();
 	~Nes_Apu();
@@ -102,7 +100,7 @@ public:
 	// Set memory reader callback used by DMC oscillator to fetch samples.
 	// When callback is invoked, 'user_data' is passed unchanged as the
 	// first parameter.
-	void dmc_reader( int (*callback)( void* user_data, nes_addr_t ), void* user_data = NULL );
+	void dmc_reader( int (*callback)( void* user_data, nes_addr_t ), void* user_data = nullptr );
 	
 	// All time values are the number of CPU clock cycles relative to the
 	// beginning of the current time frame. Before resetting the CPU clock
@@ -150,7 +148,7 @@ public:
 	// Set IRQ time callback that is invoked when the time of earliest IRQ
 	// may have changed, or NULL to disable. When callback is invoked,
 	// 'user_data' is passed unchanged as the first parameter.
-	void irq_notifier( void (*callback)( void* user_data ), void* user_data = NULL );
+	void irq_notifier( void (*callback)( void* user_data ), void* user_data = nullptr );
 	
 	// Get time that APU-generated IRQ will occur if no further register reads
 	// or writes occur. If IRQ is already pending, returns irq_waiting. If no
@@ -162,7 +160,7 @@ public:
 	// Count number of DMC reads that would occur if 'run_until( t )' were executed.
 	// If last_read is not NULL, set *last_read to the earliest time that
 	// 'count_dmc_reads( time )' would result in the same result.
-	int count_dmc_reads( nes_time_t t, nes_time_t* last_read = NULL ) const;
+	int count_dmc_reads( nes_time_t t, nes_time_t* last_read = nullptr ) const;
 	
 	// Time when next DMC memory read will occur
 	nes_time_t next_dmc_read_time() const;

@@ -33,8 +33,7 @@ struct namco_34xx_state_t
 	uint8_t mirr;
 	uint8_t mode;
 };
-
-BOOST_STATIC_ASSERT( sizeof (namco_34xx_state_t) == 10 );
+static_assert( sizeof (namco_34xx_state_t) == 10 );
 
 // Namco_34xx
 

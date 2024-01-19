@@ -1,5 +1,4 @@
 #include "Nes_Mapper.h"
-
 #pragma once
 
 // DIS23C01 DAOU ROM CONTROLLER
@@ -9,7 +8,7 @@ struct m156_state_t
 	uint8_t prg_bank;
 	uint8_t chr_banks [8];
 };
-BOOST_STATIC_ASSERT( sizeof (m156_state_t) == 9 );
+static_assert( sizeof (m156_state_t) == 9 );
 
 class Mapper156 : public Nes_Mapper, m156_state_t {
 public:

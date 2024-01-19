@@ -26,8 +26,7 @@ struct vrc1_state_t
 	uint8_t chr_banks_hi [ 2 ];
 	uint8_t mirroring;
 };
-
-BOOST_STATIC_ASSERT( sizeof ( vrc1_state_t ) == 8 );
+static_assert( sizeof ( vrc1_state_t ) == 8 );
 
 // VRC1 
 

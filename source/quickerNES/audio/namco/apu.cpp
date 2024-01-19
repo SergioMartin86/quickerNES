@@ -17,7 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 Nes_Namco_Apu::Nes_Namco_Apu()
 {
-	output( NULL );
+	output( 0 );
 	volume( 1.0 );
 	reset();
 }

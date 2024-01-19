@@ -25,7 +25,7 @@ struct Mapper015_state_t
 	uint8_t mirroring;
 };
 
-BOOST_STATIC_ASSERT( sizeof (Mapper015_state_t) == 5 );
+static_assert( sizeof (Mapper015_state_t) == 5 );
 
 // K-1029, K-1030P
 

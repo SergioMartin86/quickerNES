@@ -32,8 +32,7 @@ struct mapper32_state_t
 	uint8_t prg_mode;
 	uint8_t mirr;
 };
-
-BOOST_STATIC_ASSERT( sizeof ( mapper32_state_t ) == 12 );
+static_assert( sizeof ( mapper32_state_t ) == 12 );
 
 // Irem_G101
 

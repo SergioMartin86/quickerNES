@@ -38,7 +38,7 @@ struct fme7_state_t
 			set_le16( &sound_state.delays [i], sound_state.delays [i] );
 	}
 };
-BOOST_STATIC_ASSERT( sizeof (fme7_state_t) == 18 + sizeof (fme7_apu_state_t) );
+static_assert( sizeof (fme7_state_t) == 18 + sizeof (fme7_apu_state_t) );
 
 // Fme7
 

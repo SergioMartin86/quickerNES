@@ -32,8 +32,7 @@ struct mapper244_state_t
 	uint8_t preg;
 	uint8_t creg;
 };
-
-BOOST_STATIC_ASSERT( sizeof (mapper244_state_t) == 2 );
+static_assert( sizeof (mapper244_state_t) == 2 );
 
 class Mapper244 : public Nes_Mapper, mapper244_state_t {
 public:

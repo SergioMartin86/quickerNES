@@ -4,7 +4,7 @@
 
 #include "Nes_Mapper.h"
 
-#include <string.h>
+#include <cstring>
 #include "Nes_Core.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
@@ -37,7 +37,7 @@ struct mmc3_state_t
 	uint8_t irq_enabled;// last write was to 0) $e000, 1) $e001
 	uint8_t irq_flag;
 };
-BOOST_STATIC_ASSERT( sizeof (mmc3_state_t) == 15 );
+static_assert( sizeof (mmc3_state_t) == 15 );
 
 class Mapper004 : public Nes_Mapper, mmc3_state_t {
 public:

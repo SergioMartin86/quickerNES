@@ -33,8 +33,7 @@ struct namco_34x3_state_t
 	uint8_t mirr;
 	uint8_t mode;
 };
-
-BOOST_STATIC_ASSERT( sizeof (namco_34x3_state_t) == 10 );
+static_assert( sizeof (namco_34x3_state_t) == 10 );
 
 template < bool _is154 >
 class Mapper_Namco_34x3 : public Nes_Mapper, namco_34x3_state_t {

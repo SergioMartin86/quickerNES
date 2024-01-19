@@ -31,8 +31,7 @@ struct tc0190_state_t
 	uint8_t creg [ 6 ];
 	uint8_t mirr;
 };
-
-BOOST_STATIC_ASSERT( sizeof ( tc0190_state_t ) == 9 );
+static_assert( sizeof ( tc0190_state_t ) == 9 );
 
 // TaitoTC0190
 

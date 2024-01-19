@@ -60,7 +60,7 @@ struct vrc7_snapshot_t
 	int internal_opl_state_size;
 	OPLL_STATE internal_opl_state;
 };
-BOOST_STATIC_ASSERT( sizeof (vrc7_snapshot_t) == 28 + 440 + 4 );
+static_assert( sizeof (vrc7_snapshot_t) == 28 + 440 + 4 );
 
 inline void Nes_Vrc7::osc_output( int i, Blip_Buffer* buf )
 {

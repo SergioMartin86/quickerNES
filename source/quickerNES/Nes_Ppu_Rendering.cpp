@@ -1,4 +1,3 @@
-
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "Nes_Ppu_Rendering.h"
@@ -30,7 +29,7 @@ inline Nes_Ppu_Impl::cached_tile_t const&
 	int index = sprite_tile_index( sprite );
 	
 	// use index directly, since cached tile is same size as native tile
-	BOOST_STATIC_ASSERT( sizeof (cached_tile_t) == bytes_per_tile );
+	static_assert( sizeof (cached_tile_t) == bytes_per_tile );
 	return *(Nes_Ppu_Impl::cached_tile_t*)
 			((uint8_t*) tiles + map_chr_addr( index * bytes_per_tile ));
 }
@@ -38,7 +37,7 @@ inline Nes_Ppu_Impl::cached_tile_t const&
 inline Nes_Ppu_Impl::cached_tile_t const& Nes_Ppu_Impl::get_bg_tile( int index )
 {
 	// use index directly, since cached tile is same size as native tile
-	BOOST_STATIC_ASSERT( sizeof (cached_tile_t) == bytes_per_tile );
+	static_assert( sizeof (cached_tile_t) == bytes_per_tile );
 	return *(Nes_Ppu_Impl::cached_tile_t*)
 			((uint8_t*) tile_cache + map_chr_addr( index * bytes_per_tile ));
 }
@@ -205,11 +204,11 @@ void Nes_Ppu_Rendering::draw_background_( int remain )
 				for ( int n = 4; n--; )
 				{
 					unsigned long line = *lines++;
-					((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
-					((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
+					((uint32_t*) p) [0] = (line >> 4 & mask) + offset;
+					((uint32_t*) p) [1] = (line      & mask) + offset;
 					p += row_bytes;
-					((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
-					((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
+					((uint32_t*) p) [0] = (line >> 6 & mask) + offset;
+					((uint32_t*) p) [1] = (line >> 2 & mask) + offset;
 					p += row_bytes;
 				}
 			}
@@ -220,27 +219,27 @@ void Nes_Ppu_Rendering::draw_background_( int remain )
 				if ( fine_y & 1 )
 				{
 					unsigned long line = *lines++;
-					((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
-					((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
+					((uint32_t*) p) [0] = (line >> 6 & mask) + offset;
+					((uint32_t*) p) [1] = (line >> 2 & mask) + offset;
 					p += row_bytes;
 				}
 				
 				for ( int n = height >> 1; n--; )
 				{
 					unsigned long line = *lines++;
-					((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
-					((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
+					((uint32_t*) p) [0] = (line >> 4 & mask) + offset;
+					((uint32_t*) p) [1] = (line      & mask) + offset;
 					p += row_bytes;
-					((unaligned_uint32_t*) p) [0].val = (line >> 6 & mask) + offset;
-					((unaligned_uint32_t*) p) [1].val = (line >> 2 & mask) + offset;
+					((uint32_t*) p) [0] = (line >> 6 & mask) + offset;
+					((uint32_t*) p) [1] = (line >> 2 & mask) + offset;
 					p += row_bytes;
 				}
 				
 				if ( height & 1 )
 				{
 					unsigned long line = *lines;
-					((unaligned_uint32_t*) p) [0].val = (line >> 4 & mask) + offset;
-					((unaligned_uint32_t*) p) [1].val = (line      & mask) + offset;
+					((uint32_t*) p) [0] = (line >> 4 & mask) + offset;
+					((uint32_t*) p) [1] = (line      & mask) + offset;
 				}
 			} 
 		}
@@ -367,8 +366,8 @@ void Nes_Ppu_Rendering::check_sprite_hit( int begin, int end )
 	{
 		// get pixels for line
 		unsigned long line = lines [skip >> 1];
-		unsigned long hit0 = ((unaligned_uint32_t*) bg) [0].val;
-		unsigned long hit1 = ((unaligned_uint32_t*) bg) [1].val;
+		unsigned long hit0 = ((uint32_t*) bg) [0];
+		unsigned long hit1 = ((uint32_t*) bg) [1];
 		bg += next_row;
 		line >>= skip << 1 & 2;
 		line |= line >> 1;

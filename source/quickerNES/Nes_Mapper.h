@@ -8,6 +8,8 @@
 
 #include "Nes_Cart.h"
 #include "Nes_Cpu.h"
+#include <climits>
+
 class Blip_Buffer;
 class blip_eq_t;
 class Nes_Core;

@@ -97,7 +97,7 @@ long Nes_Buffer::read_samples( blip_sample_t* out, long count )
 		int lin_bass = lin.begin( buf );
 		int nonlin_bass = nonlin.begin( tnd );
 		
-		if (out != NULL)
+		if (out != 0)
 		{
 			for ( int n = count; n--; )
 			{
@@ -150,7 +150,7 @@ void Nes_Buffer::RestoreAudioBufferState()
 
 Nes_Nonlinearizer::Nes_Nonlinearizer()
 {
-	apu = NULL;
+	apu = nullptr;
 	enabled = true;
 	
 	float const gain = 0x7fff * 1.3f;

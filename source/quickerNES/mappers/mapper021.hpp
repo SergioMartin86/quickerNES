@@ -40,8 +40,7 @@ struct vrc2_state_t
 	uint16_t next_time;
 	uint8_t irq_pending;
 };
-
-BOOST_STATIC_ASSERT( sizeof ( vrc2_state_t ) == 18 );
+static_assert( sizeof ( vrc2_state_t ) == 18 );
 
 template <bool type_a, bool type_b>
 class Mapper_VRC2_4 : public Nes_Mapper, vrc2_state_t {

@@ -7,6 +7,8 @@
 #define NES_BUFFER_H
 
 #include "Multi_Buffer.h"
+#include <cstdint>
+
 class Nes_Apu;
 
 class Nes_Nonlinearizer {

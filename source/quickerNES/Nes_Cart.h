@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 #include <cstring>
 #include <cstdint>
+#include <cstdlib>
 #include "blargg_common.h"
 
 
@@ -36,7 +37,7 @@ public:
 	uint8_t flags2;    // MMMM --XX Mapper high 4 bits
 	uint8_t zero [8];  // if zero [7] is non-zero, treat flags2 as zero
 	};
-	BOOST_STATIC_ASSERT( sizeof (ines_header_t) == 16 );
+	static_assert( sizeof (ines_header_t) == 16 );
 
 	// Load iNES file
 void load_ines( const uint8_t* buffer )

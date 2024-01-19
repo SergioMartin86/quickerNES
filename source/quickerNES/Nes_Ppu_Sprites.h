@@ -32,11 +32,11 @@ unsigned long const maskgen = 0x80808080 + zero;
 
 #define DRAW_PAIR( shift ) {                    \
 	int sprite_count = *scanlines;              \
-	CALC_FOUR( ((unaligned_uint32_t*) out) [0].val, (line >> (shift + 4)), out0 ) \
-	CALC_FOUR( ((unaligned_uint32_t*) out) [1].val, (line >> shift), out1 )       \
+	CALC_FOUR( ((uint32_t*) out) [0], (line >> (shift + 4)), out0 ) \
+	CALC_FOUR( ((uint32_t*) out) [1], (line >> shift), out1 )       \
 	if ( sprite_count < this->max_sprites ) {   \
-		((unaligned_uint32_t*) out) [0].val = out0;           \
-		((unaligned_uint32_t*) out) [1].val = out1;           \
+		((uint32_t*) out) [0] = out0;           \
+		((uint32_t*) out) [1] = out1;           \
 	}                                           \
 	if ( CLIPPED ) visible--;                   \
 	out += next_row;                            \

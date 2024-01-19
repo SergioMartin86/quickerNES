@@ -31,8 +31,7 @@ struct taito_x1005_state_t
 	uint8_t creg [ 6 ];
 	uint8_t nametable [ 2 ];
 };
-
-BOOST_STATIC_ASSERT( sizeof (taito_x1005_state_t) == 11 );
+static_assert( sizeof (taito_x1005_state_t) == 11 );
 
 // TaitoX1005
 

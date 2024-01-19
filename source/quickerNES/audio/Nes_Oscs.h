@@ -11,6 +11,9 @@
 
 class Nes_Apu;
 
+typedef long     nes_time_t; // CPU clock cycle count
+typedef unsigned nes_addr_t; // 16-bit memory address
+
 struct Nes_Osc
 {
 	unsigned char regs [4];

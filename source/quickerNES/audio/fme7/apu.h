@@ -15,7 +15,7 @@ struct fme7_apu_state_t
 	uint8_t latch;
 	uint16_t delays [3]; // a, b, c
 };
-BOOST_STATIC_ASSERT( sizeof (fme7_apu_state_t) == 24 );
+static_assert( sizeof (fme7_apu_state_t) == 24 );
 
 class Nes_Fme7_Apu : private fme7_apu_state_t {
 public:
@@ -86,7 +86,7 @@ inline void Nes_Fme7_Apu::output( Blip_Buffer* buf )
 
 inline Nes_Fme7_Apu::Nes_Fme7_Apu()
 {
-	output( NULL );
+	output( 0 );
 	volume( 1.0 );
 	reset();
 }

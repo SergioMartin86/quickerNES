@@ -34,7 +34,7 @@ struct vrc7_state_t
 	
 	vrc7_snapshot_t sound_state;
 };
-BOOST_STATIC_ASSERT( sizeof (vrc7_state_t) == 20 + sizeof (vrc7_snapshot_t) );
+static_assert( sizeof (vrc7_state_t) == 20 + sizeof (vrc7_snapshot_t) );
 
 // Vrc7
 

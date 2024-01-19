@@ -29,7 +29,7 @@ struct ppu_state_t
 	uint8_t open_bus;
 	uint8_t unused2[3];
 };
-BOOST_STATIC_ASSERT( sizeof (ppu_state_t) == 20 + 0x20 );
+static_assert( sizeof (ppu_state_t) == 20 + 0x20 );
 
 class Nes_Ppu_Impl : public ppu_state_t {
 public:

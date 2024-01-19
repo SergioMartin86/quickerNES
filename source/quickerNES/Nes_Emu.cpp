@@ -1,4 +1,3 @@
-
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
 #include <cstring>
@@ -17,11 +16,6 @@ Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 int const sound_fade_size = 384;
-
-// Constants are manually duplicated in Nes_Emu so their value can be seen
-// directly, rather than having to look in Nes_Ppu.h. "0 +" converts to int.
-BOOST_STATIC_ASSERT( Nes_Emu::image_width  == 0 + Nes_Ppu::image_width );
-BOOST_STATIC_ASSERT( Nes_Emu::image_height == 0 + Nes_Ppu::image_height );
 
 Nes_Emu::equalizer_t const Nes_Emu::nes_eq     = {  -1.0,   80 };
 Nes_Emu::equalizer_t const Nes_Emu::famicom_eq = { -15.0,   80 };

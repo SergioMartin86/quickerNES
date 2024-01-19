@@ -325,19 +325,19 @@ struct calc_sprite_max_scanlines
 			uint8_t* p = scanlines + top;
 			if ( (unsigned) (239 - top) < limit )
 			{
-				unsigned long p0 = ((unaligned_uint32_t*)p) [0].val + offset;
-				unsigned long p4 = ((unaligned_uint32_t*)p) [1].val + offset;
-				((unaligned_uint32_t*)p) [0].val = p0;
+				unsigned long p0 = ((uint32_t*)p) [0] + offset;
+				unsigned long p4 = ((uint32_t*)p) [1] + offset;
+				((uint32_t*)p) [0] = p0;
 				any_hits |= p0;
-				((unaligned_uint32_t*)p) [1].val = p4;
+				((uint32_t*)p) [1] = p4;
 				any_hits |= p4;
 				if ( height > 8 )
 				{
-					unsigned long p0 = ((unaligned_uint32_t*)p) [2].val + offset;
-					unsigned long p4 = ((unaligned_uint32_t*)p) [3].val + offset;
-					((unaligned_uint32_t*)p) [2].val = p0;
+					unsigned long p0 = ((uint32_t*)p) [2] + offset;
+					unsigned long p4 = ((uint32_t*)p) [3] + offset;
+					((uint32_t*)p) [2] = p0;
 					any_hits |= p0;
-					((unaligned_uint32_t*)p) [3].val = p4;
+					((uint32_t*)p) [3] = p4;
 					any_hits |= p4;
 				}
 			}
@@ -376,12 +376,12 @@ long Nes_Ppu_Impl::recalc_sprite_max( int scanline )
 		
 		// check four at a time
 		uint8_t* pos = &sprite_max_scanlines [scanline];
-		unsigned long n = ((unaligned_uint32_t*)pos)->val;
+		unsigned long n = *((uint32_t*)pos);
 		while ( 1 )
 		{
 			unsigned long x = n & mask;
 			pos += 4;
-			n = ((unaligned_uint32_t*)pos)->val;
+			n = *((uint32_t*)pos);
 			if ( x )
 				break;
 		}

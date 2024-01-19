@@ -3,8 +3,7 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "Nes_Mapper.h"
-
-#include <string.h>
+#include <cstring>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -25,7 +24,7 @@ struct mmc1_state_t
 	uint8_t bit;      // number of bits in buffer (0 to 4)
 	uint8_t buf;      // currently buffered bits (new bits added to bottom)
 };
-BOOST_STATIC_ASSERT( sizeof (mmc1_state_t) == 6 );
+static_assert( sizeof (mmc1_state_t) == 6 );
 
 class Mapper001 : public Nes_Mapper, mmc1_state_t {
 public:

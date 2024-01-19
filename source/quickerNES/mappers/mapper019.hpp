@@ -5,7 +5,6 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "Nes_Mapper.h"
-
 #include "blargg_endian.h"
 #include "audio/namco/apu.h"
 
@@ -37,8 +36,7 @@ struct namco106_state_t
 			set_le16( &sound_state.delays [i], sound_state.delays [i] );
 	}
 };
-
-BOOST_STATIC_ASSERT( sizeof (namco106_state_t) == 20 + sizeof (namco_state_t) );
+static_assert( sizeof (namco106_state_t) == 20 + sizeof (namco_state_t) );
 
 // Namco106
 

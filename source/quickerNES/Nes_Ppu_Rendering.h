@@ -50,7 +50,7 @@ private:
 inline Nes_Ppu_Rendering::Nes_Ppu_Rendering()
 {
 	sprite_limit = 8;
-	host_pixels = NULL;
+	host_pixels = nullptr;
 }
 
 inline void Nes_Ppu_Rendering::draw_sprites( int start, int count )
