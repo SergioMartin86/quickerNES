@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 // Macros
 
 #define GET_OPERAND( addr )   page [addr]
-#define GET_OPERAND16( addr ) GET_LE16( &page [addr] )
+#define GET_OPERAND16( addr ) *(uint16_t*)( &page [addr] )
 
 #define ADD_PAGE        (pc++, data += 0x100 * GET_OPERAND( pc ));
 #define GET_ADDR()      GET_OPERAND16( pc )
@@ -836,7 +836,7 @@ loop:
   CALC_STATUS( temp );
   sp = (sp - 3) | 0x100;
   WRITE_LOW( sp, temp | st_b | st_r );
-  pc = GET_LE16( &code_map [0xFFFE >> page_bits] [0xFFFE] );
+  pc = *(uint16_t*)( &code_map [0xFFFE >> page_bits] [0xFFFE] );
   status |= st_i;
   goto i_flag_changed;
  }

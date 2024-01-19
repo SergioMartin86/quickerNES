@@ -21,6 +21,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 int const cache_line_size = 128; // tile cache is kept aligned to this boundary
 
+inline void set_be32( void* p, unsigned long n ) {
+	((unsigned char*) p) [0] = (unsigned char) (n >> 24);
+	((unsigned char*) p) [1] = (unsigned char) (n >> 16);
+	((unsigned char*) p) [2] = (unsigned char) (n >> 8);
+	((unsigned char*) p) [3] = (unsigned char) n;
+}
+
+#define SET_BE32( addr, data )  set_be32( addr, data )
+
 Nes_Ppu_Impl::Nes_Ppu_Impl()
 {
 	impl = NULL;
