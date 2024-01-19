@@ -4,7 +4,7 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 #include "audio/fme7/apu.h"
 
 /* Copyright (C) 2005 Chris Moeller */

@@ -22,7 +22,7 @@
  * Mapper 93 - Sunsoft-2
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 // Sunsoft2b
 

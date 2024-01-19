@@ -25,7 +25,7 @@
  *
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
  
 // NTDEC's TC-112 mapper IC.
 

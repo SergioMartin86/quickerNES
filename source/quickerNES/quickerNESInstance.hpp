@@ -34,12 +34,12 @@ class QuickerNESInstance : public EmuInstance
  const uint8_t* getChrMem() const override { return _nes->chr_mem();};
  size_t getChrMemSize() const override { return _nes->chr_size();};
 
- void serializeState(uint8_t* state) const 
+ void serializeState(uint8_t* state) const override
  {
     _nes->serializeState(state);
  }
 
- void deserializeState(const uint8_t* state) 
+ void deserializeState(const uint8_t* state) override
  {
   _nes->deserializeState(state);
  }

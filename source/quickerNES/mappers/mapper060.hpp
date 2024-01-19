@@ -17,7 +17,7 @@
  * 4-in-1 Multicart ( Reset-based )
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 // NROM-128 4-in-1 multicart
 

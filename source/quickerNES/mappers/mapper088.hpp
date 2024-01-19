@@ -25,7 +25,7 @@
  * Mapper 206
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 struct namco_34x3_state_t
 {

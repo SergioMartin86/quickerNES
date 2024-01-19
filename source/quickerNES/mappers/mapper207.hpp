@@ -23,7 +23,7 @@
  *
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 struct taito_x1005_state_t
 {

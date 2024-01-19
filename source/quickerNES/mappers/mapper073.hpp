@@ -23,7 +23,7 @@
  * VRC-3 Konami, Salamander
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 struct vrc3_state_t
 {

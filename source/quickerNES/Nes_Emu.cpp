@@ -1,7 +1,7 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
 #include <cstring>
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 #include "Nes_Emu.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you

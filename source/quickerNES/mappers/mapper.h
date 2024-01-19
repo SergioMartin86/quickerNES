@@ -181,6 +181,8 @@ protected:
 	virtual void apply_mapping() = 0;
 	
 	void default_reset_state();
+
+	static Nes_Mapper* getMapperFromCode(const int mapperCode);
 };
 
 

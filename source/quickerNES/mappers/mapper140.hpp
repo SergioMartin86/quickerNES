@@ -24,7 +24,7 @@
  *
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 // Jaleco_JF11 
 

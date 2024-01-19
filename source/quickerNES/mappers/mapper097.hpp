@@ -23,7 +23,7 @@
  *
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
  
 // Irem_Tam_S1 
 

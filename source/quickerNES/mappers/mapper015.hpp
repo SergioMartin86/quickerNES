@@ -17,7 +17,7 @@
  * 100-in-1 Contra Function 16
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 struct Mapper015_state_t
 {

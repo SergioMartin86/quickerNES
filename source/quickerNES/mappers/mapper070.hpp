@@ -23,7 +23,7 @@
  *
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 // Mapper_74x161x162x32
 

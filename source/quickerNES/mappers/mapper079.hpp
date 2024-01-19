@@ -25,7 +25,7 @@
  * Nina-03 / Nina-06
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 template < bool multicart >
 class Mapper_AveNina : public Nes_Mapper {

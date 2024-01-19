@@ -3,7 +3,7 @@
 // Konami VRC6 mapper
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 #include <string.h>
 #include "audio/vrc6/apu.h"

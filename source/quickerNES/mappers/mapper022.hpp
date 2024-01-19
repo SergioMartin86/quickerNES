@@ -26,7 +26,7 @@
  * VRC-2/VRC-4 Konami
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 #include "mappers/mapper021.hpp"
 
 typedef Mapper_VRC2_4<false,true> Mapper022;

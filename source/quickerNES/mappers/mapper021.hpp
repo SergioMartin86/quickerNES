@@ -26,7 +26,7 @@
  * VRC-2/VRC-4 Konami
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 struct vrc2_state_t
 {

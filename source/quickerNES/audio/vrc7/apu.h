@@ -4,10 +4,12 @@
 // Konami VRC7 sound chip emulator
 // Nes_Snd_Emu 0.1.7. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
 
+#include <cstdint>
 #include "audio/vrc7/emu2413_state.h"
 #include "audio/Blip_Buffer.h"
 
 struct vrc7_snapshot_t;
+typedef long nes_time_t;
 
 class Nes_Vrc7 {
 public:

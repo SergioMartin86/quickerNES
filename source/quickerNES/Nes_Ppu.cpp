@@ -5,7 +5,6 @@
 
 #include <cstring>
 #include "Nes_Ppu.h"
-#include "Nes_Mapper.h"
 #include "Nes_Core.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you

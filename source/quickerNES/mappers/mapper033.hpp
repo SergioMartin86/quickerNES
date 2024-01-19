@@ -23,7 +23,7 @@
  * 
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 struct tc0190_state_t
 {

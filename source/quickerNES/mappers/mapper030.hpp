@@ -27,7 +27,7 @@
  * Tested only on Troll Burner and Mystic Origins demo.
  */
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 // Unrom512 
 

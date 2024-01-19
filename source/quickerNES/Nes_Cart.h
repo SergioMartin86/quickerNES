@@ -96,7 +96,5 @@ private:
 	long prg_size_;
 	long chr_size_;
 	unsigned mapper;
-
-
 };
 

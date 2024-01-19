@@ -2,7 +2,7 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 #include <cstring>
 #include "Nes_Core.h"

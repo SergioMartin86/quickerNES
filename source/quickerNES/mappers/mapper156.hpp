@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Nes_Mapper.h"
+#include "mappers/mapper.h"
 
 // DIS23C01 DAOU ROM CONTROLLER
 
