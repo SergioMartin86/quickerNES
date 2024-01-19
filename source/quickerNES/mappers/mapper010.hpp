@@ -1,8 +1,6 @@
 #pragma once
 #include <cstring>
-
 #include "Nes_Mapper.h"
-#include "blargg_source.h"
 
 // MMC4 
 

@@ -2,8 +2,7 @@
 // Game_Music_Emu 0.3.0. http://www.slack.net/~ant/
 
 #include "Effects_Buffer.h"
-
-#include <string.h>
+#include <cstring>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -15,12 +14,6 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
 more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
-
-#include "blargg_source.h"
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
-	#include BLARGG_ENABLE_OPTIMIZER
-#endif
 
 typedef long fixed_t;
 
@@ -98,8 +91,7 @@ const char *Effects_Buffer::set_sample_rate( long rate, int msec )
 		reverb_buf = new blip_sample_t [reverb_size];
 	}
 	
-	for ( int i = 0; i < buf_count; i++ )
-		RETURN_ERR( bufs [i].set_sample_rate( rate, msec ) );
+	for ( int i = 0; i < buf_count; i++ ) bufs [i].set_sample_rate( rate, msec );
 	
 	config( config_ );
 	clear();

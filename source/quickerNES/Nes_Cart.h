@@ -39,7 +39,7 @@ public:
 	BOOST_STATIC_ASSERT( sizeof (ines_header_t) == 16 );
 
 	// Load iNES file
-	const char * load_ines( const uint8_t* buffer )
+void load_ines( const uint8_t* buffer )
 	{
 		ines_header_t h;
 
@@ -61,8 +61,6 @@ public:
 
 		{ size_t copySize = prg_size(); memcpy(prg(), &buffer[bufferPos], copySize); bufferPos += copySize; }
 		{ size_t copySize = chr_size(); memcpy(chr(), &buffer[bufferPos], copySize); bufferPos += copySize; }
-
-		return 0;
 	}
 
 	inline bool has_battery_ram() const { return mapper & 0x02; }

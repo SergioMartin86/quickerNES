@@ -20,7 +20,7 @@ public:
 // Basic setup
 
 	// Load iNES file into emulator and clear recording
-	const char * load_ines( const uint8_t* buffer );
+	void load_ines( const uint8_t* buffer );
 
 	// Set sample rate for sound generation
 	const char * set_sample_rate( long );
@@ -88,7 +88,7 @@ public:
 	// Use already-loaded cartridge. Retains pointer, so it must be kept around until
 	// closed. A cartridge can be shared among multiple emulators. After opening,
 	// cartridge's CHR data shouldn't be modified since a copy is cached internally.
-	const char * set_cart( Nes_Cart const* );
+	void set_cart( Nes_Cart const* );
 
 	// Pointer to current cartridge, or NULL if none is loaded
 	Nes_Cart const* cart() const { return emu.cart; }

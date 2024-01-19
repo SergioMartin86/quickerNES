@@ -21,8 +21,6 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
-
 struct fme7_state_t
 {
 	// first 16 bytes in register order
@@ -42,8 +40,6 @@ struct fme7_state_t
 	}
 };
 BOOST_STATIC_ASSERT( sizeof (fme7_state_t) == 18 + sizeof (fme7_apu_state_t) );
-
-
 
 // Fme7
 

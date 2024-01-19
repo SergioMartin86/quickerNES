@@ -22,8 +22,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // to do: remove unnecessary run_until() calls
 
-#include "blargg_source.h"
-
 // Timing
 
 ppu_time_t const scanline_len = Nes_Ppu::scanline_len;
@@ -271,7 +269,7 @@ void Nes_Ppu::update_sprite_hit( nes_time_t cpu_time )
 	if ( count_needed > 240 )
 		count_needed = 240;
 	while ( scanline_count < count_needed )
-		render_bg_until( max( cpu_time, next_bg_time + 1 ) );
+		render_bg_until( std::max( cpu_time, next_bg_time + 1 ) );
 	
 	if ( sprite_hit_found < 0 )
 		return; // sprite won't hit

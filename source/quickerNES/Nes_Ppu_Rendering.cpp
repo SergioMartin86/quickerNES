@@ -2,9 +2,9 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "Nes_Ppu_Rendering.h"
-
-#include <string.h>
-#include <stddef.h>
+#include <algorithm>
+#include <cstring>
+#include <cstddef>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -17,19 +17,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
-	#include BLARGG_ENABLE_OPTIMIZER
-#endif
-
-#ifdef __MWERKS__
-	static unsigned zero = 0; // helps CodeWarrior optimizer when added to constants
-#else
-	const  unsigned zero = 0; // compile-time constant on other compilers
-#endif
-
 // Nes_Ppu_Impl
+
+static unsigned zero = 0; // helps CodeWarrior optimizer when added to constants
 
 inline Nes_Ppu_Impl::cached_tile_t const&
 		Nes_Ppu_Impl::get_sprite_tile( uint8_t const* sprite )
@@ -509,8 +499,8 @@ void Nes_Ppu_Rendering::draw_background( int start, int count )
 	{
 		// not rendering, but still handle sprite hit using mini graphics buffer
 		int y = spr_ram [0] + 1;
-		int skip = min( count, max( y - start, 0 ) );
-		int visible = min( count - skip, sprite_height() );
+		int skip = std::min( count, std::max( y - start, 0 ) );
+		int visible = std::min( count - skip, sprite_height() );
 		
 		if ( visible > 0 )
 		{

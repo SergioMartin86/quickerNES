@@ -1,8 +1,6 @@
-
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
 
 #include "Nes_Buffer.h"
-
 #include "Nes_Apu.h"
 
 /* Library Copyright (C) 2003-2006 Shay Green. This library is free software;
@@ -16,11 +14,6 @@ details. You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
-	#include BLARGG_ENABLE_OPTIMIZER
-#endif
 
 // Nes_Buffer
 
@@ -47,8 +40,8 @@ void Nes_Buffer::enable_nonlinearity( bool b )
 const char * Nes_Buffer::set_sample_rate( long rate, int msec )
 {
 	enable_nonlinearity( nonlin.enabled ); // reapply
-	RETURN_ERR( buf.set_sample_rate( rate, msec ) );
-	RETURN_ERR( tnd.set_sample_rate( rate, msec ) );
+	buf.set_sample_rate( rate, msec );
+	tnd.set_sample_rate( rate, msec );
 	return Multi_Buffer::set_sample_rate( buf.sample_rate(), buf.length() );
 }
 

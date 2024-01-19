@@ -1,11 +1,9 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "Nes_Emu.h"
-
-#include <cstdio>
 #include <cstring>
 #include "Nes_Mapper.h"
+#include "Nes_Emu.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -17,8 +15,6 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
 more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
-
-#include "blargg_source.h"
 
 int const sound_fade_size = 384;
 
@@ -70,11 +66,12 @@ inline const char * Nes_Emu::auto_init()
 {
 	if ( !init_called )
 	{
-		RETURN_ERR( init_() );
+		init_();
 		init_called = true;
 	}
 	return 0;
 }
+
 
 inline void Nes_Emu::clear_sound_buf()
 {
@@ -83,19 +80,16 @@ inline void Nes_Emu::clear_sound_buf()
 	sound_buf->clear();
 }
 
-const char * Nes_Emu::set_cart( Nes_Cart const* new_cart )
+void Nes_Emu::set_cart( Nes_Cart const* new_cart )
 {
-	RETURN_ERR( auto_init() );
-	RETURN_ERR( emu.open( new_cart ) );
+	auto_init();
+	emu.open( new_cart );
 
 	channel_count_ = Nes_Apu::osc_count + emu.mapper->channel_count();
-	RETURN_ERR( sound_buf->set_channel_count( channel_count() ) );
+	sound_buf->set_channel_count( channel_count() );
 	set_equalizer( equalizer_ );
 	enable_sound( true );
-
 	reset();
-
-	return 0;
 }
 
 void Nes_Emu::reset( bool full_reset, bool erase_battery_ram )
@@ -175,10 +169,10 @@ const char * Nes_Emu::emulate_frame( int joypad1, int joypad2 )
 
 // Extras
 
-const char * Nes_Emu::load_ines( const uint8_t* buffer )
+void Nes_Emu::load_ines( const uint8_t* buffer )
 {
 	private_cart.load_ines( buffer );
-	return set_cart( &private_cart );
+	set_cart( &private_cart );
 }
 
 void Nes_Emu::write_chr( void const* p, long count, long offset )
@@ -191,14 +185,14 @@ void Nes_Emu::write_chr( void const* p, long count, long offset )
 const char * Nes_Emu::set_sample_rate( long rate, class Nes_Buffer* buf )
 {
 	extern Multi_Buffer* set_apu( class Nes_Buffer*, Nes_Apu* );
-	RETURN_ERR( auto_init() );
+	auto_init();
 	return set_sample_rate( rate, set_apu( buf, &emu.impl->apu ) );
 }
 
 const char * Nes_Emu::set_sample_rate( long rate, class Nes_Effects_Buffer* buf )
 {
 	extern Multi_Buffer* set_apu( class Nes_Effects_Buffer*, Nes_Apu* );
-	RETURN_ERR( auto_init() );
+	auto_init();
 	return set_sample_rate( rate, set_apu( buf, &emu.impl->apu ) );
 }
 
@@ -211,9 +205,9 @@ void Nes_Emu::set_frame_rate( double rate )
 
 const char * Nes_Emu::set_sample_rate( long rate, Multi_Buffer* new_buf )
 {
-	RETURN_ERR( auto_init() );
+	auto_init();
 	emu.impl->apu.volume( 1.0 ); // cancel any previous non-linearity
-	RETURN_ERR( new_buf->set_sample_rate( rate, 1200 / frame_rate ) );
+	new_buf->set_sample_rate( rate, 1200 / frame_rate );
 	sound_buf = new_buf;
 	sound_buf_changed_count = 0;
 	if ( new_buf != default_sound_buf )

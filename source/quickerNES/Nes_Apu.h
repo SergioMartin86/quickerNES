@@ -5,7 +5,6 @@
 // Nes_Snd_Emu 0.1.7
 
 #include <cstdint>
-#include "blargg_source.h"
 #include "blargg_endian.h"
 
 typedef long     nes_time_t; // CPU clock cycle count

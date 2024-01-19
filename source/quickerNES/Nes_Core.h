@@ -159,10 +159,10 @@ public:
 		return 0;
 	}
 	
-	const char * open( Nes_Cart const* new_cart )
+	void open( Nes_Cart const* new_cart )
 	{
 		close();
-		RETURN_ERR( init() );
+		init();
 
 		// Getting cartdrige mapper code
 		auto mapperCode = new_cart->mapper_code();
@@ -228,20 +228,18 @@ public:
 		if (mapper == NULL)
 		{
 			fprintf(stderr, "Could not find mapper for code: %u\n", mapperCode);
-			return NULL;
+			exit(-1);
 		} 
 
 		// Assigning backwards pointers to cartdrige and emulator now
 		mapper->cart_ = new_cart;
 		mapper->emu_ = this;
 
-		RETURN_ERR( ppu.open_chr( new_cart->chr(), new_cart->chr_size() ) );
+		ppu.open_chr( new_cart->chr(), new_cart->chr_size() );
 		
 		cart = new_cart;
 		memset( impl->unmapped_page, unmapped_fill, sizeof impl->unmapped_page );
 		reset( true, true );
-
-		return 0;
 	}
 
 	size_t getLiteStateSize() const
@@ -689,7 +687,7 @@ private:
 	
 	inline nes_time_t earliest_irq( nes_time_t present )
 	{
-		return min( impl->apu.earliest_irq( present ), mapper->next_irq( present ) );
+		return std::min( impl->apu.earliest_irq( present ), mapper->next_irq( present ) );
 	}
 	
 	inline nes_time_t ppu_frame_length( nes_time_t present )
@@ -710,13 +708,13 @@ private:
 		
 		// DMC
 		if ( wait_states_enabled )
-			t = min( t, impl->apu.next_dmc_read_time() + 1 );
+			t = std::min( t, impl->apu.next_dmc_read_time() + 1 );
 		
 		// NMI
-		t = min( t, ppu.nmi_time() );
+		t = std::min( t, ppu.nmi_time() );
 		
 		if ( single_instruction_mode )
-			t = min( t, present + 1 );
+			t = std::min( t, present + 1 );
 		
 		return t;
 	}

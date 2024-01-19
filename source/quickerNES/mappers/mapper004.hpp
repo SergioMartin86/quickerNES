@@ -18,8 +18,6 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
-
 // 264 or less breaks Gargoyle's Quest II
 // 267 or less breaks Magician
 int const irq_fine_tune = 268;

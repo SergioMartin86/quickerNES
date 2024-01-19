@@ -14,8 +14,6 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
-
 Multi_Buffer::Multi_Buffer( int spf ) : samples_per_frame_( spf )
 {
 	length_ = 0;
@@ -49,7 +47,7 @@ Mono_Buffer::~Mono_Buffer()
 
 const char * Mono_Buffer::set_sample_rate( long rate, int msec )
 {
-	RETURN_ERR( buf.set_sample_rate( rate, msec ) );
+	buf.set_sample_rate( rate, msec );
 	return Multi_Buffer::set_sample_rate( buf.sample_rate(), buf.length() );
 }
 
@@ -115,8 +113,7 @@ Stereo_Buffer::~Stereo_Buffer()
 
 const char * Stereo_Buffer::set_sample_rate( long rate, int msec )
 {
-	for ( int i = 0; i < buf_count; i++ )
-		RETURN_ERR( bufs [i].set_sample_rate( rate, msec ) );
+	for ( int i = 0; i < buf_count; i++ ) bufs [i].set_sample_rate( rate, msec ) ;
 	return Multi_Buffer::set_sample_rate( bufs [0].sample_rate(), bufs [0].length() );
 }
 

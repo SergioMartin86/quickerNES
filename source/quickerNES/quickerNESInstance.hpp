@@ -24,8 +24,8 @@ class QuickerNESInstance : public EmuInstance
  virtual bool loadROMFileImpl(const std::string& romData) override
  {
   // Loading rom data
-  auto result = _nes->load_ines((uint8_t*)romData.data());
-  return result == 0;
+  _nes->load_ines((uint8_t*)romData.data());
+  return true;
  }
 
  uint8_t* getLowMem() const override { return _nes->low_mem(); };

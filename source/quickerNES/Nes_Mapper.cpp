@@ -1,8 +1,8 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
+#include <cstring>
 #include "Nes_Mapper.h"
-#include <string.h>
 #include "Nes_Core.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
@@ -15,8 +15,6 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
 more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
-
-#include "blargg_source.h"
 
 Nes_Mapper::Nes_Mapper()
 {

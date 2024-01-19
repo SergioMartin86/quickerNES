@@ -14,12 +14,6 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-#include "blargg_source.h"
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
-	#include BLARGG_ENABLE_OPTIMIZER
-#endif
-
 // Nes_Osc
 
 void Nes_Osc::clock_length( int halt_mask )
