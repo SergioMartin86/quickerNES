@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include <string>
 #include "apu/apu.h"
 #include "Nes_Cpu.h"
-#include "Nes_Ppu.h"
+#include "ppu/Nes_Ppu.h"
 #include "mappers/mapper.h"
 
 class Nes_Cart;
@@ -78,7 +78,6 @@ public:
 		memset( &nes, 0, sizeof nes );
 		memset( &joypad, 0, sizeof joypad );
 	}
-
 	
 	~Nes_Core()
 	{

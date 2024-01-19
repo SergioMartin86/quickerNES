@@ -1,6 +1,6 @@
 # quickerNES Core sources
 
-quickerNESAudioSrc = [
+quickerNESAPUSrc = [
  'apu/apu.cpp', 
  'apu/Nes_Oscs.cpp', 
  'apu/Nes_Buffer.cpp', 
@@ -16,11 +16,14 @@ quickerNESAudioSrc = [
  'apu/fme7/apu.cpp', 
 ]
 
-quickerNESSrc = quickerNESAudioSrc + [
+quickerNESPPUSrc = [
+ 'ppu/Nes_Ppu.cpp', 
+ 'ppu/Nes_Ppu_Impl.cpp', 
+ 'ppu/Nes_Ppu_Rendering.cpp',
+]
+
+quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
  'mappers/mapper.cpp', 
- 'Nes_Ppu.cpp', 
- 'Nes_Ppu_Impl.cpp', 
- 'Nes_Ppu_Rendering.cpp', 
  'Nes_Emu.cpp', 
  'Nes_Cpu.cpp'
 ]

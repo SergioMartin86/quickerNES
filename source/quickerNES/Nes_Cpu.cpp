@@ -114,14 +114,16 @@ case op + 0x08: /* abs */               \
 case op + 0x00: /* zp */                \
 imm##op:                                \
 
+// Adding likely to fail because typically for loops exit conditions fail until the last one
 #define BRANCH( cond )      \
 {                           \
  pc++;                   \
  int offset = (int8_t) data;  \
- if ( !(cond) ) {clock_count--; goto loop; } \
+ int extra_clock = (pc & 0xFF) + offset; \
+ if ( !(cond) ) [[likely]] {clock_count--; goto loop; } \
  pc += offset;       \
  pc = uint16_t( pc ); \
- clock_count += (((pc & 0xFF) + offset) >> 8) & 1;  \
+ clock_count += (extra_clock >> 8) & 1;  \
  goto loop;          \
 }
 
