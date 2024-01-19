@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -19,8 +21,6 @@
  *
  * Mapper 184 - Sunsoft-1
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
 

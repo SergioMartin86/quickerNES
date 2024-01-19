@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -18,7 +20,5 @@
  * This mapper was added by retrowertz for Libretro port of QuickNES.
  *
  */
-
-#pragma once
 
 typedef Mapper_74x161x162x32<86> Mapper086;

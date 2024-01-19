@@ -1,14 +1,12 @@
+#pragma once 
 
 // NES mapper interface
 
 // Nes_Emu 0.7.0
 
-#ifndef NES_MAPPER
-#define NES_MAPPER
-
+#include <climits>
 #include "Nes_Cart.h"
 #include "Nes_Cpu.h"
-#include <climits>
 
 class Blip_Buffer;
 class blip_eq_t;
@@ -201,7 +199,3 @@ inline void Nes_Mapper::register_state( void* p, unsigned s )
 inline bool Nes_Mapper::write_intercepted( nes_time_t, nes_addr_t, int ) { return false; }
 
 inline int Nes_Mapper::read( nes_time_t, nes_addr_t ) { return -1; } // signal to caller
-
-
-
-#endif

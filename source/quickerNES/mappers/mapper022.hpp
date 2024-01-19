@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  *  Copyright (C) 2004-2006 Shay Green
  *  Copyright (C) 2007 CaH4e3
@@ -24,7 +26,6 @@
  * VRC-2/VRC-4 Konami
  */
 
-#pragma once
 #include "Nes_Mapper.h"
 #include "mappers/mapper021.hpp"
 

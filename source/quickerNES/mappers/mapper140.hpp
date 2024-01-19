@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -21,8 +23,6 @@
  * Mapper 140 - Jaleco's JF-11 and JF-14
  *
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
 

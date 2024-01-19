@@ -1,9 +1,7 @@
+#pragma once
 
 // Optional less-common simple mappers
-
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
-
-#pragma once
 
 #include "Nes_Mapper.h"
 

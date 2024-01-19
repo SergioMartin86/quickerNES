@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -18,8 +20,6 @@
  * This mapper was added by retrowertz for Libretro port of QuickNES.
  *
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
  

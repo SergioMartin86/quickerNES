@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -21,8 +23,6 @@
  * Senjou no Ookami (Japanese version of Commando)
  *
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
  

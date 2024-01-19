@@ -1,11 +1,9 @@
-
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/nes-emu/
 
-#include "Nes_Cpu.h"
-#include <string.h>
-#include <limits.h>
-#include "blargg_endian.h"
-#include <stdio.h>
+#include <cstring>
+#include <climits>
+#include <cstdio>
+#include <Nes_Cpu.h>
 #include <Nes_Core.h>
 
 /**

@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <cstdint>
 #include <climits>
-#include "blargg_endian.h"
 #include "Nes_Oscs.h"
 
 class Nes_Apu {

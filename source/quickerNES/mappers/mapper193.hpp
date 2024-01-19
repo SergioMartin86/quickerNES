@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -22,8 +24,6 @@
  * War in the Gulf & (its Brazilian localization)
  *
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
  

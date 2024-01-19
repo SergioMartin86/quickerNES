@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -24,8 +26,6 @@
  * No flash and one screen mirroring support.
  * Tested only on Troll Burner and Mystic Origins demo.
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
 

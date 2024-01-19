@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright (C) 2018.
  * This module is free software; you
  * can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -14,8 +16,6 @@
  *
  * 100-in-1 Contra Function 16
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
 

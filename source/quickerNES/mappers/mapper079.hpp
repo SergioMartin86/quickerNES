@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -24,8 +26,6 @@
  */
 
 #include "Nes_Mapper.h"
-
-#pragma once
 
 template < bool multicart >
 class Mapper_AveNina : public Nes_Mapper {

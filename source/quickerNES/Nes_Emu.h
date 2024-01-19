@@ -1,10 +1,8 @@
+#pragma once 
 
 // NES video game console emulator with snapshot support
 
 // Nes_Emu 0.7.0
-
-#ifndef NES_EMU_H
-#define NES_EMU_H
 
 #include "audio/Multi_Buffer.h"
 #include "Nes_Cart.h"
@@ -262,4 +260,3 @@ inline long Nes_Emu::chr_size() const
 	return cart()->chr_size() ? cart()->chr_size() : emu.ppu.chr_addr_size;
 }
 
-#endif

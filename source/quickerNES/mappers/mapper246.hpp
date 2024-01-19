@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -20,8 +22,6 @@
  * Mapper 246 - Feng Shen Bang (Asia) (Ja) (Unl)
  *
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
 

@@ -1,10 +1,8 @@
+#pragma once 
 
 // NES PPU emulator
 
 // Nes_Emu 0.7.0
-
-#ifndef NES_PPU_H
-#define NES_PPU_H
 
 #include "Nes_Ppu_Rendering.h"
 #include <climits>
@@ -138,5 +136,3 @@ inline void Nes_Ppu::update_open_bus( nes_time_t time )
 	if ( time >= decay_low ) open_bus &= ~0x1F;
 	if ( time >= decay_high ) open_bus &= ~0xE0;
 }
-
-#endif

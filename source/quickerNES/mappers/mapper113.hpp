@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -22,7 +24,5 @@
  * Mapper 113
  * Nina-03 / Nina-06
  */
-
-#pragma once
 
 typedef Mapper_AveNina<true> Mapper113;

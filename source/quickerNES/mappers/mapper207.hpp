@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -20,8 +22,6 @@
  * Taito's X1-005 ( Rev. B ) Fudou Myouou Den
  *
  */
-
-#pragma once
 
 #include "Nes_Mapper.h"
 

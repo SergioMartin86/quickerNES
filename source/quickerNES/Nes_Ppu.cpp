@@ -3,9 +3,8 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
+#include <cstring>
 #include "Nes_Ppu.h"
-
-#include <string.h>
 #include "Nes_Mapper.h"
 #include "Nes_Core.h"
 

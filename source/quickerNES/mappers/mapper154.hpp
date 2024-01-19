@@ -1,3 +1,5 @@
+#pragma once
+
 /* Copyright notice for this file:
  * Copyright (C) 2018
  *
@@ -22,7 +24,5 @@
  * Mapper 154
  * Mapper 206
  */
-
-#pragma once
 
 typedef Mapper_Namco_34x3<true> Mapper154;

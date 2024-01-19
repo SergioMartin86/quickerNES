@@ -1,3 +1,4 @@
+#pragma once 
 
 // NES cartridge data (PRG, CHR, mapper)
 
@@ -13,10 +14,6 @@ Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
-
-
-#ifndef NES_CART_H
-#define NES_CART_H
 
 #include <cstring>
 #include <cstdint>
@@ -103,4 +100,3 @@ private:
 
 };
 
-#endif

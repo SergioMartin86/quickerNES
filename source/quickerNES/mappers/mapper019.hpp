@@ -5,7 +5,6 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "Nes_Mapper.h"
-#include "blargg_endian.h"
 #include "audio/namco/apu.h"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you

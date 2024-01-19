@@ -5,7 +5,6 @@
 
 #include <cstdint>
 
-class Nes_State_;
 
 struct ppu_state_t
 {
@@ -38,8 +37,6 @@ public:
 	const char * open_chr( const uint8_t*, long size );
 	void rebuild_chr( unsigned long begin, unsigned long end );
 	void close_chr();
-	void save_state( Nes_State_* out ) const;
-	void load_state( Nes_State_ const& );
 	
 	static const uint16_t image_width = 256;
 	static const uint16_t image_height = 240;

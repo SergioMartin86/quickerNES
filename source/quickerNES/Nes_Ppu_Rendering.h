@@ -1,10 +1,8 @@
+#pragma once 
 
 // NES PPU emulator graphics rendering
 
 // Nes_Emu 0.7.0
-
-#ifndef NES_PPU_RENDERING_H
-#define NES_PPU_RENDERING_H
 
 #include "Nes_Ppu_Impl.h"
 
@@ -58,4 +56,3 @@ inline void Nes_Ppu_Rendering::draw_sprites( int start, int count )
 	draw_scanlines( start, count, host_pixels + host_row_bytes * start, host_row_bytes, 2 );
 }
 
-#endif

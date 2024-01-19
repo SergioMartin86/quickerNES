@@ -1,4 +1,3 @@
-
 int sprite_2 = sprite [2];
 
 // pixels
