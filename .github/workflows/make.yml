@@ -13,16 +13,16 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: recursive
-    - name: List files
-      run: ls -la ~/quickerNES/tests/roms
     - name: Create build directory
       run: mkdir build
     - name: Installing meson and ninja
       run: python3 -m pip install meson ninja
     - name: Run meson configuration
-      run: meson setup build -DonlyOpenSource=true
+      run: meson setup build
     - name: Building project
       run: ninja -C build
+    - name: Copying roms
+      run: cp ~/quickerNES/tests/roms/* tests/roms/
     - name: Running tests
       run: ninja test -C build
     - uses: actions/upload-artifact@v4
