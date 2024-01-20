@@ -25,3 +25,7 @@ jobs:
       run: ninja -C build
     - name: Running tests
       run: ninja test -C build
+    - uses: actions/upload-artifact@v4
+      with:
+        name: meson-logs
+        path: build/meson-logs/
