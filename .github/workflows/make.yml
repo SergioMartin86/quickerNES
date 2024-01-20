@@ -7,7 +7,7 @@ on:
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -18,11 +18,9 @@ jobs:
     - name: Installing meson and ninja
       run: python3 -m pip install meson ninja
     - name: Run meson configuration
-      run: meson setup build
+      run: meson setup build -DonlyOpenSource=true
     - name: Building project
       run: ninja -C build
-    - name: Copying roms
-      run: cp ~/quickerNES/tests/roms/* tests/roms/
     - name: Running tests
       run: ninja test -C build
     - uses: actions/upload-artifact@v4
