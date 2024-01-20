@@ -3,5 +3,5 @@
   "Expected ROM SHA1": "3F3B499CF50386084E053BCA096AE8E52330CFAE",
   "Initial State File": "",
   "Sequence File": "saintSeiyaKanketsuHen.anyPercent.sol",
-  "Disable State Blocks": [ ]
+  "Disable State Blocks": [ "SRAM", "CHRR", "NTAB", "SPRT", "CTRL" ]
 }

@@ -111,9 +111,6 @@ int main(int argc, char *argv[])
   // Disable rendering
   e.disableRendering();
 
-  // Getting initial hash
-  auto initialHash = e.getStateHash();
-
   // Getting lite state size
   const auto liteStateSize = e.getLiteStateSize();
 
@@ -142,10 +139,9 @@ int main(int argc, char *argv[])
   printf("[] Cycle Type:              '%s'\n", cycleType.c_str());
   printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
-  printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
+  //printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
-  printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
   #ifdef _USE_QUICKNES
   printf("[] State Size:              %lu bytes\n", e.getFullStateSize());
   #endif

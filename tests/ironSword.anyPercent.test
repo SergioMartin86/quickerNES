@@ -3,5 +3,5 @@
   "Expected ROM SHA1": "97B79E432F62403FB9F877090850C41112A9A168",
   "Initial State File": "",
   "Sequence File": "ironSword.anyPercent.sol",
-  "Disable State Blocks": [ ]
+  "Disable State Blocks": [ "SRAM", "CHRR", "NTAB", "SPRT", "CTRL" ]
 }

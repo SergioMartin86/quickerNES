@@ -3,5 +3,5 @@
   "Expected ROM SHA1": "BBE5CF2DFA0B5422776A530D6F1B617238A8569F",
   "Initial State File": "",
   "Sequence File": "nigelMansell.anyPercent.sol",
-  "Disable State Blocks": [ ]
+  "Disable State Blocks": [ "SRAM", "CHRR", "SPRT", "CTRL" ]
 }

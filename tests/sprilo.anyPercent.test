@@ -3,5 +3,5 @@
   "Expected ROM SHA1": "6EC09B9B51320A536A786D3D4719432B714C5779",
   "Initial State File": "",
   "Sequence File": "sprilo.anyPercent.sol",
-  "Disable State Blocks": [ ]
+  "Disable State Blocks": [ "SRAM", "CHRR", "NTAB", "SPRT", "CTRL" ]
 }

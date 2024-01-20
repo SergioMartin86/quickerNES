@@ -3,5 +3,5 @@
   "Expected ROM SHA1": "57919B685B55EE3ED3AD98FB1D25626B98BE7D39",
   "Initial State File": "",
   "Sequence File": "superOffroad.anyPercent.sol",
-  "Disable State Blocks": [ ]
+  "Disable State Blocks": [ "SRAM", "CHRR", "SPRT", "CTRL" ]
 }

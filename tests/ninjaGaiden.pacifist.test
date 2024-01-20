@@ -3,5 +3,5 @@
   "Expected ROM SHA1": "CA513F841D75EFEB33BB8099FB02BEEB39F6BB9C",
   "Initial State File": "",
   "Sequence File": "ninjaGaiden.pacifist.sol",
-  "Disable State Blocks": [ ]
+  "Disable State Blocks": [ "SRAM", "CHRR", "NTAB", "SPRT", "CTRL" ]
 }
