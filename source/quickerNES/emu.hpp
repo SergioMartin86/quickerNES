@@ -234,8 +234,8 @@ class Emu
   virtual const char *init_();
 
   virtual void loading_state(State const &) {}
-  long timestamp() const { return emu.nes.frame_count; }
-  void set_timestamp(long t) { emu.nes.frame_count = t; }
+  long timestamp() const { return 0; }
+  void set_timestamp(long t) {  }
 
   private:
   // noncopyable
