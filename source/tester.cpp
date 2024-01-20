@@ -4,6 +4,8 @@
 #include "utils.hpp"
 #include <chrono>
 #include <sstream>
+#include <vector>
+#include <string>
 
 #ifdef _USE_QUICKNES
   #include "quickNESInstance.hpp"
@@ -76,6 +78,18 @@ int main(int argc, char *argv[])
   if (scriptJson["Expected ROM SHA1"].is_string() == false) EXIT_WITH_ERROR("Script file 'Expected ROM SHA1' entry is not a string\n");
   std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
 
+  // Parsing disabled blocks in lite state serialization
+  std::vector<std::string> liteStateDisabledBlocks;
+  std::string liteStateDisabledBlocksOutput;
+  if (scriptJson.contains("Disable Lite State Blocks") == false) EXIT_WITH_ERROR("Script file missing 'Disable Lite State Blocks' entry\n");
+  if (scriptJson["Disable Lite State Blocks"].is_array() == false) EXIT_WITH_ERROR("Script file 'Disable Lite State Blocks' is not an array\n");
+  for (const auto& entry : scriptJson["Disable Lite State Blocks"])
+  {
+    if (entry.is_string() == false) EXIT_WITH_ERROR("Script file 'Disable Lite State Blocks' entry is not a string\n");
+    liteStateDisabledBlocks.push_back(entry.get<std::string>());
+    liteStateDisabledBlocksOutput += entry.get<std::string>() + std::string(" ");
+  } 
+  
   // Creating emulator instance
   #ifdef _USE_QUICKNES
   auto e = QuickNESInstance();
@@ -124,16 +138,17 @@ int main(int argc, char *argv[])
 
   // Printing test information
   printf("[] -----------------------------------------\n");
-  printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
-  printf("[] Cycle Type:              '%s'\n", cycleType.c_str());
-  printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
-  printf("[] ROM File:                '%s'\n", romFilePath.c_str());
-  printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
-  printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
-  printf("[] Sequence Length:         %lu\n", sequenceLength);
-  printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
-  printf("[] Full State Size:         %lu bytes\n", fullStateSize);
-  printf("[] Lite State Size:         %lu bytes\n", liteStateSize);
+  printf("[] Running Script:              '%s'\n", scriptFilePath.c_str());
+  printf("[] Cycle Type:                  '%s'\n", cycleType.c_str());
+  printf("[] Emulation Core:              '%s'\n", emulationCoreName.c_str());
+  printf("[] ROM File:                    '%s'\n", romFilePath.c_str());
+  printf("[] ROM SHA1:                    '%s'\n", romSHA1.c_str());
+  printf("[] Sequence File:               '%s'\n", sequenceFilePath.c_str());
+  printf("[] Sequence Length:             %lu\n", sequenceLength);
+  printf("[] Initial State Hash:          0x%lX%lX\n", initialHash.first, initialHash.second);
+  printf("[] Full State Size:             %lu bytes\n", fullStateSize);
+  printf("[] Lite State Size:             %lu bytes\n", liteStateSize);
+  printf("[] Lite State Disabled Blocks:  [ %s ]\n", liteStateDisabledBlocksOutput.c_str());
   printf("[] ********** Running Test **********\n");
 
   fflush(stdout);

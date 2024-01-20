@@ -45,6 +45,9 @@ class QuickerNESInstance : public EmuInstance
   size_t getFullStateSize() const override { return _nes->getFullStateSize(); }
   size_t getLiteStateSize() const override { return _nes->getLiteStateSize(); }
 
+  void enableLiteStateBlock(const std::string& block) override { _nes->enableLiteStateBlock(block); };
+  void disableLiteStateBlock(const std::string& block) override { _nes->disableLiteStateBlock(block); };
+
   void advanceStateImpl(const inputType controller1, const inputType controller2) override
   {
     if (_doRendering == true) _nes->emulate_frame(controller1, controller2);

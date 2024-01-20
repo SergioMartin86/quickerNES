@@ -54,6 +54,9 @@ class Emu
   size_t getLiteStateSize() const { return emu.serializeLiteState(nullptr); }
   size_t getFullStateSize() const { return emu.serializeFullState(nullptr); }
 
+  void enableLiteStateBlock(const std::string& block) { emu.enableLiteStateBlock(block); };
+  void disableLiteStateBlock(const std::string& block) { emu.disableLiteStateBlock(block); };
+
   // Basic emulation
 
   // Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image

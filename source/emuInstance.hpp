@@ -154,6 +154,9 @@ class EmuInstance
   virtual void deserializeLiteState(const uint8_t *state) = 0;
   virtual size_t getFullStateSize() const = 0;
   virtual size_t getLiteStateSize() const = 0;
+  virtual void enableLiteStateBlock(const std::string& block) = 0;
+  virtual void disableLiteStateBlock(const std::string& block) = 0;
+
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;

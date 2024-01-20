@@ -80,6 +80,20 @@ class Core : private Cpu
   typedef Cpu cpu;
 
   public:
+
+  // Flags for lite state storage
+  bool TIMEBlockEnabled = true;
+  bool CPURBlockEnabled = true;
+  bool PPURBlockEnabled = true;
+  bool APURBlockEnabled = true;
+  bool CTRLBlockEnabled = true;
+  bool MAPRBlockEnabled = true;
+  bool LRAMBlockEnabled = true;
+  bool SPRTBlockEnabled = true;
+  bool NTABBlockEnabled = true;
+  bool CHRRBlockEnabled = true;
+  bool SRAMBlockEnabled = true;
+
   Core() : ppu(this)
   {
     cart = NULL;
@@ -412,78 +426,151 @@ class Core : private Cpu
     return pos; // Bytes read
   }
 
+void enableLiteStateBlock(const std::string& block)
+{ 
+   bool recognizedBlock = false;
+   
+   if (block == "TIME") { TIMEBlockEnabled = true; recognizedBlock = true; }
+   if (block == "CPUR") { CPURBlockEnabled = true; recognizedBlock = true; }
+   if (block == "PPUR") { PPURBlockEnabled = true; recognizedBlock = true; }
+   if (block == "APUR") { APURBlockEnabled = true; recognizedBlock = true; }
+   if (block == "CTRL") { CTRLBlockEnabled = true; recognizedBlock = true; }
+   if (block == "MAPR") { MAPRBlockEnabled = true; recognizedBlock = true; }
+   if (block == "LRAM") { LRAMBlockEnabled = true; recognizedBlock = true; }
+   if (block == "SPRT") { SPRTBlockEnabled = true; recognizedBlock = true; }
+   if (block == "NTAB") { NTABBlockEnabled = true; recognizedBlock = true; }
+   if (block == "CHRR") { CHRRBlockEnabled = true; recognizedBlock = true; }
+   if (block == "SRAM") { SRAMBlockEnabled = true; recognizedBlock = true; }
+
+   if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
+};
+
+
+void disableLiteStateBlock(const std::string& block)
+{ 
+   bool recognizedBlock = false;
+   
+   if (block == "TIME") { TIMEBlockEnabled = false; recognizedBlock = true; }
+   if (block == "CPUR") { CPURBlockEnabled = false; recognizedBlock = true; }
+   if (block == "PPUR") { PPURBlockEnabled = false; recognizedBlock = true; }
+   if (block == "APUR") { APURBlockEnabled = false; recognizedBlock = true; }
+   if (block == "CTRL") { CTRLBlockEnabled = false; recognizedBlock = true; }
+   if (block == "MAPR") { MAPRBlockEnabled = false; recognizedBlock = true; }
+   if (block == "LRAM") { LRAMBlockEnabled = false; recognizedBlock = true; }
+   if (block == "SPRT") { SPRTBlockEnabled = false; recognizedBlock = true; }
+   if (block == "NTAB") { NTABBlockEnabled = false; recognizedBlock = true; }
+   if (block == "CHRR") { CHRRBlockEnabled = false; recognizedBlock = true; }
+   if (block == "SRAM") { SRAMBlockEnabled = false; recognizedBlock = true; }
+
+   if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
+};
+
+
 size_t serializeLiteState(uint8_t *buffer) const
   {
     size_t pos = 0;
     uint32_t blockSize = 0;
     void *dataSource;
 
-    nes_state_lite_t state;
-    state.timestamp = nes.timestamp;
-    state.frame_count = (uint8_t)nes.frame_count;
-    state.timestamp *= 5;
-    blockSize = sizeof(nes_state_lite_t);
-    dataSource = (void *)&state;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    blockSize = sizeof(cpu::registers_t);
-    dataSource = (void *)&r;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    blockSize = sizeof(ppu_state_t);
-    dataSource = (void *)&ppu;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    Apu::apu_state_t apuState;
-    impl->apu.save_state(&apuState);
-    blockSize = sizeof(Apu::apu_state_t);
-    if (buffer != nullptr) memcpy(&buffer[pos], &apuState, blockSize);
-    pos += blockSize;
-
-    blockSize = sizeof(joypad_state_t);
-    dataSource = (void *)&joypad;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    blockSize = mapper->state_size;
-    dataSource = (void *)mapper->state;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    blockSize = low_ram_size;
-    dataSource = (void *)low_mem;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    blockSize = Ppu::spr_ram_size;
-    dataSource = (void *)ppu.spr_ram;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    size_t nametable_size = 0x800;
-    if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
-    blockSize = nametable_size;
-    dataSource = (void *)ppu.impl->nt_ram;
-    if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-    pos += blockSize;
-
-    if (ppu.chr_is_writable)
+    if (TIMEBlockEnabled == true)
     {
-      blockSize = ppu.chr_size;
-      dataSource = (void *)ppu.impl->chr_ram;
+      nes_state_lite_t state;
+      state.timestamp = nes.timestamp;
+      state.frame_count = (uint8_t)nes.frame_count;
+      state.timestamp *= 5;
+      blockSize = sizeof(nes_state_lite_t);
+      dataSource = (void *)&state;
       if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
       pos += blockSize;
     }
 
-    if (sram_present)
+    if (CPURBlockEnabled == true)
     {
-      blockSize = impl->sram_size;
-      dataSource = (void *)impl->sram;
+      blockSize = sizeof(cpu::registers_t);
+      dataSource = (void *)&r;
       if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
       pos += blockSize;
+    }
+
+    if (PPURBlockEnabled == true)
+    {
+      blockSize = sizeof(ppu_state_t);
+      dataSource = (void *)&ppu;
+      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+      pos += blockSize;
+    }
+
+    if (APURBlockEnabled == true)
+    {
+      Apu::apu_state_t apuState;
+      impl->apu.save_state(&apuState);
+      blockSize = sizeof(Apu::apu_state_t);
+      if (buffer != nullptr) memcpy(&buffer[pos], &apuState, blockSize);
+      pos += blockSize;
+    }
+
+    if (CTRLBlockEnabled == true)
+    {
+      blockSize = sizeof(joypad_state_t);
+      dataSource = (void *)&joypad;
+      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+      pos += blockSize;
+    }
+
+    if (MAPRBlockEnabled == true)
+    {
+      blockSize = mapper->state_size;
+      dataSource = (void *)mapper->state;
+      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+      pos += blockSize;
+    }
+
+    if (LRAMBlockEnabled == true)
+    {
+      blockSize = low_ram_size;
+      dataSource = (void *)low_mem;
+      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+      pos += blockSize;
+    }
+
+    if (SPRTBlockEnabled == true)
+    {
+      blockSize = Ppu::spr_ram_size;
+      dataSource = (void *)ppu.spr_ram;
+      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+      pos += blockSize;
+    }
+
+    if (NTABBlockEnabled == true)
+    {
+      size_t nametable_size = 0x800;
+      if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
+      blockSize = nametable_size;
+      dataSource = (void *)ppu.impl->nt_ram;
+      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+      pos += blockSize;
+    }
+
+    if (CHRRBlockEnabled == true)
+    {
+      if (ppu.chr_is_writable)
+      {
+        blockSize = ppu.chr_size;
+        dataSource = (void *)ppu.impl->chr_ram;
+        if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+        pos += blockSize;
+      }
+    }
+
+    if (SRAMBlockEnabled == true)
+    {
+      if (sram_present)
+      {
+        blockSize = impl->sram_size;
+        dataSource = (void *)impl->sram;
+        if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
+        pos += blockSize;
+      }
     }
 
     return pos; // Bytes written
@@ -499,77 +586,111 @@ size_t serializeLiteState(uint8_t *buffer) const
     uint32_t blockSize = 0;
 
     // TIME Block
-    nes_state_lite_t nesState;
-    blockSize = sizeof(nes_state_lite_t);
-    memcpy(&nesState, &buffer[pos], blockSize);
-    pos += blockSize;
-    nes.frame_count = nesState.frame_count;
-    nes.timestamp = nesState.timestamp;
-    nes.timestamp /= 5;
+    if (TIMEBlockEnabled == true)
+    {
+      nes_state_lite_t nesState;
+      blockSize = sizeof(nes_state_lite_t);
+      memcpy(&nesState, &buffer[pos], blockSize);
+      pos += blockSize;
+      nes.frame_count = nesState.frame_count;
+      nes.timestamp = nesState.timestamp;
+      nes.timestamp /= 5;
+    }
 
     // CPUR Block
-    blockSize = sizeof(cpu::registers_t);
-    memcpy((void *)&r, &buffer[pos], blockSize);
-    pos += blockSize;
+    if (CPURBlockEnabled == true)
+    {
+      blockSize = sizeof(cpu::registers_t);
+      memcpy((void *)&r, &buffer[pos], blockSize);
+      pos += blockSize;
+    }
 
     // PPUR Block
-    blockSize = sizeof(ppu_state_t);
-    memcpy((void *)&ppu, &buffer[pos], blockSize);
-    pos += blockSize;
+    if (PPURBlockEnabled == true)
+    {
+      blockSize = sizeof(ppu_state_t);
+      memcpy((void *)&ppu, &buffer[pos], blockSize);
+      pos += blockSize;
+    }
 
     // APUR Block
-    Apu::apu_state_t apuState;
-    blockSize = sizeof(Apu::apu_state_t);
-    memcpy(&apuState, &buffer[pos], blockSize);
-    pos += blockSize;
-    impl->apu.load_state(apuState);
-    impl->apu.end_frame(-(int)nes.timestamp / ppu_overclock);
+    if (APURBlockEnabled == true)
+    {
+      Apu::apu_state_t apuState;
+      blockSize = sizeof(Apu::apu_state_t);
+      memcpy(&apuState, &buffer[pos], blockSize);
+      pos += blockSize;
+      impl->apu.load_state(apuState);
+      impl->apu.end_frame(-(int)nes.timestamp / ppu_overclock);
+    }
 
     // CTRL Block
-    blockSize = sizeof(joypad_state_t);
-    memcpy((void *)&joypad, &buffer[pos], blockSize);
-    pos += blockSize;
+    if (CTRLBlockEnabled == true)
+    {
+      blockSize = sizeof(joypad_state_t);
+      memcpy((void *)&joypad, &buffer[pos], blockSize);
+      pos += blockSize;
+    }
 
     // MAPR Block
-    mapper->default_reset_state();
-    blockSize = mapper->state_size;
-    memcpy((void *)mapper->state, &buffer[pos], blockSize);
-    pos += blockSize;
-    mapper->apply_mapping();
+    if (MAPRBlockEnabled == true)
+    {
+      mapper->default_reset_state();
+      blockSize = mapper->state_size;
+      memcpy((void *)mapper->state, &buffer[pos], blockSize);
+      pos += blockSize;
+      mapper->apply_mapping();
+    }
 
     // LRAM Block
-    blockSize = low_ram_size;
-    memcpy((void *)low_mem, &buffer[pos], blockSize);
-    pos += blockSize;
+    if (LRAMBlockEnabled == true)
+    {
+      blockSize = low_ram_size;
+      memcpy((void *)low_mem, &buffer[pos], blockSize);
+      pos += blockSize;
+    }
 
     // SPRT Block
-    blockSize = Ppu::spr_ram_size;
-    memcpy((void *)ppu.spr_ram, &buffer[pos], blockSize);
-    pos += blockSize;
+    if (SPRTBlockEnabled == true)
+    {
+      blockSize = Ppu::spr_ram_size;
+      memcpy((void *)ppu.spr_ram, &buffer[pos], blockSize);
+      pos += blockSize;
+    }
 
     // NTAB Block
-    size_t nametable_size = 0x800;
-    if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
-    blockSize = nametable_size;
-    memcpy((void *)ppu.impl->nt_ram, &buffer[pos], blockSize);
-    pos += blockSize;
-
-    if (ppu.chr_is_writable)
+    if (NTABBlockEnabled == true)
     {
-      // CHRR Block
-      blockSize = ppu.chr_size;
-      memcpy((void *)ppu.impl->chr_ram, &buffer[pos], blockSize);
+      size_t nametable_size = 0x800;
+      if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
+      blockSize = nametable_size;
+      memcpy((void *)ppu.impl->nt_ram, &buffer[pos], blockSize);
       pos += blockSize;
     }
 
-    if (sram_present)
+    if (CHRRBlockEnabled == true)
     {
-      // SRAM Block
-      blockSize = impl->sram_size;
-      memcpy((void *)impl->sram, &buffer[pos], blockSize);
-      pos += blockSize;
-      enable_sram(true);
+      if (ppu.chr_is_writable)
+      {
+        // CHRR Block
+        blockSize = ppu.chr_size;
+        memcpy((void *)ppu.impl->chr_ram, &buffer[pos], blockSize);
+        pos += blockSize;
+      }
     }
+
+    if (SRAMBlockEnabled == true)
+    {
+      if (sram_present)
+      {
+        // SRAM Block
+        blockSize = impl->sram_size;
+        memcpy((void *)impl->sram, &buffer[pos], blockSize);
+        pos += blockSize;
+      }
+    }
+
+    if (sram_present) enable_sram(true);
 
     return pos; // Bytes read
   }

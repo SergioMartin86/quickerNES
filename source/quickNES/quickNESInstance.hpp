@@ -49,6 +49,9 @@ class QuickNESInstance : public EmuInstance
   void deserializeLiteState(const uint8_t *state) override { deserializeFullState(state); }
   inline size_t getLiteStateSize() const override { return getFullStateSize(); }
 
+  void enableLiteStateBlock(const std::string& block) override {};
+  void disableLiteStateBlock(const std::string& block) override {};
+
   void serializeFullState(uint8_t *state) const override
   {
     Mem_Writer w(state, _fullStateSize, 0);
