@@ -17,8 +17,8 @@ jobs:
         submodules: recursive
     - name: Create build directory
       run: mkdir build
-    - name: Installing meson
-      run: python3 -m pip install meson
+    - name: Installing meson and ninja
+      run: python3 -m pip install meson ninja
     - name: Run meson configuration
       run: meson setup build
     - name: Building project
