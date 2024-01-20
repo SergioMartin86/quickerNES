@@ -21,42 +21,49 @@
  *
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // https://www.nesdev.org/wiki/INES_Mapper240
 
-class Mapper240 : public Nes_Mapper {
-public:
-	Mapper240()
-	{
-		register_state( &regs, 1 );
-	}
+namespace quickerNES
+{
 
-	virtual void reset_state()
-	{
-	}
+class Mapper240 : public Mapper
+{
+  public:
+  Mapper240()
+  {
+    register_state(&regs, 1);
+  }
 
-	virtual void apply_mapping()
-	{
-		enable_sram();
-		intercept_writes( 0x4020, 1 );
-		write_intercepted( 0, 0x4120, regs );
-	}
+  virtual void reset_state()
+  {
+  }
 
-	virtual void write( nes_time_t, nes_addr_t, int data )
-	{ }
+  virtual void apply_mapping()
+  {
+    enable_sram();
+    intercept_writes(0x4020, 1);
+    write_intercepted(0, 0x4120, regs);
+  }
 
-	virtual bool write_intercepted( nes_time_t, nes_addr_t addr, int data )
-	{
-		if ( addr < 0x4020 || addr > 0x5FFF )
-			return false;
+  virtual void write(nes_time_t, nes_addr_t, int data)
+  {
+  }
 
-		regs = data;
-		set_chr_bank( 0x0000, bank_8k, data & 0x0F );
-		set_prg_bank( 0x8000, bank_32k, data >> 4 );
+  virtual bool write_intercepted(nes_time_t, nes_addr_t addr, int data)
+  {
+    if (addr < 0x4020 || addr > 0x5FFF)
+      return false;
 
-		return true;
-	}
+    regs = data;
+    set_chr_bank(0x0000, bank_8k, data & 0x0F);
+    set_prg_bank(0x8000, bank_32k, data >> 4);
 
-	uint8_t regs;
+    return true;
+  }
+
+  uint8_t regs;
 };
+
+} // namespace quickNES

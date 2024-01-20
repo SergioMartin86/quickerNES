@@ -25,4 +25,9 @@
  * Nina-03 / Nina-06
  */
 
+namespace quickerNES
+{
+
 typedef Mapper_AveNina<true> Mapper113;
+
+} // namespace quickNES

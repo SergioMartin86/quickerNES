@@ -22,33 +22,40 @@
  * Mapper 93 - Sunsoft-2
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
-// Sunsoft2a 
+// Sunsoft2a
 
-class Mapper093 : public Nes_Mapper {
-public:
-	Mapper093()
-	{
-		register_state( &regs, 1 );
-	}
+namespace quickerNES
+{
 
-	virtual void reset_state()
-	{}
+class Mapper093 : public Mapper
+{
+  public:
+  Mapper093()
+  {
+    register_state(&regs, 1);
+  }
 
-	virtual void apply_mapping()
-	{
-		set_prg_bank( 0xC000, bank_16k, last_bank );
-		write( 0, 0x8000, regs );
-	}
+  virtual void reset_state()
+  {
+  }
 
-	virtual void write( nes_time_t, nes_addr_t addr, int data )
-	{
-		regs = handle_bus_conflict( addr, data );
+  virtual void apply_mapping()
+  {
+    set_prg_bank(0xC000, bank_16k, last_bank);
+    write(0, 0x8000, regs);
+  }
 
-		set_chr_bank( 0x0000, bank_8k, data & 0x0F );
-		set_prg_bank( 0x8000, bank_16k, ( data >> 4 ) & 0x07 );
-	}
+  virtual void write(nes_time_t, nes_addr_t addr, int data)
+  {
+    regs = handle_bus_conflict(addr, data);
 
-	uint8_t regs;
+    set_chr_bank(0x0000, bank_8k, data & 0x0F);
+    set_prg_bank(0x8000, bank_16k, (data >> 4) & 0x07);
+  }
+
+  uint8_t regs;
 };
+
+} // namespace quickNES

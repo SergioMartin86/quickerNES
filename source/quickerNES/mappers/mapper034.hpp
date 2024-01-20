@@ -2,9 +2,9 @@
 
 // Optional less-common simple mappers
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -19,23 +19,29 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Nina-1 (Deadly Towers only)
 
-class Mapper034 : public Nes_Mapper {
-	uint8_t bank;
-public:
-	Mapper034()
-	{
-		register_state( &bank, 1 );
-	}
-	
-	virtual void apply_mapping()
-	{
-		write( 0, 0, bank );
-	}
-	
-	virtual void write( nes_time_t, nes_addr_t, int data )
-	{
-		bank = data;
-		set_prg_bank( 0x8000, bank_32k, bank );
-	}
+namespace quickerNES
+{
+
+class Mapper034 : public Mapper
+{
+  uint8_t bank;
+
+  public:
+  Mapper034()
+  {
+    register_state(&bank, 1);
+  }
+
+  virtual void apply_mapping()
+  {
+    write(0, 0, bank);
+  }
+
+  virtual void write(nes_time_t, nes_addr_t, int data)
+  {
+    bank = data;
+    set_prg_bank(0x8000, bank_32k, bank);
+  }
 };
 
+} // namespace quickNES

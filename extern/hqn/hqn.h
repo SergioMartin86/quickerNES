@@ -1,11 +1,21 @@
 #ifndef __HQN_H__
 #define __HQN_H__
 
-#include <Nes_Emu.h>
 #include <cstdint>
 #include <stdio.h>
 
 #define BLIT_SIZE 65536
+
+// Creating emulator instance
+#ifdef _USE_QUICKNES
+  #include <Nes_Emu.hpp>
+  typedef Nes_Emu emulator_t;
+#endif
+
+#ifdef _USE_QUICKERNES
+  #include <emu.hpp>
+  typedef quickerNES::Emu emulator_t;
+#endif
 
 namespace hqn
 {
@@ -36,7 +46,7 @@ class HQNState
 public:
 
     /* A reference to the emulator instance. */
-    Nes_Emu *m_emu;
+    emulator_t *m_emu;
 
     static const int32_t *NES_VIDEO_PALETTE;
 
@@ -46,7 +56,7 @@ public:
     HQNState();
     ~HQNState();
 
-    void setEmulatorPointer(void* const emuPtr) { m_emu = (Nes_Emu*)emuPtr; }
+    void setEmulatorPointer(void* const emuPtr) { m_emu = (emulator_t*)emuPtr; }
 
     /*
     The joypad data for the two joypads available to an NES.
@@ -55,7 +65,7 @@ public:
     uint32_t joypad[2];
 
     /* Get the emulator this state uses. */
-    inline Nes_Emu *emu() const
+    inline emulator_t *emu() const
     { return m_emu; }
 
 
@@ -146,7 +156,7 @@ inline void saveBlit(const void *ePtr, int32_t *dest, const int32_t *colors, int
 {
     // what is the point of the 256 color bitmap and the dynamic color allocation to it?
     // why not just render directly to a 512 color bitmap with static palette positions?
-//    Nes_Emu *e = m_emu; // e was a parameter but since this is now part of a class, it's just in here
+//    emulator_t *e = m_emu; // e was a parameter but since this is now part of a class, it's just in here
 //    const int srcpitch = e->frame().pitch;
 //    const unsigned char *src = e->frame().pixels;
 //    const unsigned char *const srcend = src + (e->image_height - cropbottom) * srcpitch;
@@ -166,16 +176,16 @@ inline void saveBlit(const void *ePtr, int32_t *dest, const int32_t *colors, int
 //        }
 //    }
 
- const Nes_Emu *e = (Nes_Emu*) ePtr;
+ const emulator_t *e = (emulator_t*) ePtr;
  const unsigned char *in_pixels = e->frame().pixels;
  if (in_pixels == NULL) return;
  int32_t *out_pixels = dest;
 
- for (unsigned h = 0; h < Nes_Emu::image_height;  h++, in_pixels += e->frame().pitch, out_pixels += Nes_Emu::image_width)
-  for (unsigned w = 0; w < Nes_Emu::image_width; w++)
+ for (unsigned h = 0; h < emulator_t::image_height;  h++, in_pixels += e->frame().pitch, out_pixels += emulator_t::image_width)
+  for (unsigned w = 0; w < emulator_t::image_width; w++)
   {
      unsigned col = e->frame().palette[in_pixels[w]];
-     const Nes_Emu::rgb_t& rgb = e->nes_colors[col];
+     const emulator_t::rgb_t& rgb = e->nes_colors[col];
      unsigned r = rgb.red;
      unsigned g = rgb.green;
      unsigned b = rgb.blue;

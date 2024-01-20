@@ -21,31 +21,36 @@
  * 3/24/18
  *
  * Unrom-512
- * 
- * NOTE: 
+ *
+ * NOTE:
  * No flash and one screen mirroring support.
  * Tested only on Troll Burner and Mystic Origins demo.
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
-// Unrom512 
+// Unrom512
 
-class Mapper030 : public Nes_Mapper {
-public:
-	Mapper030() { }
+namespace quickerNES
+{
 
-	void reset_state() { }
+class Mapper030 : public Mapper
+{
+  public:
+  Mapper030() {}
 
-	void apply_mapping() { }
+  void reset_state() {}
 
-	void write( nes_time_t, nes_addr_t addr, int data )
-	{
-		if ( ( addr & 0xF000 ) >= 0x8000 )
-		{
-			set_prg_bank(0x8000, bank_16k, data & 0x1F);
-			set_chr_bank(0x0000, bank_8k, (data >> 5) & 0x3);
-		}
-	}
+  void apply_mapping() {}
+
+  void write(nes_time_t, nes_addr_t addr, int data)
+  {
+    if ((addr & 0xF000) >= 0x8000)
+    {
+      set_prg_bank(0x8000, bank_16k, data & 0x1F);
+      set_chr_bank(0x0000, bank_8k, (data >> 5) & 0x3);
+    }
+  }
 };
 
+} // namespace quickNES

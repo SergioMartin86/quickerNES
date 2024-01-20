@@ -1,56 +1,79 @@
 #pragma once
+#include "mappers/mapper.hpp"
 #include <cstring>
-#include "mappers/mapper.h"
 
-// MMC4 
-
-class Mapper010: public Nes_Mapper
+namespace quickerNES
 {
-	uint8_t regs[6]; // A,B,C,D,E,F
 
-	void mirror(uint8_t val)
-	{
-		if (val & 1)
-			mirror_horiz();
-		else
-			mirror_vert();
-	}
+// MMC4
 
-public:
-	Mapper010()
-	{
-		register_state(regs, sizeof(regs));
-	}
+class Mapper010 : public Mapper
+{
+  uint8_t regs[6]; // A,B,C,D,E,F
 
-	virtual void reset_state()
-	{
-		std::memset(regs, 0, sizeof(regs));
-	}
+  void mirror(uint8_t val)
+  {
+    if (val & 1)
+      mirror_horiz();
+    else
+      mirror_vert();
+  }
 
-	virtual void apply_mapping()
-	{
-		enable_sram();
+  public:
+  Mapper010()
+  {
+    register_state(regs, sizeof(regs));
+  }
 
-		mirror(regs[5]);
-		set_prg_bank(0x8000, bank_16k, regs[0]);
+  virtual void reset_state()
+  {
+    std::memset(regs, 0, sizeof(regs));
+  }
 
-		set_chr_bank(0x0000, bank_4k, regs[1]);
-		set_chr_bank(0x1000, bank_4k, regs[3]);
+  virtual void apply_mapping()
+  {
+    enable_sram();
 
-		set_chr_bank_ex(0x0000, bank_4k, regs[2]);
-		set_chr_bank_ex(0x1000, bank_4k, regs[4]);
-	}
+    mirror(regs[5]);
+    set_prg_bank(0x8000, bank_16k, regs[0]);
 
-	virtual void write(nes_time_t, nes_addr_t addr, int data)
-	{
-		switch (addr >> 12)
-		{
-		case 0xa: regs[0] = data; set_prg_bank(0x8000, bank_16k, data); break;
-		case 0xb: regs[1] = data; set_chr_bank(0x0000, bank_4k, data); break;
-		case 0xc: regs[2] = data; set_chr_bank_ex(0x0000, bank_4k, data); break;
-		case 0xd: regs[3] = data; set_chr_bank(0x1000, bank_4k, data); break;
-		case 0xe: regs[4] = data; set_chr_bank_ex(0x1000, bank_4k, data); break;
-		case 0xf: regs[5] = data; mirror(data); break;
-		}
-	}
+    set_chr_bank(0x0000, bank_4k, regs[1]);
+    set_chr_bank(0x1000, bank_4k, regs[3]);
+
+    set_chr_bank_ex(0x0000, bank_4k, regs[2]);
+    set_chr_bank_ex(0x1000, bank_4k, regs[4]);
+  }
+
+  virtual void write(nes_time_t, nes_addr_t addr, int data)
+  {
+    switch (addr >> 12)
+    {
+    case 0xa:
+      regs[0] = data;
+      set_prg_bank(0x8000, bank_16k, data);
+      break;
+    case 0xb:
+      regs[1] = data;
+      set_chr_bank(0x0000, bank_4k, data);
+      break;
+    case 0xc:
+      regs[2] = data;
+      set_chr_bank_ex(0x0000, bank_4k, data);
+      break;
+    case 0xd:
+      regs[3] = data;
+      set_chr_bank(0x1000, bank_4k, data);
+      break;
+    case 0xe:
+      regs[4] = data;
+      set_chr_bank_ex(0x1000, bank_4k, data);
+      break;
+    case 0xf:
+      regs[5] = data;
+      mirror(data);
+      break;
+    }
+  }
 };
+
+} // namespace quickNES

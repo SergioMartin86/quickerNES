@@ -2,9 +2,9 @@
 
 // Common simple mappers
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -19,14 +19,20 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // NROM
 
-class Mapper000 : public Nes_Mapper {
-public:
-	Mapper000() { }
-	
-	virtual void apply_mapping() { }
-	
-	virtual void write( nes_time_t, nes_addr_t, int )
-	{
-		// empty
-	}
+namespace quickerNES
+{
+
+class Mapper000 : public Mapper
+{
+  public:
+  Mapper000() {}
+
+  virtual void apply_mapping() {}
+
+  virtual void write(nes_time_t, nes_addr_t, int)
+  {
+    // empty
+  }
 };
+
+} // namespace quickNES
