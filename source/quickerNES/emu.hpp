@@ -6,7 +6,7 @@
 
 #include "cart.hpp"
 #include "core.hpp"
-#include "apu/Multi_Buffer.hpp"
+#include "apu/multiBuffer.hpp"
 
 namespace quickerNES
 {
@@ -44,8 +44,18 @@ class Emu
 
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
-  size_t getLiteStateSize() const { return emu.getLiteStateSize(); }
-  size_t getStateSize() const { return emu.getStateSize(); }
+// Save emulator state variants
+  size_t serializeFullState(uint8_t *buffer) const   { return emu.serializeFullState(buffer); }
+  size_t serializeLiteState(uint8_t *buffer) const   { return emu.serializeLiteState(buffer); }
+
+  size_t deserializeFullState(const uint8_t *buffer) { return emu.deserializeFullState(buffer); }
+  size_t deserializeLiteState(const uint8_t *buffer) { return emu.deserializeLiteState(buffer); }
+
+  size_t getLiteStateSize() const { return emu.serializeLiteState(nullptr); }
+  size_t getFullStateSize() const { return emu.serializeFullState(nullptr); }
+
+  void enableLiteStateBlock(const std::string& block) { emu.enableLiteStateBlock(block); };
+  void disableLiteStateBlock(const std::string& block) { emu.disableLiteStateBlock(block); };
 
   // Basic emulation
 
@@ -141,10 +151,6 @@ class Emu
 
   // File save/load
 
-  // Save emulator state
-  size_t serializeState(uint8_t *buffer) const { return emu.serializeState(buffer); }
-  size_t deserializeState(const uint8_t *buffer) { return emu.deserializeState(buffer); }
-
   // True if current cartridge claims it uses battery-backed memory
   bool has_battery_ram() const { return cart()->has_battery_ram(); }
 
@@ -231,8 +237,8 @@ class Emu
   virtual const char *init_();
 
   virtual void loading_state(State const &) {}
-  long timestamp() const { return emu.nes.frame_count; }
-  void set_timestamp(long t) { emu.nes.frame_count = t; }
+  long timestamp() const { return 0; }
+  void set_timestamp(long t) {  }
 
   private:
   // noncopyable

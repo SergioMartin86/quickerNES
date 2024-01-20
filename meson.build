@@ -47,7 +47,7 @@ quickerNESTester = executable('quickerNESTester',
 
 quickNESTester = executable('quickNESTester',
   'source/tester.cpp',
-  cpp_args            : [ commonCompileArgs, '-Wno-multichar', '-DDISABLE_AUTO_FILE', '-D__LIBRETRO__', '-DNDEBUG', '-DBLARGG_NONPORTABLE'  ],
+  cpp_args            : [ commonCompileArgs, '-w', '-DDISABLE_AUTO_FILE', '-D__LIBRETRO__', '-DNDEBUG', '-DBLARGG_NONPORTABLE'  ],
   dependencies        : [ quickNESDependency, toolDependency ],
   include_directories : include_directories(['../extern/json'])
 )

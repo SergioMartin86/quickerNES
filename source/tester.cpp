@@ -4,6 +4,8 @@
 #include "utils.hpp"
 #include <chrono>
 #include <sstream>
+#include <vector>
+#include <string>
 
 #ifdef _USE_QUICKNES
   #include "quickNESInstance.hpp"
@@ -76,14 +78,29 @@ int main(int argc, char *argv[])
   if (scriptJson["Expected ROM SHA1"].is_string() == false) EXIT_WITH_ERROR("Script file 'Expected ROM SHA1' entry is not a string\n");
   std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
 
-// Creating emulator instance
-#ifdef _USE_QUICKNES
+  // Parsing disabled blocks in lite state serialization
+  std::vector<std::string> stateDisabledBlocks;
+  std::string stateDisabledBlocksOutput;
+  if (scriptJson.contains("Disable State Blocks") == false) EXIT_WITH_ERROR("Script file missing 'Disable State Blocks' entry\n");
+  if (scriptJson["Disable State Blocks"].is_array() == false) EXIT_WITH_ERROR("Script file 'Disable State Blocks' is not an array\n");
+  for (const auto& entry : scriptJson["Disable State Blocks"])
+  {
+    if (entry.is_string() == false) EXIT_WITH_ERROR("Script file 'Disable State Blocks' entry is not a string\n");
+    stateDisabledBlocks.push_back(entry.get<std::string>());
+    stateDisabledBlocksOutput += entry.get<std::string>() + std::string(" ");
+  } 
+  
+  // Creating emulator instance
+  #ifdef _USE_QUICKNES
   auto e = QuickNESInstance();
-#endif
+  #endif
 
-#ifdef _USE_QUICKERNES
+  #ifdef _USE_QUICKERNES
   auto e = quickerNES::QuickerNESInstance();
-#endif
+  #endif
+
+  // Disabling requested blocks from light state serialization
+  for (const auto& block : stateDisabledBlocks) e.disableLiteStateBlock(block);
 
   // Loading ROM File
   e.loadROMFile(romFilePath);
@@ -93,12 +110,6 @@ int main(int argc, char *argv[])
 
   // Disable rendering
   e.disableRendering();
-
-  // Getting initial hash
-  auto initialHash = e.getStateHash();
-
-  // Getting full state size
-  const auto stateSize = e.getStateSize();
 
   // Getting lite state size
   const auto liteStateSize = e.getLiteStateSize();
@@ -128,19 +139,22 @@ int main(int argc, char *argv[])
   printf("[] Cycle Type:              '%s'\n", cycleType.c_str());
   printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
-  printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
+  //printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
-  printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
-  printf("[] Full State Size:         %lu bytes\n", stateSize);
-  printf("[] Lite State Size:         %lu bytes\n", liteStateSize);
+  #ifdef _USE_QUICKNES
+  printf("[] State Size:              %lu bytes\n", e.getFullStateSize());
+  #endif
+  #ifdef _USE_QUICKERNES
+  printf("[] State Size:              %lu bytes - Disabled Blocks:  [ %s ]\n", e.getLiteStateSize(), stateDisabledBlocksOutput.c_str());
+  #endif
   printf("[] ********** Running Test **********\n");
 
   fflush(stdout);
 
   // Serializing initial state
-  uint8_t *currentState = (uint8_t *)malloc(stateSize);
-  e.serializeState(currentState);
+  uint8_t *currentState = (uint8_t *)malloc(liteStateSize);
+  e.serializeLiteState(currentState);
 
   // Check whether to perform each action
   bool doPreAdvance = cycleType == "Full";
@@ -152,9 +166,9 @@ int main(int argc, char *argv[])
   for (const std::string &input : sequence)
   {
     if (doPreAdvance == true) e.advanceState(input);
-    if (doDeserialize == true) e.deserializeState(currentState);
+    if (doDeserialize == true) e.deserializeLiteState(currentState);
     e.advanceState(input);
-    if (doSerialize == true) e.serializeState(currentState);
+    if (doSerialize == true) e.serializeLiteState(currentState);
   }
   auto tf = std::chrono::high_resolution_clock::now();
 

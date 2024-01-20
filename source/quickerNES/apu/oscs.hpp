@@ -4,7 +4,7 @@
 // Private oscillators used by Apu
 // Snd_Emu 0.1.7
 
-#include "Blip_Buffer.hpp"
+#include "blipBuffer.hpp"
 
 namespace quickerNES
 {

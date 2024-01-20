@@ -3,8 +3,8 @@
 // Multi-channel effects buffer with panning, echo and reverb
 // Game_Music_Emu 0.3.0
 
-#include "Multi_Buffer.hpp"
 #include <stdint.h>
+#include "multiBuffer.hpp"
 
 namespace quickerNES
 { 

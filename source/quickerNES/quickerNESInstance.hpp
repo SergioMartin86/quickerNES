@@ -36,15 +36,17 @@ class QuickerNESInstance : public EmuInstance
   const uint8_t *getChrMem() const override { return _nes->chr_mem(); };
   size_t getChrMemSize() const override { return _nes->chr_size(); };
 
-  void serializeState(uint8_t *state) const override
-  {
-    _nes->serializeState(state);
-  }
+  void serializeFullState(uint8_t *state) const override {  _nes->serializeFullState(state); }
+  void deserializeFullState(const uint8_t *state) override { _nes->deserializeFullState(state); }
 
-  void deserializeState(const uint8_t *state) override
-  {
-    _nes->deserializeState(state);
-  }
+  void serializeLiteState(uint8_t *state) const override {  _nes->serializeLiteState(state); }
+  void deserializeLiteState(const uint8_t *state) override { _nes->deserializeLiteState(state); }
+
+  size_t getFullStateSize() const override { return _nes->getFullStateSize(); }
+  size_t getLiteStateSize() const override { return _nes->getLiteStateSize(); }
+
+  void enableLiteStateBlock(const std::string& block) override { _nes->enableLiteStateBlock(block); };
+  void disableLiteStateBlock(const std::string& block) override { _nes->disableLiteStateBlock(block); };
 
   void advanceStateImpl(const inputType controller1, const inputType controller2) override
   {
@@ -57,17 +59,6 @@ class QuickerNESInstance : public EmuInstance
   void doHardReset() override { _nes->reset(true); }
 
   void *getInternalEmulatorPointer() const override { return _nes; }
-
-  private:
-  inline size_t getStateSizeImpl() const override
-  {
-    return _nes->getStateSize();
-  }
-
-  inline size_t getLiteStateSizeImpl() const override
-  {
-    return _nes->getLiteStateSize();
-  }
 
   // Video buffer
   uint8_t *video_buffer;

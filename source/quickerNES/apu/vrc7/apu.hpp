@@ -5,7 +5,7 @@
 // Snd_Emu 0.1.7. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
 
 #include <cstdint>
-#include "apu/Blip_Buffer.hpp"
+#include "apu/blipBuffer.hpp"
 #include "apu/vrc7/emu2413_state.hpp"
 
 namespace quickerNES
