@@ -1,8 +1,6 @@
 name: Build and Run Tests
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -25,3 +23,8 @@ jobs:
       run: ninja -C build
     - name: Running tests
       run: ninja test -C build
+    - name: Archive build and test logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: meson-logs
+        path: build/meson-logs/**

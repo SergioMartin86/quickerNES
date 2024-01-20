@@ -11,7 +11,7 @@ pageSize = get_option('CPUFunctionAlignment')
 subdir('source')
 
 # Common application flags
-commonCompileArgs = [ '-Wfatal-errors', '-Wall', '-Wno-multichar' ]
+commonCompileArgs = [ '-Wfatal-errors', '-Wall']
 
 # Building playback tool
 
@@ -47,7 +47,7 @@ quickerNESTester = executable('quickerNESTester',
 
 quickNESTester = executable('quickNESTester',
   'source/tester.cpp',
-  cpp_args            : [ commonCompileArgs ],
+  cpp_args            : [ commonCompileArgs, '-Wno-multichar', '-DDISABLE_AUTO_FILE', '-D__LIBRETRO__', '-DNDEBUG', '-DBLARGG_NONPORTABLE'  ],
   dependencies        : [ quickNESDependency, toolDependency ],
   include_directories : include_directories(['../extern/json'])
 )
