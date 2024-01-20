@@ -5,8 +5,8 @@
 // Nes_Snd_Emu 0.1.7. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
 
 #include <cstdint>
-#include "apu/vrc7/emu2413_state.h"
-#include "apu/Blip_Buffer.h"
+#include "apu/vrc7/emu2413_state.hpp"
+#include "apu/Blip_Buffer.hpp"
 
 struct vrc7_snapshot_t;
 typedef long nes_time_t;

@@ -5,8 +5,8 @@
 // Nes_Snd_Emu 0.1.7
 
 #include <cstdint>
-#include "apu/apu.h"
-#include "apu/Blip_Buffer.h"
+#include "apu/apu.hpp"
+#include "apu/Blip_Buffer.hpp"
 
 struct vrc6_apu_state_t;
 

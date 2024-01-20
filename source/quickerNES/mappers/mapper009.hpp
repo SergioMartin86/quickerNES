@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstring>
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // MMC2 
 

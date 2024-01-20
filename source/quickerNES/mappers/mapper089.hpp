@@ -22,7 +22,7 @@
  * Mapper 93 - Sunsoft-2
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // Sunsoft2b
 

@@ -59,7 +59,7 @@ if the origin of this software is not misrepresented.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "emu2413.h"
+#include "emu2413.hpp"
 
 static const unsigned char default_inst[15][8] = {
   	/* 2019-03-19 VRC7 instrument patchset dumped by Nuke.YKT */

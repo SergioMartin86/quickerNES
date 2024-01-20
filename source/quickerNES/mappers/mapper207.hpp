@@ -23,7 +23,7 @@
  *
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 struct taito_x1005_state_t
 {

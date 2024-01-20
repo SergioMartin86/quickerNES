@@ -18,10 +18,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 #include <cstdio>
 #include <string>
-#include "apu/apu.h"
-#include "Nes_Cpu.h"
-#include "ppu/Nes_Ppu.h"
-#include "mappers/mapper.h"
+#include "apu/apu.hpp"
+#include "Nes_Cpu.hpp"
+#include "ppu/Nes_Ppu.hpp"
+#include "mappers/mapper.hpp"
 
 class Nes_Cart;
 

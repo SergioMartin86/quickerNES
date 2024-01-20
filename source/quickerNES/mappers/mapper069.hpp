@@ -4,8 +4,8 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "mappers/mapper.h"
-#include "apu/fme7/apu.h"
+#include "mappers/mapper.hpp"
+#include "apu/fme7/apu.hpp"
 
 /* Copyright (C) 2005 Chris Moeller */
 /* Copyright (C) 2005-2006 Shay Green. This module is free software; you

@@ -1,13 +1,10 @@
+#pragma once 
 
 // Effects_Buffer with non-linear sound
-
 // Nes_Emu 0.7.0
 
-#ifndef NES_EFFECTS_BUFFER_H
-#define NES_EFFECTS_BUFFER_H
-
-#include "Nes_Buffer.h"
-#include "Effects_Buffer.h"
+#include "Nes_Buffer.hpp"
+#include "Effects_Buffer.hpp"
 
 // Effects_Buffer uses several buffers and outputs stereo sample pairs.
 class Nes_Effects_Buffer : public Effects_Buffer {
@@ -36,5 +33,3 @@ private:
 	Nes_Nonlinearizer nonlin;
 	friend Multi_Buffer* set_apu( Nes_Effects_Buffer*, Nes_Apu* );
 };
-
-#endif

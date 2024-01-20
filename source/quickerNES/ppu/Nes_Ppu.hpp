@@ -1,10 +1,9 @@
 #pragma once 
 
 // NES PPU emulator
-
 // Nes_Emu 0.7.0
 
-#include "Nes_Ppu_Rendering.h"
+#include "Nes_Ppu_Rendering.hpp"
 #include <climits>
 
 class Nes_Mapper;

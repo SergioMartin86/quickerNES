@@ -26,6 +26,6 @@
  * VRC-2/VRC-4 Konami
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 typedef Mapper_VRC2_4<false, false> Mapper023;

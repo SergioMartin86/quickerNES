@@ -21,7 +21,7 @@
  *
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // https://www.nesdev.org/wiki/INES_Mapper240
 

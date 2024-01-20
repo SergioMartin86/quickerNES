@@ -1,13 +1,12 @@
 #pragma once
 
 // NES 2A03 APU sound chip emulator
-
 // Nes_Snd_Emu 0.1.7
 
 #include <cstdint>
 #include <cstdint>
 #include <climits>
-#include "Nes_Oscs.h"
+#include "Nes_Oscs.hpp"
 
 class Nes_Apu {
 public:

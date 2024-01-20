@@ -1,12 +1,12 @@
 
 // Blip_Buffer 0.4.0. http://www.slack.net/~ant/
 
-#include "Blip_Buffer.h"
-
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include "Blip_Buffer.hpp"
+
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -18,10 +18,6 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
 more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
-
-#ifdef BLARGG_ENABLE_OPTIMIZER
-	#include BLARGG_ENABLE_OPTIMIZER
-#endif
 
 int const buffer_extra = blip_widest_impulse_ + 2;
 

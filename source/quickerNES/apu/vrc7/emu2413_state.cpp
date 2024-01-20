@@ -1,5 +1,5 @@
-#include "emu2413_state.h"
 #include <stdint.h>
+#include "emu2413_state.hpp"
 
 #ifdef __cplusplus
 extern "C"

@@ -22,7 +22,7 @@
  * Mapper 184 - Sunsoft-1
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // Sunsoft1
 

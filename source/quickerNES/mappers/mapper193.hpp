@@ -25,7 +25,7 @@
  *
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
  
 // NTDEC's TC-112 mapper IC.
 

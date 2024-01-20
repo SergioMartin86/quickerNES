@@ -1,12 +1,10 @@
 
-// Private oscillators used by Nes_Apu
+#pragma once 
 
+// Private oscillators used by Nes_Apu
 // Nes_Snd_Emu 0.1.7
 
-#ifndef NES_OSCS_H
-#define NES_OSCS_H
-
-#include "Blip_Buffer.h"
+#include "Blip_Buffer.hpp"
 
 class Nes_Apu;
 
@@ -148,4 +146,3 @@ struct Nes_Dmc : Nes_Osc
 	nes_time_t next_read_time() const;
 };
 
-#endif

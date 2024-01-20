@@ -1,6 +1,6 @@
 #pragma once
 
-#include "emu2413.h"
+#include "emu2413.hpp"
 
 typedef struct {
 	e_int32 feedback;

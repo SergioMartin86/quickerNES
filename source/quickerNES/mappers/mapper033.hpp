@@ -23,7 +23,7 @@
  * 
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 struct tc0190_state_t
 {

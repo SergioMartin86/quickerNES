@@ -1,10 +1,9 @@
 #pragma once 
 
 // NES PPU emulator graphics rendering
-
 // Nes_Emu 0.7.0
 
-#include "Nes_Ppu_Impl.h"
+#include "Nes_Ppu_Impl.hpp"
 
 class Nes_Ppu_Rendering : public Nes_Ppu_Impl {
 	typedef Nes_Ppu_Impl base;

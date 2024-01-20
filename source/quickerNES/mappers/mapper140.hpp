@@ -24,7 +24,7 @@
  *
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // Jaleco_JF11 
 

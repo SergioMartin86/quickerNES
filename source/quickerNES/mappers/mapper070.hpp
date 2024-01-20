@@ -23,7 +23,7 @@
  *
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // Mapper_74x161x162x32
 

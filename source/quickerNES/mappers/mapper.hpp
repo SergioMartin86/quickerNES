@@ -1,12 +1,11 @@
 #pragma once 
 
 // NES mapper interface
-
 // Nes_Emu 0.7.0
 
 #include <climits>
-#include "Nes_Cart.h"
-#include "Nes_Cpu.h"
+#include "Nes_Cart.hpp"
+#include "Nes_Cpu.hpp"
 
 class Blip_Buffer;
 class blip_eq_t;

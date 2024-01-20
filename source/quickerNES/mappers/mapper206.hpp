@@ -25,7 +25,7 @@
  * Mapper 206
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 struct namco_34xx_state_t
 {

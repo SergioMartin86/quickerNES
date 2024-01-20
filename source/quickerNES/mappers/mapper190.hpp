@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 // Magic Kid Googoo
 

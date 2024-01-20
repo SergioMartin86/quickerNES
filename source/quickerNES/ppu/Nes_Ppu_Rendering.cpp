@@ -1,9 +1,9 @@
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "Nes_Ppu_Rendering.h"
 #include <algorithm>
 #include <cstring>
 #include <cstddef>
+#include "Nes_Ppu_Rendering.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -287,7 +287,7 @@ void Nes_Ppu_Rendering::draw_sprites_( int begin, int end )
 			int visible = sprite_height;
 			
 			#define CLIPPED 0
-			#include "Nes_Ppu_Sprites.h"
+			#include "Nes_Ppu_Sprites.hpp"
 		}
 		else
 		{
@@ -308,7 +308,7 @@ void Nes_Ppu_Rendering::draw_sprites_( int begin, int end )
 			//      begin, end, top_minus_one + 1, skip, visible );
 			
 			#define CLIPPED 1
-			#include "Nes_Ppu_Sprites.h"
+			#include "Nes_Ppu_Sprites.hpp"
 		}
 	}
 	while ( index < 0x100 );

@@ -23,7 +23,7 @@
  * VRC-3 Konami, Salamander
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 struct vrc3_state_t
 {

@@ -3,8 +3,8 @@
 // Nes_Emu 0.5.4. http://www.slack.net/~ant/
 
 #include <cstring>
-#include "mappers/mapper.h"
-#include "apu/vrc7/apu.h"
+#include "mappers/mapper.hpp"
+#include "apu/vrc7/apu.hpp"
 
 /* Copyright (C) 2004-2005 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

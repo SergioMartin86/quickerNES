@@ -1,13 +1,10 @@
+#pragma once
 
 // Multi-channel effects buffer with panning, echo and reverb
-
 // Game_Music_Emu 0.3.0
 
-#ifndef EFFECTS_BUFFER_H
-#define EFFECTS_BUFFER_H
-
 #include <stdint.h>
-#include "Multi_Buffer.h"
+#include "Multi_Buffer.hpp"
 
 // Effects_Buffer uses several buffers and outputs stereo sample pairs.
 class Effects_Buffer : public Multi_Buffer {
@@ -90,4 +87,3 @@ private:
 		return channels [i % chan_count];
 	}
 	
-#endif

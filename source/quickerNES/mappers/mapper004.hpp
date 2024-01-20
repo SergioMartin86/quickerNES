@@ -2,10 +2,10 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 #include <cstring>
-#include "Nes_Core.h"
+#include "Nes_Core.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

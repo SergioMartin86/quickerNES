@@ -4,9 +4,9 @@
 
 // Nes_Emu 0.7.0
 
-#include "apu/Multi_Buffer.h"
-#include "Nes_Cart.h"
-#include "Nes_Core.h"
+#include "apu/Multi_Buffer.hpp"
+#include "Nes_Cart.hpp"
+#include "Nes_Core.hpp"
 
 class Nes_State;
 

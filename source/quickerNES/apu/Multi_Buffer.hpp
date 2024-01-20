@@ -1,12 +1,10 @@
 
-// Multi-channel sound buffer interface, and basic mono and stereo buffers
+#pragma once
 
+// Multi-channel sound buffer interface, and basic mono and stereo buffers
 // Blip_Buffer 0.4.0
 
-#ifndef MULTI_BUFFER_H
-#define MULTI_BUFFER_H
-
-#include "Blip_Buffer.h"
+#include "Blip_Buffer.hpp"
 
 // Interface to one or more Blip_Buffers mapped to one or more channels
 // consisting of left, center, and right buffers.
@@ -186,4 +184,3 @@ inline long Mono_Buffer::read_samples( blip_sample_t* p, long s ) { return buf.r
 
 inline long Mono_Buffer::samples_avail() const { return buf.samples_avail(); }
 
-#endif

@@ -3,8 +3,8 @@
 #include <cstring>
 #include <climits>
 #include <cstdio>
-#include <Nes_Cpu.h>
-#include <Nes_Core.h>
+#include "Nes_Cpu.hpp"
+#include "Nes_Core.hpp"
 
 /**
  * Optimizations by Sergio Martin (eien86) 2023-2024

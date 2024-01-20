@@ -1,7 +1,7 @@
 #ifndef __HQN_H__
 #define __HQN_H__
 
-#include <Nes_Emu.h>
+#include <Nes_Emu.hpp>
 #include <cstdint>
 #include <stdio.h>
 

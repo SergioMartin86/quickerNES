@@ -23,7 +23,7 @@
  *
  */
  
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
  
 // UxROM (inverted)
 

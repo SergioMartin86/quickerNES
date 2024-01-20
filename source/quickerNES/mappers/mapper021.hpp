@@ -26,7 +26,7 @@
  * VRC-2/VRC-4 Konami
  */
 
-#include "mappers/mapper.h"
+#include "mappers/mapper.hpp"
 
 struct vrc2_state_t
 {

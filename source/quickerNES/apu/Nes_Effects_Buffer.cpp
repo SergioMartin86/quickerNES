@@ -1,8 +1,8 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "apu/Nes_Effects_Buffer.h"
-#include "apu/apu.h"
+#include "apu/Nes_Effects_Buffer.hpp"
+#include "apu/apu.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
