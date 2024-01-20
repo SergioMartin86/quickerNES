@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #define INC_DEC_XY( reg, n ) reg = uint8_t (nz = reg + n); goto loop;
 
 #define IND_Y(r,c) {                                            \
-  int temp = READ_LOW( data ) + y;                        \
+  int32_t temp = READ_LOW( data ) + y;                        \
   data = temp + 0x100 * READ_LOW( uint8_t (data + 1) );   \
   if (c) HANDLE_PAGE_CROSSING( temp );                    \
   if (!(r) || (temp & 0x100))                             \
@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
  }
 
 #define IND_X {                                                 \
-  int temp = data + x;                                    \
+  int32_t temp = data + x;                                    \
   data = 0x100 * READ_LOW( uint8_t (temp + 1) ) + READ_LOW( uint8_t (temp) ); \
  }
 
@@ -118,11 +118,10 @@ imm##op:                                \
 #define BRANCH( cond )      \
 {                           \
  pc++;                   \
- int offset = (int8_t) data;  \
- int extra_clock = (pc & 0xFF) + offset; \
- if ( !(cond) ) [[likely]] {clock_count--; goto loop; } \
+ if ( (cond) == false ) [[likely]] {clock_count--; goto loop; } \
+ int32_t offset = (int8_t) data;  \
+ int32_t extra_clock = (pc & 0xFF) + offset; \
  pc += offset;       \
- pc = uint16_t( pc ); \
  clock_count += (extra_clock >> 8) & 1;  \
  goto loop;          \
 }
@@ -147,7 +146,7 @@ void Nes_Cpu::reset( void const* unmapped_page )
  code_map [1] = low_mem - 1 * page_size;
  code_map [2] = low_mem - 2 * page_size;
  code_map [3] = low_mem - 3 * page_size;
- for ( int i = 4; i < page_count + 1; i++ )
+ for ( int32_t i = 4; i < page_count + 1; i++ )
    code_map [i] = (uint8_t*) unmapped_page;
 
  isCorrectExecution = true;
@@ -156,13 +155,13 @@ void Nes_Cpu::reset( void const* unmapped_page )
 // Note: 'addr' is evaulated more than once in the following macros, so it
 // must not contain side-effects.
 
-//static void log_read( int opcode ) { LOG_FREQ( "read", 256, opcode ); }
+//static void log_read( int32_t opcode ) { LOG_FREQ( "read", 256, opcode ); }
 
 #define READ_LIKELY_PPU( addr ) (NES_CPU_READ_PPU( this, (addr), (clock_count) ))
 #define READ( addr )            (NES_CPU_READ( this, (addr), (clock_count) ))
 #define WRITE( addr, data )     {NES_CPU_WRITE( this, (addr), (data), (clock_count) );}
 
-#define READ_LOW( addr )        (low_mem [int (addr)])
+#define READ_LOW( addr )        (low_mem [int32_t (addr)])
 #define WRITE_LOW( addr, data ) (void) (READ_LOW( addr ) = (data))
 
 #define READ_PROG( addr )   (code_map [(addr) >> page_bits] [addr])
@@ -188,7 +187,7 @@ void Nes_Cpu::reset( void const* unmapped_page )
   nz |= ~in & st_z;                       \
  } while ( 0 )
 
-inline int Nes_Cpu::read( nes_addr_t addr )
+inline int32_t Nes_Cpu::read( nes_addr_t addr )
 {
  return READ( addr );
 }
@@ -211,18 +210,18 @@ __attribute__((optimize("align-functions=" _PAGE_SIZE)))
  volatile result_t result = result_cycles;
 
  // registers
- unsigned pc = r.pc;
- int sp;
+ uint32_t pc = r.pc;
+ int32_t sp;
  SET_SP( r.sp );
- int a = r.a;
- int x = r.x;
- int y = r.y;
+ int32_t a = r.a;
+ int32_t x = r.x;
+ int32_t y = r.y;
 
- int status;
- int c;  // carry set if (c & 0x100) != 0
- int nz; // Z set if (nz & 0xFF) == 0, N set if (nz & 0x880) != 0
+ int32_t status;
+ int32_t c;  // carry set if (c & 0x100) != 0
+ int32_t nz; // Z set if (nz & 0xFF) == 0, N set if (nz & 0x880) != 0
  {
-  int temp = r.status;
+  int32_t temp = r.status;
   SET_STATUS( temp );
  }
 
@@ -256,7 +255,7 @@ loop:
   BRANCH( (uint8_t) nz );
 
  case 0x20: { // JSR
-  int temp = pc + 1;
+  int32_t temp = pc + 1;
   pc = GET_OPERAND16( pc );
   WRITE_LOW( 0x100 | (sp - 1), temp >> 8 );
   sp = (sp - 2) | 0x100;
@@ -301,12 +300,11 @@ loop:
   a = nz = y;
   goto loop;
 
- case 0xAD:{// LDA abs
-  unsigned addr = GET_ADDR();
+ case 0xAD: // LDA abs
+  data = GET_ADDR();
   pc += 2;
-  a = nz = READ_LIKELY_PPU( addr );
+  a = nz = READ_LIKELY_PPU( data );
   goto loop;
- }
 
  case 0x60: // RTS
   pc = 1 + READ_LOW( sp );
@@ -320,12 +318,11 @@ loop:
 
  case 0x9D: // STA abs,X
   data += x;
- sta_ind_common: {
-  int temp = data;
+ sta_ind_common:
   ADD_PAGE
-  READ( data - ( temp & 0x100 ) );
+  READ( data - ( data & 0x100 ) );
   goto sta_ptr;
- }
+  
  case 0x8D: // STA abs
   ADD_PAGE
  sta_ptr:
@@ -344,15 +341,15 @@ loop:
   data -= x;
  case 0xBD:{// LDA abs,X
   pc++;
-  unsigned msb = GET_OPERAND( pc );
+  uint32_t msb = GET_OPERAND( pc );
   data += x;
   // indexed common
   pc++;
   HANDLE_PAGE_CROSSING( data );
-  int temp = data;
+  int32_t temp = data;
   data += msb * 0x100;
   a = nz = READ_PROG( uint16_t( data ) );
-  if ( (unsigned) (data - 0x2000) >= 0x6000 )
+  if ( (uint32_t) (data - 0x2000) >= 0x6000 )
    goto loop;
   if ( temp & 0x100 )
    READ( data - 0x100 );
@@ -361,15 +358,15 @@ loop:
  }
 
  case 0xB1:{// LDA (ind),Y
-  unsigned msb = READ_LOW( (uint8_t) (data + 1) );
+  uint32_t msb = READ_LOW( (uint8_t) (data + 1) );
   data = READ_LOW( data ) + y;
   // indexed common
   pc++;
   HANDLE_PAGE_CROSSING( data );
-  int temp = data;
+  int32_t temp = data;
   data += msb * 0x100;
   a = nz = READ_PROG( uint16_t( data ) );
-  if ( (unsigned) (data - 0x2000) >= 0x6000 )
+  if ( (uint32_t) (data - 0x2000) >= 0x6000 )
    goto loop;
   if ( temp & 0x100 )
    READ( data - 0x100 );
@@ -446,7 +443,7 @@ loop:
   HANDLE_PAGE_CROSSING( data );
  case 0xAC:{// LDY abs
   pc++;
-  unsigned addr = data + 0x100 * GET_OPERAND( pc );
+  uint32_t addr = data + 0x100 * GET_OPERAND( pc );
   if ( data & 0x100 )
    READ( addr - 0x100 );
   pc++;
@@ -459,7 +456,7 @@ loop:
   HANDLE_PAGE_CROSSING( data );
  case 0xAE:{// LDX abs
   pc++;
-  unsigned addr = data + 0x100 * GET_OPERAND( pc );
+  uint32_t addr = data + 0x100 * GET_OPERAND( pc );
   pc++;
   if ( data & 0x100 )
    READ( addr - 0x100 );
@@ -468,7 +465,7 @@ loop:
  }
 
  {
-  int temp;
+  int32_t temp;
  case 0x8C: // STY abs
   temp = y;
   goto store_abs;
@@ -476,7 +473,7 @@ loop:
  case 0x8E: // STX abs
   temp = x;
  store_abs:
-  unsigned addr = GET_ADDR();
+  uint32_t addr = GET_ADDR();
   WRITE( addr, temp );
   pc += 2;
   goto loop;
@@ -485,7 +482,7 @@ loop:
 // Compare
 
  case 0xEC:{// CPX abs
-  unsigned addr = GET_ADDR();
+  uint32_t addr = GET_ADDR();
   pc++;
   data = READ( addr );
   goto cpx_data;
@@ -502,7 +499,7 @@ loop:
   goto loop;
 
  case 0xCC:{// CPY abs
-  unsigned addr = GET_ADDR();
+  uint32_t addr = GET_ADDR();
   pc++;
   data = READ( addr );
   goto cpy_data;
@@ -536,7 +533,7 @@ loop:
   goto loop;
 
  case 0x2C:{// BIT abs
-  unsigned addr = GET_ADDR();
+  uint32_t addr = GET_ADDR();
   pc += 2;
   status &= ~st_v;
   nz = READ_LIKELY_PPU( addr );
@@ -568,8 +565,8 @@ loop:
 
  ARITH_ADDR_MODES( 0x65 ) // ADC
  adc_imm: {
-  int carry = (c >> 8) & 1;
-  int ov = (a ^ 0x80) + carry + (int8_t) data; // sign-extend
+  int32_t carry = (c >> 8) & 1;
+  int32_t ov = (a ^ 0x80) + carry + (int8_t) data; // sign-extend
   status &= ~st_v;
   status |= (ov >> 2) & 0x40;
   c = nz = a + data + carry;
@@ -598,7 +595,7 @@ loop:
 
  case 0x2A: { // ROL A
   nz = a << 1;
-  int temp = (c >> 8) & 1;
+  int32_t temp = (c >> 8) & 1;
   c = nz;
   nz |= temp;
   a = (uint8_t) nz;
@@ -615,7 +612,7 @@ loop:
   c = 0;
  case 0x2E: // ROL abs
  rol_abs: {
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE
   if ( opcode == 0x1E || opcode == 0x3E ) READ( data - ( temp & 0x100 ) );
   WRITE( data, temp = READ( data ) );
@@ -637,7 +634,7 @@ loop:
   c = 0;
  case 0x6E: // ROR abs
  ror_abs: {
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE
   if ( opcode == 0x5E || opcode == 0x7E ) READ( data - ( temp & 0x100 ) );
   WRITE( data, temp = READ( data ) );
@@ -656,7 +653,7 @@ loop:
   c = 0;
  case 0x66: // ROR zp
  ror_zp: {
-  int temp = READ_LOW( data );
+  int32_t temp = READ_LOW( data );
   nz = ((c >> 1) & 0x80) | (temp >> 1);
   c = temp << 8;
   goto write_nz_zp;
@@ -700,7 +697,7 @@ loop:
   goto loop;
 
  case 0xFE: { // INC abs,x
-  int temp = data + x;
+  int32_t temp = data + x;
   data = x + GET_ADDR();
   READ( data - ( temp & 0x100 ) );
   goto inc_ptr;
@@ -713,7 +710,7 @@ loop:
   goto inc_common;
 
  case 0xDE: { // DEC abs,x
-  int temp = data + x;
+  int32_t temp = data + x;
   data = x + GET_ADDR();
   READ( data - ( temp & 0x100 ) );
   goto dec_ptr;
@@ -724,7 +721,7 @@ loop:
  dec_ptr:
   nz = -1;
  inc_common: {
-  int temp;
+  int32_t temp;
   WRITE( data, temp = READ( data ) );
   nz += temp;
   pc += 2;
@@ -761,7 +758,7 @@ loop:
 
  case 0x40: // RTI
   {
-   int temp = READ_LOW( sp );
+   int32_t temp = READ_LOW( sp );
    pc   = READ_LOW( 0x100 | (sp - 0xFF) );
    pc  |= READ_LOW( 0x100 | (sp - 0xFE) ) * 0x100;
    sp = (sp - 0xFD) | 0x100;
@@ -783,7 +780,7 @@ loop:
   goto loop;
 
  case 0x28:{// PLP
-  int temp = READ_LOW( sp );
+  int32_t temp = READ_LOW( sp );
   sp = (sp - 0xFF) | 0x100;
   data = status;
   SET_STATUS( temp );
@@ -795,7 +792,7 @@ loop:
  }
 
  case 0x08: { // PHP
-  int temp;
+  int32_t temp;
   CALC_STATUS( temp );
   PUSH( temp | st_b | st_r );
   goto loop;
@@ -811,7 +808,7 @@ loop:
   pc++;
   WRITE_LOW( 0x100 | (sp - 1), pc >> 8 );
   WRITE_LOW( 0x100 | (sp - 2), pc );
-  int temp;
+  int32_t temp;
   CALC_STATUS( temp );
   sp = (sp - 3) | 0x100;
   WRITE_LOW( sp, temp | st_b | st_r );
@@ -879,7 +876,7 @@ loop:
  case 0x1C: case 0x3C: case 0x5C: case 0x7C: case 0xDC: case 0xFC: { // SKW
   data += x;
   HANDLE_PAGE_CROSSING( data );
-  int addr = GET_ADDR() + x;
+  int32_t addr = GET_ADDR() + x;
   if ( data & 0x100 )
    READ( addr - 0x100 );
   READ( addr );
@@ -911,7 +908,7 @@ loop:
 
  ARITH_ADDR_MODES_PTR( 0x27 ) { // RLA
   WRITE( data, nz = READ( data ) );
-  int temp = c;
+  int32_t temp = c;
   c = nz << 1;
   nz = uint8_t( c ) | ( ( temp >> 8 ) & 0x01 );
   WRITE( data, nz );
@@ -921,7 +918,7 @@ loop:
  }
 
  ARITH_ADDR_MODES_PTR( 0x67 ) { // RRA
-  int temp;
+  int32_t temp;
   WRITE( data, temp = READ( data ) );
   nz = ((c >> 1) & 0x80) | (temp >> 1);
   WRITE( data, nz );
@@ -992,7 +989,7 @@ loop:
  case 0xBF: {
   data += y;
   HANDLE_PAGE_CROSSING( data );
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE;
   if ( temp & 0x100 )
    READ( data - 0x100 );
@@ -1041,7 +1038,7 @@ loop:
 
  case 0x9F: { // SHA abs,Y
   data += y;
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE
   READ( data - ( temp & 0x100 ) );
   pc++;
@@ -1051,7 +1048,7 @@ loop:
 
  case 0x9E: { // SHX abs,Y
   data += y;
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE
   READ( data - ( temp & 0x100 ) );
   pc++;
@@ -1062,7 +1059,7 @@ loop:
 
  case 0x9C: { // SHY abs,X
   data += x;
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE
   READ( data - ( temp & 0x100 ) );
   pc++;
@@ -1073,7 +1070,7 @@ loop:
 
  case 0x9B: { // SHS abs,Y
   data += y;
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE
   READ( data - ( temp & 0x100 ) );
   pc++;
@@ -1085,7 +1082,7 @@ loop:
  case 0xBB: { // LAS abs,Y
   data += y;
   HANDLE_PAGE_CROSSING( data );
-  int temp = data;
+  int32_t temp = data;
   ADD_PAGE
   if ( temp & 0x100 )
    READ( data - 0x100 );
@@ -1115,7 +1112,7 @@ loop:
   // fall through
 // default:
 //  // skip over proper number of bytes
-//  static unsigned char const row [8] = { 0x95, 0x95, 0x95, 0xd5, 0x95, 0x95, 0xd5, 0xf5 };
+//  static uint32_t char const row [8] = { 0x95, 0x95, 0x95, 0xd5, 0x95, 0x95, 0xd5, 0xf5 };
 //  int len = row [opcode >> 2 & 7] >> (opcode << 1 & 6) & 3;
 //  if ( opcode == 0x9C )
 //   len = 3;
@@ -1150,20 +1147,20 @@ end:
 
 uint8_t clock_table [256] = {
 //  0 1 2 3 4 5 6 7 8 9 A B C D E F
- 7,6,2,8,3,3,5,5,3,2,2,2,4,4,6,6,// 0
- 3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 1
- 6,6,2,8,3,3,5,5,4,2,2,2,4,4,6,6,// 2
- 3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 3
- 6,6,2,8,3,3,5,5,3,2,2,2,3,4,6,6,// 4
- 3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 5
- 6,6,2,8,3,3,5,5,4,2,2,2,5,4,6,6,// 6
- 3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 7
- 2,6,2,6,3,3,3,3,2,2,2,2,4,4,4,4,// 8
- 3,6,2,6,4,4,4,4,2,5,2,5,5,5,5,5,// 9
- 2,6,2,6,3,3,3,3,2,2,2,2,4,4,4,4,// A
- 3,5,2,5,4,4,4,4,2,4,2,4,4,4,4,4,// B
- 2,6,2,8,3,3,5,5,2,2,2,2,4,4,6,6,// C
- 3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// D
- 2,6,2,8,3,3,5,5,2,2,2,2,4,4,6,6,// E
- 3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7 // F
+    7,6,2,8,3,3,5,5,3,2,2,2,4,4,6,6,// 0
+    3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 1
+    6,6,2,8,3,3,5,5,4,2,2,2,4,4,6,6,// 2
+    3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 3
+    6,6,2,8,3,3,5,5,3,2,2,2,3,4,6,6,// 4
+    3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 5
+    6,6,2,8,3,3,5,5,4,2,2,2,5,4,6,6,// 6
+    3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// 7
+    2,6,2,6,3,3,3,3,2,2,2,2,4,4,4,4,// 8
+    3,6,2,6,4,4,4,4,2,5,2,5,5,5,5,5,// 9
+    2,6,2,6,3,3,3,3,2,2,2,2,4,4,4,4,// A
+    3,5,2,5,4,4,4,4,2,4,2,4,4,4,4,4,// B
+    2,6,2,8,3,3,5,5,2,2,2,2,4,4,6,6,// C
+    3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7,// D
+    2,6,2,8,3,3,5,5,2,2,2,2,4,4,6,6,// E
+    3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7 // F
 };

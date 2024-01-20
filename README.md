@@ -16,6 +16,7 @@ Changes
 - Optimizations made in the CPU emulation core, including:
   + Forced alignment at the start of a page to prevent crossing cache line boundaries
   + Simplifying the 6502 CPU instruction fetching and decoding
+  + Multiple branch optimizations
 - Minimize compiled code size to reduce pressure on L1i cache
 - Assuming little endiannes to reduce unnecessary conversion operations (not portable to big endian systems)
 - Reduce heap allocations
