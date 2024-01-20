@@ -1,8 +1,0 @@
-{
-  "Rom File": "../roms/Saiyuuki World (J).nes",
-  "Expected ROM SHA1": "C2F12D915A4D0B1FFDF8A64AE1092CE6A2D08770",
-  "Initial State File": "lastHalf.state",
-  "Sequence File": "anyPercent.sol",
-  "Disable State Blocks": [ ],
-  "Credits": "https://tasvideos.org/4422M by aiqiyou & J.Y"
-}
