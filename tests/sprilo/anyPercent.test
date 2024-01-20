@@ -2,5 +2,6 @@
   "Rom File": "../roms/sprilo.nes",
   "Expected ROM SHA1": "6EC09B9B51320A536A786D3D4719432B714C5779",
   "Initial State File": "",
-  "Sequence File": "anyPercent.sol"
+  "Sequence File": "anyPercent.sol",
+  "Disable State Blocks": [ ]
 }

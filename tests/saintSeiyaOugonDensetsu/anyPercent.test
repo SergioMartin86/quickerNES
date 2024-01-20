@@ -2,5 +2,6 @@
   "Rom File": "../roms/Saint Seiya - Ougon Densetsu (J) [!].nes",
   "Expected ROM SHA1": "3F3B499CF50386084E053BCA096AE8E52330CFAE",
   "Initial State File": "",
-  "Sequence File": "anyPercent.sol"
+  "Sequence File": "anyPercent.sol",
+  "Disable State Blocks": [ ]
 }

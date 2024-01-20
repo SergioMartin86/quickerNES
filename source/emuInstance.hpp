@@ -91,9 +91,9 @@ class EmuInstance
     MetroHash128 hash;
 
     hash.Update(getLowMem(), _LOW_MEM_SIZE);
-    hash.Update(getHighMem(), _HIGH_MEM_SIZE);
-    hash.Update(getNametableMem(), _NAMETABLES_MEM_SIZE);
-    hash.Update(getChrMem(), getChrMemSize());
+    // hash.Update(getHighMem(), _HIGH_MEM_SIZE);
+    // hash.Update(getNametableMem(), _NAMETABLES_MEM_SIZE);
+    // hash.Update(getChrMem(), getChrMemSize());
 
     hash_t result;
     hash.Finalize(reinterpret_cast<uint8_t *>(&result));
