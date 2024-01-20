@@ -23,3 +23,5 @@ jobs:
       run: meson setup build
     - name: Building project
       run: ninja -C build
+    - name: Running tests
+      run: ninja test -C build
