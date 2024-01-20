@@ -20,4 +20,6 @@ jobs:
     - name: Installing meson
       run: python3 -m pip install meson
     - name: Run meson configuration
-      run: meson -C build
+      run: meson setup build
+    - name: Building project
+      run: ninja -C build
