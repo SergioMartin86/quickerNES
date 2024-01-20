@@ -27,6 +27,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 template <bool multicart>
 class Mapper_AveNina : public Nes_Mapper
 {
@@ -91,3 +94,5 @@ void Mapper_AveNina<multicart>::write_regs()
 }
 
 typedef Mapper_AveNina<false> Mapper079;
+
+} // namespace quickNES

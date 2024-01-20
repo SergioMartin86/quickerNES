@@ -28,6 +28,9 @@
 
 // Jaleco_JF11
 
+namespace quickerNES
+{
+
 class Mapper140 : public Nes_Mapper
 {
   public:
@@ -62,3 +65,5 @@ class Mapper140 : public Nes_Mapper
 
   uint8_t regs;
 };
+
+} // namespace quickNES

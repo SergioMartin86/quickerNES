@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Camerica
 
+namespace quickerNES
+{
+
 class Mapper071 : public Nes_Mapper
 {
   uint8_t regs[3];
@@ -50,3 +53,5 @@ class Mapper071 : public Nes_Mapper
     }
   }
 };
+
+} // namespace quickNES

@@ -28,6 +28,9 @@
 
 // Un1rom
 
+namespace quickerNES
+{
+
 class Mapper094 : public Nes_Mapper
 {
   public:
@@ -53,3 +56,5 @@ class Mapper094 : public Nes_Mapper
 
   uint8_t bank;
 };
+
+} // namespace quickNES

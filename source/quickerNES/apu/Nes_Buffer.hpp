@@ -6,6 +6,9 @@
 #include "Multi_Buffer.hpp"
 #include <cstdint>
 
+namespace quickerNES
+{
+
 class Nes_Apu;
 
 class Nes_Nonlinearizer
@@ -75,3 +78,5 @@ class Nes_Buffer : public Multi_Buffer
   virtual void SaveAudioBufferState();
   virtual void RestoreAudioBufferState();
 };
+
+} // namespace quickNES

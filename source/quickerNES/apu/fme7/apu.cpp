@@ -15,6 +15,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 void Nes_Fme7_Apu::reset()
 {
   last_time = 0;
@@ -101,3 +104,5 @@ void Nes_Fme7_Apu::run_until(blip_time_t end_time)
 
   last_time = end_time;
 }
+
+} // namespace quickNES

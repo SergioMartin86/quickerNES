@@ -14,6 +14,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 Nes_Vrc6_Apu::Nes_Vrc6_Apu()
 {
   output(0);
@@ -208,3 +211,5 @@ void Nes_Vrc6_Apu::run_saw(nes_time_t end_time)
 
   osc.last_amp = last_amp;
 }
+
+} // namespace quickNES

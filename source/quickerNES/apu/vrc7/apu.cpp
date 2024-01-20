@@ -1,6 +1,9 @@
+#include <cstring>
 #include "apu/vrc7/apu.hpp"
 #include "apu/vrc7/emu2413.hpp"
-#include <cstring>
+
+namespace quickerNES
+{
 
 #define BYTESWAP(xxxx)                                  \
   {                                                     \
@@ -204,3 +207,5 @@ void Nes_Vrc7::update_last_amp()
     }
   }
 }
+
+} // namespace quickNES

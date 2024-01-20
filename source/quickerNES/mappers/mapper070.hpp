@@ -27,6 +27,9 @@
 
 // Mapper_74x161x162x32
 
+namespace quickerNES
+{
+
 template <int mapperId>
 class Mapper_74x161x162x32 : public Nes_Mapper
 {
@@ -80,3 +83,5 @@ class Mapper_74x161x162x32 : public Nes_Mapper
 };
 
 typedef Mapper_74x161x162x32<70> Mapper070;
+
+} // namespace quickNES

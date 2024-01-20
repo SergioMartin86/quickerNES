@@ -1,5 +1,8 @@
 #pragma once
 
+namespace quickerNES
+{
+
 typedef signed int e_int;
 typedef unsigned int e_uint;
 typedef signed char e_int8;
@@ -216,3 +219,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+} // namespace quickNES

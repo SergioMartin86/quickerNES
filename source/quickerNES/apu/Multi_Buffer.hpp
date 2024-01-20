@@ -6,6 +6,9 @@
 
 #include "Blip_Buffer.hpp"
 
+namespace quickerNES
+{
+
 // Interface to one or more Blip_Buffers mapped to one or more channels
 // consisting of left, center, and right buffers.
 class Multi_Buffer
@@ -195,3 +198,5 @@ inline void Mono_Buffer::bass_freq(int freq) { buf.bass_freq(freq); }
 inline long Mono_Buffer::read_samples(blip_sample_t *p, long s) { return buf.read_samples(p, s); }
 
 inline long Mono_Buffer::samples_avail() const { return buf.samples_avail(); }
+
+} // namespace quickNES

@@ -27,6 +27,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct namco_34xx_state_t
 {
   uint8_t bank[8];
@@ -96,3 +99,5 @@ class Mapper206 : public Nes_Mapper, namco_34xx_state_t
     }
   }
 };
+
+} // namespace quickNES

@@ -17,6 +17,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 struct vrc7_state_t
 {
   // written registers
@@ -221,3 +224,5 @@ class Mapper085 : public Nes_Mapper, vrc7_state_t
     timer_period = 113 * 4 + 3
   };
 };
+
+} // namespace quickNES

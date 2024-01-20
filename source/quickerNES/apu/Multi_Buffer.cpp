@@ -15,6 +15,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 Multi_Buffer::Multi_Buffer(int spf) : samples_per_frame_(spf)
 {
   length_ = 0;
@@ -280,3 +283,5 @@ void Stereo_Buffer::RestoreAudioBufferState()
   center()->RestoreAudioBufferState();
   right()->RestoreAudioBufferState();
 }
+
+} // namespace quickNES

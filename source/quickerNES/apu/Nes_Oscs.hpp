@@ -6,6 +6,9 @@
 
 #include "Blip_Buffer.hpp"
 
+namespace quickerNES
+{
+
 class Nes_Apu;
 
 typedef long nes_time_t;     // CPU clock cycle count
@@ -165,3 +168,5 @@ struct Nes_Dmc : Nes_Osc
   int count_reads(nes_time_t, nes_time_t *) const;
   nes_time_t next_read_time() const;
 };
+
+} // namespace quickNES

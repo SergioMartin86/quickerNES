@@ -3,9 +3,12 @@
 // NES 2A03 APU sound chip emulator
 // Nes_Snd_Emu 0.1.7
 
-#include "Nes_Oscs.hpp"
 #include <climits>
 #include <cstdint>
+#include "Nes_Oscs.hpp"
+
+namespace quickerNES
+{
 
 class Nes_Apu
 {
@@ -356,3 +359,5 @@ inline void Nes_Apu::load_state(apu_state_t const &state)
   noise.run(last_time, last_time);
   dmc.run(last_time, last_time);
 }
+
+} // namespace quickNES

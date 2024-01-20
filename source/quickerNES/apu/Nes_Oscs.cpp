@@ -14,6 +14,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 // Nes_Osc
 
 void Nes_Osc::clock_length(int halt_mask)
@@ -675,3 +678,5 @@ void Nes_Noise::run(nes_time_t time, nes_time_t end_time)
 
   delay = time - end_time;
 }
+
+} // namespace quickNES

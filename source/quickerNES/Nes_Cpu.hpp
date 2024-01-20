@@ -5,6 +5,9 @@
 
 #include <cstdint>
 
+namespace quickerNES
+{
+
 typedef long nes_time_t;     // clock cycle count
 typedef unsigned nes_addr_t; // 16-bit address
 
@@ -136,3 +139,5 @@ class Nes_Cpu
     return (uint8_t *)code_map[addr >> page_bits] + addr;
   }
 };
+
+} // namespace quickNES

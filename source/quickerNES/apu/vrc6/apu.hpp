@@ -4,9 +4,12 @@
 // Konami VRC6 sound chip emulator
 // Nes_Snd_Emu 0.1.7
 
+#include <cstdint>
 #include "apu/Blip_Buffer.hpp"
 #include "apu/apu.hpp"
-#include <cstdint>
+
+namespace quickerNES
+{
 
 struct vrc6_apu_state_t;
 
@@ -105,3 +108,5 @@ inline void Nes_Vrc6_Apu::treble_eq(blip_eq_t const &eq)
   saw_synth.treble_eq(eq);
   square_synth.treble_eq(eq);
 }
+
+} // namespace quickNES

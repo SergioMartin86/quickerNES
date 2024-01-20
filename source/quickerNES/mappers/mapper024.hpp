@@ -18,6 +18,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 struct vrc6_state_t
 {
   // written registers
@@ -229,3 +232,5 @@ class Mapper_Vrc6 : public Nes_Mapper, vrc6_state_t
 };
 
 typedef Mapper_Vrc6<0> Mapper024;
+
+} // namespace quickNES

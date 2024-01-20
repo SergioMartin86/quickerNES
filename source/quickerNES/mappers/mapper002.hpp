@@ -17,6 +17,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 // UNROM
 
 class Mapper002 : public Nes_Mapper
@@ -41,3 +44,5 @@ class Mapper002 : public Nes_Mapper
     set_prg_bank(0x8000, bank_16k, data);
   }
 };
+
+} // namespace quickNES

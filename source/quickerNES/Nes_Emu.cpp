@@ -15,6 +15,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 int const sound_fade_size = 384;
 
 Nes_Emu::equalizer_t const Nes_Emu::nes_eq     = {  -1.0,   80 };
@@ -441,3 +444,5 @@ void Nes_Emu::RestoreAudioBufferState()
 	sound_buf_changed_count = extra_sound_buf_changed_count;
 	sound_buf->RestoreAudioBufferState();
 }
+
+} // namespace quickNES

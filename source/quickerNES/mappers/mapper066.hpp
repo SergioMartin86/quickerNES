@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // GNROM
 
+namespace quickerNES
+{
+
 class Mapper066 : public Nes_Mapper
 {
   uint8_t bank;
@@ -48,3 +51,5 @@ class Mapper066 : public Nes_Mapper
       set_chr_bank(0, bank_8k, bank & 3);
   }
 };
+
+} // namespace quickNES

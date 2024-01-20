@@ -20,6 +20,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // to do: CHR mapping and nametable handling needs work
 
+namespace quickerNES
+{
+
 struct namco106_state_t
 {
   uint8_t regs[16];
@@ -195,3 +198,5 @@ class Mapper019 : public Nes_Mapper, namco106_state_t
   Nes_Namco_Apu sound;
   nes_time_t last_time;
 };
+
+} // namespace quickNES

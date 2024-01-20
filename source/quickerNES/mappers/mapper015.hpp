@@ -19,6 +19,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct Mapper015_state_t
 {
   uint8_t prg_bank[4];
@@ -90,3 +93,5 @@ class Mapper015 : public Nes_Mapper, Mapper015_state_t
 
   unsigned long int i;
 };
+
+} // namespace quickNES

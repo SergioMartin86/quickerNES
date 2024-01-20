@@ -3,8 +3,11 @@
 // NES PPU emulator
 // Nes_Emu 0.7.0
 
-#include "Nes_Ppu_Rendering.hpp"
 #include <climits>
+#include "Nes_Ppu_Rendering.hpp"
+
+namespace quickerNES
+{
 
 class Nes_Mapper;
 class Nes_Core;
@@ -139,3 +142,5 @@ inline void Nes_Ppu::update_open_bus(nes_time_t time)
   if (time >= decay_low) open_bus &= ~0x1F;
   if (time >= decay_high) open_bus &= ~0xE0;
 }
+
+} // namespace quickNES

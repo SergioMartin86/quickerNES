@@ -25,6 +25,9 @@
 
 // https://www.nesdev.org/wiki/INES_Mapper241
 
+namespace quickerNES
+{
+
 class Mapper241 : public Nes_Mapper
 {
   public:
@@ -51,3 +54,5 @@ class Mapper241 : public Nes_Mapper
 
   uint8_t bank;
 };
+
+} // namespace quickNES

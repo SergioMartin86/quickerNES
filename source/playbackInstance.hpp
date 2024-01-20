@@ -11,7 +11,14 @@
 
 #define _INVERSE_FRAME_RATE 16667
 
-class Nes_Emu;
+// Creating emulator instance
+#ifdef _USE_QUICKNES
+  typedef Nes_Emu emulator_t;
+#endif
+
+#ifdef _USE_QUICKERNES
+  typedef quickerNES::Nes_Emu emulator_t;
+#endif
 
 struct stepData_t
 {
@@ -43,8 +50,8 @@ class PlaybackInstance
 
     // Loading Emulator instance HQN
     _hqnState.setEmulatorPointer(_emu->getInternalEmulatorPointer());
-    static uint8_t video_buffer[Nes_Emu::image_width * Nes_Emu::image_height];
-    _hqnState.m_emu->set_pixels(video_buffer, Nes_Emu::image_width + 8);
+    static uint8_t video_buffer[emulator_t::image_width * emulator_t::image_height];
+    _hqnState.m_emu->set_pixels(video_buffer, emulator_t::image_width + 8);
 
     // Building sequence information
     for (const auto &input : sequence)

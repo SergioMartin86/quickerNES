@@ -19,6 +19,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 struct fme7_state_t
 {
   // first 16 bytes in register order
@@ -186,3 +189,5 @@ class Mapper069 : public Nes_Mapper, fme7_state_t
   nes_time_t last_time;
   Nes_Fme7_Apu sound;
 };
+
+} // namespace quickNES

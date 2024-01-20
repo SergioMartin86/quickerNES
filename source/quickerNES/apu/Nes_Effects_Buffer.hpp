@@ -6,6 +6,9 @@
 #include "Effects_Buffer.hpp"
 #include "Nes_Buffer.hpp"
 
+namespace quickerNES
+{
+
 // Effects_Buffer uses several buffers and outputs stereo sample pairs.
 class Nes_Effects_Buffer : public Effects_Buffer
 {
@@ -34,3 +37,5 @@ class Nes_Effects_Buffer : public Effects_Buffer
   Nes_Nonlinearizer nonlin;
   friend Multi_Buffer *set_apu(Nes_Effects_Buffer *, Nes_Apu *);
 };
+
+} // namespace quickNES

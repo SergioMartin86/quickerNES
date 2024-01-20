@@ -27,6 +27,9 @@
 
 // https://www.nesdev.org/wiki/INES_Mapper244
 
+namespace quickerNES
+{
+
 struct mapper244_state_t
 {
   uint8_t preg;
@@ -68,3 +71,5 @@ class Mapper244 : public Nes_Mapper, mapper244_state_t
     }
   }
 };
+
+} // namespace quickNES

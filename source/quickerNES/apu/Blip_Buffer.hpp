@@ -1,10 +1,10 @@
+#pragma once
 
 // Band-limited sound synthesis and buffering
-
 // Blip_Buffer 0.4.0
 
-#ifndef BLIP_BUFFER_H
-#define BLIP_BUFFER_H
+namespace quickerNES
+{
 
 // Time unit at source clock rate
 typedef long blip_time_t;
@@ -377,4 +377,4 @@ inline int Blip_Reader::begin(Blip_Buffer &blip_buf)
 int const blip_max_length = 0;
 int const blip_default_length = 250;
 
-#endif
+} // namespace quickNES

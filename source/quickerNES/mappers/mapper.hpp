@@ -7,6 +7,9 @@
 #include "Nes_Cpu.hpp"
 #include <climits>
 
+namespace quickerNES
+{
+
 class Blip_Buffer;
 class blip_eq_t;
 class Nes_Core;
@@ -205,3 +208,5 @@ inline void Nes_Mapper::register_state(void *p, unsigned s)
 inline bool Nes_Mapper::write_intercepted(nes_time_t, nes_addr_t, int) { return false; }
 
 inline int Nes_Mapper::read(nes_time_t, nes_addr_t) { return -1; } // signal to caller
+
+} // namespace quickNES

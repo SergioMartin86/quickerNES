@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include <cstdlib>
 #include <cstring>
 
+namespace quickerNES
+{
+
 class Nes_Cart
 {
   public:
@@ -110,3 +113,5 @@ class Nes_Cart
   long chr_size_;
   unsigned mapper;
 };
+
+} // namespace quickNES

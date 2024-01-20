@@ -3,9 +3,12 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/
 
+#include <cstring>
 #include "Nes_Ppu.hpp"
 #include "Nes_Core.hpp"
-#include <cstring>
+
+namespace quickerNES
+{
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -652,3 +655,5 @@ nes_time_t Nes_Ppu::earliest_open_bus_decay()
 {
   return (decay_low < decay_high) ? decay_low : decay_high;
 }
+
+} // namespace quickNES

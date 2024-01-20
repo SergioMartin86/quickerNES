@@ -3,8 +3,11 @@
 // Sunsoft FME-7 sound emulator
 // Nes_Emu 0.7.0
 
-#include "apu/Blip_Buffer.hpp"
 #include <cstdint>
+#include "apu/Blip_Buffer.hpp"
+
+namespace quickerNES
+{
 
 struct fme7_apu_state_t
 {
@@ -148,3 +151,5 @@ inline void Nes_Fme7_Apu::load_state(fme7_apu_state_t const &in)
   // Run sound channels for 0 cycles for clean audio after loading state
   run_until(last_time);
 }
+
+} // namespace quickNES

@@ -14,6 +14,9 @@ details. You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 // Nes_Buffer
 
 Nes_Buffer::Nes_Buffer() : Multi_Buffer(1) {}
@@ -229,3 +232,5 @@ void Nes_Nonlinearizer::RestoreAudioBufferState()
   accum = extra_accum;
   prev = extra_prev;
 }
+
+} // namespace quickNES

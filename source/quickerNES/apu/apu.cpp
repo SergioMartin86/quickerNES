@@ -13,6 +13,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 int const amp_range = 15;
 
 Nes_Apu::Nes_Apu() : square1(&square_synth),
@@ -368,3 +371,5 @@ int Nes_Apu::read_status(nes_time_t time)
 
   return result;
 }
+
+} // namespace quickNES

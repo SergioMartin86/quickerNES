@@ -16,7 +16,8 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-// Nes_Ppu_Impl
+namespace quickerNES
+{
 
 static unsigned zero = 0; // helps CodeWarrior optimizer when added to constants
 
@@ -501,3 +502,5 @@ void Nes_Ppu_Rendering::draw_background(int start, int count)
     }
   }
 }
+
+} // namespace quickNES

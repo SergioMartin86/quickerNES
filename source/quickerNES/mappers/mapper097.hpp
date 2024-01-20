@@ -27,6 +27,9 @@
 
 // Irem_Tam_S1
 
+namespace quickerNES
+{
+
 class Mapper097 : public Nes_Mapper
 {
   public:
@@ -62,3 +65,5 @@ class Mapper097 : public Nes_Mapper
 
   uint8_t bank;
 };
+
+} // namespace quickNES

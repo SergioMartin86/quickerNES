@@ -27,6 +27,9 @@
 
 // UxROM (inverted)
 
+namespace quickerNES
+{
+
 class Mapper180 : public Nes_Mapper
 {
   public:
@@ -53,3 +56,5 @@ class Mapper180 : public Nes_Mapper
 
   uint8_t bank;
 };
+
+} // namespace quickNES

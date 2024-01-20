@@ -5,6 +5,9 @@
 
 #include <cstdint>
 
+namespace quickerNES
+{
+
 struct ppu_state_t
 {
   uint8_t w2000;        // control
@@ -239,3 +242,5 @@ inline void Nes_Ppu_Impl::begin_frame()
   palette_offset = palette_begin * 0x01010101;
   addr_inc = w2000 & 4 ? 32 : 1;
 }
+
+} // namespace quickNES

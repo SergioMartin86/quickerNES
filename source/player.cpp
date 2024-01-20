@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef _USE_QUICKERNES
-  auto e = QuickerNESInstance();
+  auto e = quickerNES::QuickerNESInstance();
 #endif
 
   // Loading ROM File

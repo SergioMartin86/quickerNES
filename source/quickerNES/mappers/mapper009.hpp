@@ -3,6 +3,9 @@
 #include "mappers/mapper.hpp"
 #include <cstring>
 
+namespace quickerNES
+{
+
 // MMC2
 
 class Mapper009 : public Nes_Mapper
@@ -74,3 +77,5 @@ class Mapper009 : public Nes_Mapper
     }
   }
 };
+
+} // namespace quickNES

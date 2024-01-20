@@ -10,7 +10,7 @@ namespace hqn
 int32_t *_initF_VideoPalette()
 {
     static int32_t VideoPalette[512];
-    const Nes_Emu::rgb_t *palette = Nes_Emu::nes_colors;
+    const emulator_t::rgb_t *palette = emulator_t::nes_colors;
     for (int i = 0; i < 512; i++)
     {
         VideoPalette[i] = palette[i].red << 16 | palette[i].green << 8
@@ -25,7 +25,7 @@ const int32_t *HQNState::NES_VIDEO_PALETTE = _initF_VideoPalette();
 // Constructor
 HQNState::HQNState()
 {
-    m_emu = new Nes_Emu();
+    m_emu = new emulator_t();
     joypad[0] = 0x00;
     joypad[1] = 0x00;
 
@@ -50,7 +50,7 @@ error_t HQNState::setSampleRate(int rate)
 {
 	const char *ret = m_emu->set_sample_rate(rate);
 	if (!ret)
-		m_emu->set_equalizer(Nes_Emu::nes_eq);
+		m_emu->set_equalizer(emulator_t::nes_eq);
 	return ret;
 }
 

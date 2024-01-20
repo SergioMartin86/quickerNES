@@ -4,6 +4,9 @@
 
 // Magic Kid Googoo
 
+namespace quickerNES
+{
+
 class Mapper190 : public Nes_Mapper
 {
   public:
@@ -53,3 +56,5 @@ class Mapper190 : public Nes_Mapper
     }
   }
 };
+
+} // namespace quickNES

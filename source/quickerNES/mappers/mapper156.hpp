@@ -4,6 +4,9 @@
 
 // DIS23C01 DAOU ROM CONTROLLER
 
+namespace quickerNES
+{
+
 struct m156_state_t
 {
   uint8_t prg_bank;
@@ -58,3 +61,5 @@ class Mapper156 : public Nes_Mapper, m156_state_t
     }
   }
 };
+
+} // namespace quickNES

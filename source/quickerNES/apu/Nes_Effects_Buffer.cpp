@@ -15,6 +15,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 Nes_Effects_Buffer::Nes_Effects_Buffer() : Effects_Buffer(true) // nes never uses stereo channels
 {
   config_t c;
@@ -85,3 +88,5 @@ void Nes_Effects_Buffer::SaveAudioBufferState()
 void Nes_Effects_Buffer::RestoreAudioBufferState()
 {
 }
+
+} // namespace quickNES

@@ -26,6 +26,9 @@
 
 // Sunsoft2b
 
+namespace quickerNES
+{
+
 class Mapper089 : public Nes_Mapper
 {
   public:
@@ -55,3 +58,5 @@ class Mapper089 : public Nes_Mapper
 
   uint8_t regs;
 };
+
+} // namespace quickNES

@@ -19,6 +19,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct vrc1_state_t
 {
   uint8_t prg_banks[3];
@@ -106,3 +109,5 @@ class Mapper075 : public Nes_Mapper, vrc1_state_t
     }
   }
 };
+
+} // namespace quickNES

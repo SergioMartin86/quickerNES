@@ -8,6 +8,9 @@
 #include "Nes_Core.hpp"
 #include "apu/Multi_Buffer.hpp"
 
+namespace quickerNES
+{
+
 class Nes_State;
 
 class Nes_Emu
@@ -281,3 +284,5 @@ inline long Nes_Emu::chr_size() const
 {
   return cart()->chr_size() ? cart()->chr_size() : emu.ppu.chr_addr_size;
 }
+
+} // namespace quickNES

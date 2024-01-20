@@ -76,6 +76,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include "mappers/mapper244.hpp"
 #include "mappers/mapper246.hpp"
 
+namespace quickerNES
+{
+
 Nes_Mapper::Nes_Mapper()
 {
   emu_ = NULL;
@@ -287,3 +290,5 @@ Nes_Mapper *Nes_Mapper::getMapperFromCode(const int mapperCode)
 
   return mapper;
 }
+
+} // namespace quickNES

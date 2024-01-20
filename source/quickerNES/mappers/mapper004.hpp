@@ -18,6 +18,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 // 264 or less breaks Gargoyle's Quest II
 // 267 or less breaks Magician
 int const irq_fine_tune = 268;
@@ -251,3 +254,5 @@ class Mapper004 : public Nes_Mapper, mmc3_state_t
   nes_time_t next_time;
   int counter_just_clocked; // used only for debugging
 };
+
+} // namespace quickNES

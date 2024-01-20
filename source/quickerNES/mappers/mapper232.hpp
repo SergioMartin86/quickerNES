@@ -20,6 +20,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Quattro
 
+namespace quickerNES
+{
+
 class Mapper232 : public Nes_Mapper
 {
   uint8_t regs[2];
@@ -52,3 +55,5 @@ class Mapper232 : public Nes_Mapper
     Mapper232::apply_mapping();
   }
 };
+
+} // namespace quickNES

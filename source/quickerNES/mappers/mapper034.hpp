@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Nina-1 (Deadly Towers only)
 
+namespace quickerNES
+{
+
 class Mapper034 : public Nes_Mapper
 {
   uint8_t bank;
@@ -40,3 +43,5 @@ class Mapper034 : public Nes_Mapper
     set_prg_bank(0x8000, bank_32k, bank);
   }
 };
+
+} // namespace quickNES

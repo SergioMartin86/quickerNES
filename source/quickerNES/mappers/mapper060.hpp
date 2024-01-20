@@ -21,6 +21,9 @@
 
 // NROM-128 4-in-1 multicart
 
+namespace quickerNES
+{
+
 class Mapper060 : public Nes_Mapper
 {
   public:
@@ -49,3 +52,5 @@ class Mapper060 : public Nes_Mapper
 
   uint8_t game_sel, last_game;
 };
+
+} // namespace quickNES

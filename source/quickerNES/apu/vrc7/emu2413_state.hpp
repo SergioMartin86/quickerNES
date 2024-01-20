@@ -2,6 +2,9 @@
 
 #include "emu2413.hpp"
 
+namespace quickerNES
+{
+	
 typedef struct
 {
   e_int32 feedback;
@@ -34,3 +37,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+} // namespace quickNES

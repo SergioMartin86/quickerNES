@@ -25,6 +25,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct mapper32_state_t
 {
   uint8_t chr_bank[8];
@@ -122,3 +125,5 @@ class Mapper032 : public Nes_Mapper, mapper32_state_t
     }
   }
 };
+
+} // namespace quickNES

@@ -4,6 +4,9 @@
 
 // Holy Diver and Uchuusen - Cosmo Carrier.
 
+namespace quickerNES
+{
+
 class Mapper078 : public Nes_Mapper
 {
   // lower 8 bits are the reg at 8000:ffff
@@ -73,3 +76,5 @@ class Mapper078 : public Nes_Mapper
     }
   }
 };
+
+} // namespace quickNES

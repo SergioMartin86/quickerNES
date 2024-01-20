@@ -61,6 +61,9 @@ if the origin of this software is not misrepresented.
 #include <stdlib.h>
 #include <string.h>
 
+namespace quickerNES
+{
+
 static const unsigned char default_inst[15][8] = {
   /* 2019-03-19 VRC7 instrument patchset dumped by Nuke.YKT */
   /* https://wiki.nesdev.com/w/index.php/VRC7_audio */
@@ -1148,3 +1151,5 @@ void OPLL_writeIO(OPLL *opll, e_uint32 adr, e_uint32 val)
   else
     opll->adr = val;
 }
+
+} // namespace quickNES

@@ -28,6 +28,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct vrc2_state_t
 {
   uint8_t prg_banks[2];
@@ -252,3 +255,5 @@ void Mapper_VRC2_4<type_a, type_b>::write_irq(nes_time_t time,
 }
 
 typedef Mapper_VRC2_4<true, true> Mapper021;
+
+} // namespace quickNES

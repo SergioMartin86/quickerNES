@@ -22,6 +22,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include <cstdio>
 #include <string>
 
+namespace quickerNES
+{
+
 class Nes_Cart;
 
 #undef NES_EMU_CPU_HOOK
@@ -598,7 +601,7 @@ class Nes_Core : private Nes_Cpu
 
     // extra byte allows CPU to always read operand of instruction, which
     // might go past end of data
-    uint8_t unmapped_page[::Nes_Cpu::page_size + 1];
+    uint8_t unmapped_page[Nes_Cpu::page_size + 1];
   };
   impl_t *impl; // keep large arrays separate
   unsigned long error_count;
@@ -1043,3 +1046,5 @@ inline void Nes_Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
     else                                                         \
       static_cast<Nes_Core &>(*cpu).cpu_write(addr, data, time); \
   }
+
+} // namespace quickNES

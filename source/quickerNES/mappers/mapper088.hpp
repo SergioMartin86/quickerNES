@@ -27,6 +27,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct namco_34x3_state_t
 {
   uint8_t bank[8];
@@ -108,10 +111,5 @@ class Mapper_Namco_34x3 : public Nes_Mapper, namco_34x3_state_t
 
 typedef Mapper_Namco_34x3<false> Mapper088;
 
-// void register_mapper_namco_34xx();
-// void register_mapper_namco_34xx()
-// {
-// 	register_mapper< Mapper_Namco_34x3 <false> > ( 88 );
-// 	register_mapper< Mapper_Namco_34x3 <true> > ( 154 );
-// 	register_mapper< Mapper_Namco_34xx > ( 206 );
-// }
+
+} // namespace quickNES

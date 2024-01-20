@@ -3,6 +3,9 @@
 #include <Nes_Emu.hpp>
 #include <emuInstance.hpp>
 
+namespace quickerNES
+{
+
 class QuickerNESInstance : public EmuInstance
 {
   public:
@@ -72,3 +75,5 @@ class QuickerNESInstance : public EmuInstance
   // Emulator instance
   Nes_Emu *_nes;
 };
+
+} // namespace quickNES

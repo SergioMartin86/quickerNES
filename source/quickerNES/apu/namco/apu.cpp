@@ -15,6 +15,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 Nes_Namco_Apu::Nes_Namco_Apu()
 {
   output(0);
@@ -176,3 +179,5 @@ void Nes_Namco_Apu::load_state(namco_state_t const &in)
 
   run_until(last_time);
 }
+
+} // namespace quickNES

@@ -29,6 +29,9 @@
 
 // NTDEC's TC-112 mapper IC.
 
+namespace quickerNES
+{
+
 class Mapper193 : public Nes_Mapper
 {
   public:
@@ -74,3 +77,5 @@ class Mapper193 : public Nes_Mapper
 
   uint8_t regs[4];
 };
+
+} // namespace quickNES

@@ -25,6 +25,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct tc0190_state_t
 {
   uint8_t preg[2];
@@ -99,3 +102,5 @@ class Mapper033 : public Nes_Mapper, tc0190_state_t
     }
   }
 };
+
+} // namespace quickNES

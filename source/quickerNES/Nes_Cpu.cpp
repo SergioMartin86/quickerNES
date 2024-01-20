@@ -22,6 +22,9 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace quickerNES
+{
+
 #define st_n 0x80
 #define st_v 0x40
 #define st_r 0x20
@@ -1164,3 +1167,5 @@ uint8_t clock_table [256] = {
     2,6,2,8,3,3,5,5,2,2,2,2,4,4,6,6,// E
     3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7 // F
 };
+
+} // namespace quickNES

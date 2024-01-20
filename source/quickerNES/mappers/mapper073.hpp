@@ -25,6 +25,9 @@
 
 #include "mappers/mapper.hpp"
 
+namespace quickerNES
+{
+
 struct vrc3_state_t
 {
   bool irq_enable;
@@ -131,8 +134,4 @@ class Mapper073 : public Nes_Mapper, vrc3_state_t
   }
 };
 
-// void register_vrc3_mapper();
-// void register_vrc3_mapper()
-// {
-// 	register_mapper< Mapper073> ( 73 );
-// }
+} // namespace quickNES

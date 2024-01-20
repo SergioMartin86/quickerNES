@@ -1,6 +1,9 @@
 #include "emu2413_state.hpp"
 #include <stdint.h>
 
+namespace quickerNES
+{
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -109,3 +112,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+} // namespace quickNES

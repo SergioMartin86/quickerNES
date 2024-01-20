@@ -31,6 +31,9 @@
 
 // Unrom512
 
+namespace quickerNES
+{
+
 class Mapper030 : public Nes_Mapper
 {
   public:
@@ -49,3 +52,5 @@ class Mapper030 : public Nes_Mapper
     }
   }
 };
+
+} // namespace quickNES
