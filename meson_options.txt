@@ -5,6 +5,13 @@ option('buildPlayer',
   yield: true
 )
 
+option('onlyOpenSource',
+  type : 'boolean',
+  value : false,
+  description : 'Test using only open source games (for cloud CI)',
+  yield: true
+)
+
 option('CPUFunctionAlignment',
   type : 'integer',
   min : 1,

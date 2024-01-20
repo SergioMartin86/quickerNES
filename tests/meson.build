@@ -4,6 +4,8 @@ bash = find_program('bash')
 testCommands = ['../run_test.sh', quickerNESTester.path(), quickNESTester.path() ]
 testTimeout = 120
 
+if get_option('onlyOpenSource') == false
+
 subdir('arkanoid')
 subdir('castlevania1')
 subdir('superOffroad')
@@ -20,3 +22,9 @@ subdir('saintSeiyaKanketsuHen')
 subdir('superMarioBros')
 subdir('superMarioBros3')
 subdir('saiyuukiWorld')
+
+endif
+
+# Open source games
+subdir('sprilo')
+subdir('novaTheSquirrel')
