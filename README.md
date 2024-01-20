@@ -1,6 +1,8 @@
 quickerNES
 -----------
 
+[![Build & Tests](https://github.com/SergioMartin86/quickerNES/actions/workflows/make.yml/badge.svg)](https://github.com/SergioMartin86/quickerNES/actions/workflows/make.yml)
+
 quickerNES is an attempt to modernizing [quickNES](https://github.com/kode54/QuickNES). The goals for this project are, in order of importance:
 
 - Improve overall emulation performance for modern (x86) CPUs (portability to other systems not guaranteed)
