@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * General code is from FCEUX https://sourceforge.net/p/fceultra/code/HEAD/tree/fceu/trunk/src/boards/vrc2and4.cpp
  * IRQ portion is from existing VRC6/VRC7 by Shay Green
  * This mapper was ported by retrowertz for Libretro port of QuickNES.
@@ -29,4 +29,4 @@
 #include "mappers/mapper.hpp"
 #include "mappers/mapper021.hpp"
 
-typedef Mapper_VRC2_4<false,true> Mapper022;
+typedef Mapper_VRC2_4<false, true> Mapper022;

@@ -1,21 +1,21 @@
 #pragma once
 
+#include <algorithm>
 #include <fstream>
+#include <metrohash128/metrohash128.h>
 #include <sstream>
-#include <vector>
 #include <stdarg.h>
 #include <stdexcept>
 #include <stdio.h>
 #include <unistd.h>
-#include <algorithm>
-#include <metrohash128/metrohash128.h>
+#include <vector>
 
 // If we use NCurses, we need to use the appropriate printing function
 #ifdef NCURSES
- #include <ncurses.h>
- #define LOG printw
+  #include <ncurses.h>
+  #define LOG printw
 #else
- #define LOG printf
+  #define LOG printf
 #endif
 
 // If we use NCurses, define the following useful functions
@@ -82,12 +82,10 @@ void refreshTerminal()
   refresh();
 }
 
-
 #endif // NCURSES
 
-
 typedef _uint128_t hash_t;
-inline hash_t calculateMetroHash(uint8_t* data, size_t size)
+inline hash_t calculateMetroHash(uint8_t *data, size_t size)
 {
   MetroHash128 hash;
   hash.Update(data, size);
@@ -100,7 +98,8 @@ inline hash_t calculateMetroHash(uint8_t* data, size_t size)
 // Taken from stack overflow answer to https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
 // By Evan Teran
 
-template <typename Out> inline void split(const std::string &s, char delim, Out result)
+template <typename Out>
+inline void split(const std::string &s, char delim, Out result)
 {
   std::istringstream iss(s);
   std::string item;
@@ -112,11 +111,11 @@ template <typename Out> inline void split(const std::string &s, char delim, Out 
 
 inline std::vector<std::string> split(const std::string &s, char delim)
 {
- std::string newString = s;
- std::replace(newString.begin(), newString.end(), '\n', ' ');
- std::vector<std::string> elems;
- split(newString, delim, std::back_inserter(elems));
- return elems;
+  std::string newString = s;
+  std::replace(newString.begin(), newString.end(), '\n', ' ');
+  std::vector<std::string> elems;
+  split(newString, delim, std::back_inserter(elems));
+  return elems;
 }
 
 // Taken from https://stackoverflow.com/questions/116038/how-do-i-read-an-entire-file-into-a-stdstring-in-c/116220#116220
@@ -127,8 +126,8 @@ inline std::string slurp(std::ifstream &in)
   return sstr.str();
 }
 
-#define EXIT_WITH_ERROR(...)  exitWithError(__FILE__, __LINE__, __VA_ARGS__)
-inline  void exitWithError [[noreturn]] (const char *fileName, const int lineNumber, const char *format, ...)
+#define EXIT_WITH_ERROR(...) exitWithError(__FILE__, __LINE__, __VA_ARGS__)
+inline void exitWithError [[noreturn]] (const char *fileName, const int lineNumber, const char *format, ...)
 {
   char *outstr = 0;
   va_list ap;
@@ -178,7 +177,8 @@ inline bool saveStringToFile(const std::string &src, const char *fileName)
 }
 
 // Function to split a vector into n mostly fair chunks
-template <typename T> inline std::vector<T> splitVector(const T size, const T n)
+template <typename T>
+inline std::vector<T> splitVector(const T size, const T n)
 {
   std::vector<T> subSizes(n);
 
@@ -191,14 +191,19 @@ template <typename T> inline std::vector<T> splitVector(const T size, const T n)
   return subSizes;
 }
 
-inline std::string simplifyMove(const std::string& move)
+inline std::string simplifyMove(const std::string &move)
 {
- std::string simpleMove;
+  std::string simpleMove;
 
- bool isEmptyMove = true;
- for (size_t i = 0; i < move.size(); i++) if (move[i] != '.' && move[i] != '|') { simpleMove += move[i]; isEmptyMove = false; }
- if (isEmptyMove) return ".";
- return simpleMove;
+  bool isEmptyMove = true;
+  for (size_t i = 0; i < move.size(); i++)
+    if (move[i] != '.' && move[i] != '|')
+    {
+      simpleMove += move[i];
+      isEmptyMove = false;
+    }
+  if (isEmptyMove) return ".";
+  return simpleMove;
 }
 
 inline bool getBitFlag(const uint8_t value, const uint8_t idx)
@@ -214,29 +219,42 @@ inline bool getBitFlag(const uint8_t value, const uint8_t idx)
   return false;
 }
 
-
-inline size_t countButtonsPressedString(const std::string& input) { size_t count = 0; for (size_t i = 0; i < input.size(); i++) if (input[i] != '.') count++; return count; };
-
-template<typename T> inline uint16_t countButtonsPressedNumber(const T& input) {
- uint16_t count = 0;
- if (input & 0b0000000000000001) count++;
- if (input & 0b0000000000000010) count++;
- if (input & 0b0000000000000100) count++;
- if (input & 0b0000000000001000) count++;
- if (input & 0b0000000000010000) count++;
- if (input & 0b0000000000100000) count++;
- if (input & 0b0000000001000000) count++;
- if (input & 0b0000000010000000) count++;
- if (input & 0b0000000100000000) count++;
- if (input & 0b0000001000000000) count++;
- if (input & 0b0000010000000000) count++;
- if (input & 0b0000100000000000) count++;
- if (input & 0b0001000000000000) count++;
- if (input & 0b0010000000000000) count++;
- if (input & 0b0100000000000000) count++;
- if (input & 0b1000000000000000) count++;
- return count;
+inline size_t countButtonsPressedString(const std::string &input)
+{
+  size_t count = 0;
+  for (size_t i = 0; i < input.size(); i++)
+    if (input[i] != '.') count++;
+  return count;
 };
 
-static auto moveCountComparerString = [](const std::string& a, const std::string& b) { return countButtonsPressedString(a) < countButtonsPressedString(b); };
-static auto moveCountComparerNumber = [](const uint8_t a, const uint8_t b) { return countButtonsPressedNumber(a) < countButtonsPressedNumber(b); };
+template <typename T>
+inline uint16_t countButtonsPressedNumber(const T &input)
+{
+  uint16_t count = 0;
+  if (input & 0b0000000000000001) count++;
+  if (input & 0b0000000000000010) count++;
+  if (input & 0b0000000000000100) count++;
+  if (input & 0b0000000000001000) count++;
+  if (input & 0b0000000000010000) count++;
+  if (input & 0b0000000000100000) count++;
+  if (input & 0b0000000001000000) count++;
+  if (input & 0b0000000010000000) count++;
+  if (input & 0b0000000100000000) count++;
+  if (input & 0b0000001000000000) count++;
+  if (input & 0b0000010000000000) count++;
+  if (input & 0b0000100000000000) count++;
+  if (input & 0b0001000000000000) count++;
+  if (input & 0b0010000000000000) count++;
+  if (input & 0b0100000000000000) count++;
+  if (input & 0b1000000000000000) count++;
+  return count;
+};
+
+static auto moveCountComparerString = [](const std::string &a, const std::string &b)
+{
+  return countButtonsPressedString(a) < countButtonsPressedString(b);
+};
+static auto moveCountComparerNumber = [](const uint8_t a, const uint8_t b)
+{
+  return countButtonsPressedNumber(a) < countButtonsPressedNumber(b);
+};

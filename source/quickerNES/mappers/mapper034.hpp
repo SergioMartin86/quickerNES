@@ -19,23 +19,24 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Nina-1 (Deadly Towers only)
 
-class Mapper034 : public Nes_Mapper {
-	uint8_t bank;
-public:
-	Mapper034()
-	{
-		register_state( &bank, 1 );
-	}
-	
-	virtual void apply_mapping()
-	{
-		write( 0, 0, bank );
-	}
-	
-	virtual void write( nes_time_t, nes_addr_t, int data )
-	{
-		bank = data;
-		set_prg_bank( 0x8000, bank_32k, bank );
-	}
-};
+class Mapper034 : public Nes_Mapper
+{
+  uint8_t bank;
 
+  public:
+  Mapper034()
+  {
+    register_state(&bank, 1);
+  }
+
+  virtual void apply_mapping()
+  {
+    write(0, 0, bank);
+  }
+
+  virtual void write(nes_time_t, nes_addr_t, int data)
+  {
+    bank = data;
+    set_prg_bank(0x8000, bank_32k, bank);
+  }
+};

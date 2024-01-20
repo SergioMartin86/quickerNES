@@ -19,14 +19,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // NROM
 
-class Mapper000 : public Nes_Mapper {
-public:
-	Mapper000() { }
-	
-	virtual void apply_mapping() { }
-	
-	virtual void write( nes_time_t, nes_addr_t, int )
-	{
-		// empty
-	}
+class Mapper000 : public Nes_Mapper
+{
+  public:
+  Mapper000() {}
+
+  virtual void apply_mapping() {}
+
+  virtual void write(nes_time_t, nes_addr_t, int)
+  {
+    // empty
+  }
 };

@@ -18,30 +18,31 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Jaleco/Konami/Taito
 
-class Mapper087 : public Nes_Mapper {
-	uint8_t bank;
-public:
-	Mapper087()
-	{
-		register_state( &bank, 1 );
-	}
-	
-	void apply_mapping()
-	{
-		intercept_writes( 0x6000, 1 );
-		write( 0, 0x6000, bank );
-	}
-	
-	bool write_intercepted( nes_time_t, nes_addr_t addr, int data )
-	{
-		if ( addr != 0x6000 )
-			return false;
-		
-		bank = data;
-		set_chr_bank( 0, bank_8k, data >> 1 );
-		return true;
-	}
-	
-	void write( nes_time_t, nes_addr_t, int ) { }
-};
+class Mapper087 : public Nes_Mapper
+{
+  uint8_t bank;
 
+  public:
+  Mapper087()
+  {
+    register_state(&bank, 1);
+  }
+
+  void apply_mapping()
+  {
+    intercept_writes(0x6000, 1);
+    write(0, 0x6000, bank);
+  }
+
+  bool write_intercepted(nes_time_t, nes_addr_t addr, int data)
+  {
+    if (addr != 0x6000)
+      return false;
+
+    bank = data;
+    set_chr_bank(0, bank_8k, data >> 1);
+    return true;
+  }
+
+  void write(nes_time_t, nes_addr_t, int) {}
+};

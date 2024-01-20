@@ -19,32 +19,32 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // AOROM
 
-class Mapper007 : public Nes_Mapper {
-	uint8_t bank;
-public:
-	Mapper007()
-	{
-		register_state( &bank, 1 );
-	}
-	
-	virtual void apply_mapping()
-	{
-		int b = bank;
-		bank = ~b; // force update
-		write( 0, 0, b );
-	}
-	
-	virtual void write( nes_time_t, nes_addr_t, int data )
-	{
-		int changed = bank ^ data;
-		bank = data;
-		
-		if ( changed & 0x10 )
-			mirror_single( bank >> 4 & 1 );
-		
-		if ( changed & 0x0f )
-			set_prg_bank( 0x8000, bank_32k, bank & 7 );
-	}
-};
-	
+class Mapper007 : public Nes_Mapper
+{
+  uint8_t bank;
 
+  public:
+  Mapper007()
+  {
+    register_state(&bank, 1);
+  }
+
+  virtual void apply_mapping()
+  {
+    int b = bank;
+    bank = ~b; // force update
+    write(0, 0, b);
+  }
+
+  virtual void write(nes_time_t, nes_addr_t, int data)
+  {
+    int changed = bank ^ data;
+    bank = data;
+
+    if (changed & 0x10)
+      mirror_single(bank >> 4 & 1);
+
+    if (changed & 0x0f)
+      set_prg_bank(0x8000, bank_32k, bank & 7);
+  }
+};

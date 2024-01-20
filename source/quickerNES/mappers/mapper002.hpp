@@ -19,24 +19,25 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // UNROM
 
-class Mapper002 : public Nes_Mapper {
-	uint8_t bank;
-public:
-	Mapper002()
-	{
-		register_state( &bank, 1 );
-	}
-	
-	virtual void apply_mapping()
-	{
-		enable_sram(); // at least one UNROM game needs sram (Bomberman 2)
-		set_prg_bank( 0x8000, bank_16k, bank );
-	}
-	
-	virtual void write( nes_time_t, nes_addr_t addr, int data )
-	{
-		bank = handle_bus_conflict( addr, data );
-		set_prg_bank( 0x8000, bank_16k, data );
-	}
-};
+class Mapper002 : public Nes_Mapper
+{
+  uint8_t bank;
 
+  public:
+  Mapper002()
+  {
+    register_state(&bank, 1);
+  }
+
+  virtual void apply_mapping()
+  {
+    enable_sram(); // at least one UNROM game needs sram (Bomberman 2)
+    set_prg_bank(0x8000, bank_16k, bank);
+  }
+
+  virtual void write(nes_time_t, nes_addr_t addr, int data)
+  {
+    bank = handle_bus_conflict(addr, data);
+    set_prg_bank(0x8000, bank_16k, data);
+  }
+};

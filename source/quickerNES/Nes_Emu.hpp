@@ -1,262 +1,283 @@
-#pragma once 
+#pragma once
 
 // NES video game console emulator with snapshot support
 
 // Nes_Emu 0.7.0
 
-#include "apu/Multi_Buffer.hpp"
 #include "Nes_Cart.hpp"
 #include "Nes_Core.hpp"
+#include "apu/Multi_Buffer.hpp"
 
 class Nes_State;
 
-class Nes_Emu {
-public:
-	Nes_Emu();
-	virtual ~Nes_Emu();
+class Nes_Emu
+{
+  public:
+  Nes_Emu();
+  virtual ~Nes_Emu();
 
-// Basic setup
+  // Basic setup
 
-	// Load iNES file into emulator and clear recording
-	void load_ines( const uint8_t* buffer );
+  // Load iNES file into emulator and clear recording
+  void load_ines(const uint8_t *buffer);
 
-	// Set sample rate for sound generation
-	const char * set_sample_rate( long );
+  // Set sample rate for sound generation
+  const char *set_sample_rate(long);
 
-	// Size and depth of graphics buffer required for rendering. Note that this
-	// is larger than the actual image, with a temporary area around the edge
-	// that gets filled with junk.
-	static const uint16_t buffer_width  = Nes_Ppu::buffer_width;
-	uint16_t buffer_height() const { return buffer_height_; }
-	static const uint8_t bits_per_pixel = 8;
+  // Size and depth of graphics buffer required for rendering. Note that this
+  // is larger than the actual image, with a temporary area around the edge
+  // that gets filled with junk.
+  static const uint16_t buffer_width = Nes_Ppu::buffer_width;
+  uint16_t buffer_height() const { return buffer_height_; }
+  static const uint8_t bits_per_pixel = 8;
 
-	// Set graphics buffer to render pixels to. Pixels points to top-left pixel and
-	// row_bytes is the number of bytes to get to the next line (positive or negative).
-	void set_pixels( void* pixels, long row_bytes );
+  // Set graphics buffer to render pixels to. Pixels points to top-left pixel and
+  // row_bytes is the number of bytes to get to the next line (positive or negative).
+  void set_pixels(void *pixels, long row_bytes);
 
-	// Size of image generated in graphics buffer
-	static const uint16_t image_width   = 256;
-	static const uint16_t image_height  = 240;
+  // Size of image generated in graphics buffer
+  static const uint16_t image_width = 256;
+  static const uint16_t image_height = 240;
 
-   const uint8_t* getHostPixels () const { return emu.ppu.host_pixels; }
-    
-	size_t getLiteStateSize() const { return emu.getLiteStateSize(); }
-	size_t getStateSize() const { return emu.getStateSize(); }
+  const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
-// Basic emulation
+  size_t getLiteStateSize() const { return emu.getLiteStateSize(); }
+  size_t getStateSize() const { return emu.getStateSize(); }
 
-	// Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image
-	// and sound are available for output using the accessors below.
-	virtual const char * emulate_frame( int joypad1, int joypad2 = 0 );
+  // Basic emulation
 
-	// Emulate one video frame using joypad1 and joypad2 as input, but skips drawing.
-	// Afterwards, audio is available for output using the accessors below.
-	virtual const char * emulate_skip_frame( int joypad1, int joypad2 = 0 );
+  // Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image
+  // and sound are available for output using the accessors below.
+  virtual const char *emulate_frame(int joypad1, int joypad2 = 0);
 
-	// Maximum size of palette that can be generated
-	static const uint16_t max_palette_size = 256;
+  // Emulate one video frame using joypad1 and joypad2 as input, but skips drawing.
+  // Afterwards, audio is available for output using the accessors below.
+  virtual const char *emulate_skip_frame(int joypad1, int joypad2 = 0);
 
-	// Result of current frame
-	struct frame_t
-	{
-		static const uint8_t left = 8;
-		
-		int joypad_read_count;  // number of times joypads were strobed (read)
-		int burst_phase;        // NTSC burst phase for frame (0, 1, or 2)
+  // Maximum size of palette that can be generated
+  static const uint16_t max_palette_size = 256;
 
-		int sample_count;       // number of samples (always a multiple of chan_count)
-		int chan_count;         // 1: mono, 2: stereo
+  // Result of current frame
+  struct frame_t
+  {
+    static const uint8_t left = 8;
 
-		int top;                // top-left position of image in graphics buffer
-		unsigned char* pixels;  // pointer to top-left pixel of image
-		long pitch;             // number of bytes to get to next row of image
+    int joypad_read_count; // number of times joypads were strobed (read)
+    int burst_phase;       // NTSC burst phase for frame (0, 1, or 2)
 
-		int palette_begin;      // first host palette entry, as set by set_palette_range()
-		int palette_size;       // number of entries used for current frame
-		short palette [max_palette_size]; // [palette_begin to palette_begin+palette_size-1]
-	};
-	frame_t const& frame() const { return *frame_; }
+    int sample_count; // number of samples (always a multiple of chan_count)
+    int chan_count;   // 1: mono, 2: stereo
 
-	// Read samples for the current frame. Returns number of samples read into buffer.
-	// Currently all samples must be read in one call.
-	virtual long read_samples( short* out, long max_samples );
+    int top;               // top-left position of image in graphics buffer
+    unsigned char *pixels; // pointer to top-left pixel of image
+    long pitch;            // number of bytes to get to next row of image
 
-// Additional features
+    int palette_begin;               // first host palette entry, as set by set_palette_range()
+    int palette_size;                // number of entries used for current frame
+    short palette[max_palette_size]; // [palette_begin to palette_begin+palette_size-1]
+  };
+  frame_t const &frame() const { return *frame_; }
 
-	// Use already-loaded cartridge. Retains pointer, so it must be kept around until
-	// closed. A cartridge can be shared among multiple emulators. After opening,
-	// cartridge's CHR data shouldn't be modified since a copy is cached internally.
-	void set_cart( Nes_Cart const* );
+  // Read samples for the current frame. Returns number of samples read into buffer.
+  // Currently all samples must be read in one call.
+  virtual long read_samples(short *out, long max_samples);
 
-	// Pointer to current cartridge, or NULL if none is loaded
-	Nes_Cart const* cart() const { return emu.cart; }
+  // Additional features
 
-	// Emulate powering NES off and then back on. If full_reset is false, emulates
-	// pressing the reset button only, which doesn't affect memory, otherwise
-	// emulates powering system off then on.
-	virtual void reset( bool full_reset = true, bool erase_battery_ram = false );
+  // Use already-loaded cartridge. Retains pointer, so it must be kept around until
+  // closed. A cartridge can be shared among multiple emulators. After opening,
+  // cartridge's CHR data shouldn't be modified since a copy is cached internally.
+  void set_cart(Nes_Cart const *);
 
-	// Number of undefined CPU instructions encountered. Cleared after reset() and
-	// load_state(). A non-zero value indicates that cartridge is probably
-	// incompatible.
-	unsigned long error_count() const { return emu.error_count; }
+  // Pointer to current cartridge, or NULL if none is loaded
+  Nes_Cart const *cart() const { return emu.cart; }
 
-// Sound
+  // Emulate powering NES off and then back on. If full_reset is false, emulates
+  // pressing the reset button only, which doesn't affect memory, otherwise
+  // emulates powering system off then on.
+  virtual void reset(bool full_reset = true, bool erase_battery_ram = false);
 
-	// Set sample rate and use a custom sound buffer instead of the default
-	// mono buffer, i.e. Nes_Buffer, Effects_Buffer, etc..
-	const char * set_sample_rate( long rate, Multi_Buffer* );
+  // Number of undefined CPU instructions encountered. Cleared after reset() and
+  // load_state(). A non-zero value indicates that cartridge is probably
+  // incompatible.
+  unsigned long error_count() const { return emu.error_count; }
 
-	// Adjust effective frame rate by changing how many samples are generated each frame.
-	// Allows fine tuning of frame rate to improve synchronization.
-	void set_frame_rate( double rate );
+  // Sound
 
-	// Number of sound channels for current cartridge
-	int channel_count() const { return channel_count_; }
+  // Set sample rate and use a custom sound buffer instead of the default
+  // mono buffer, i.e. Nes_Buffer, Effects_Buffer, etc..
+  const char *set_sample_rate(long rate, Multi_Buffer *);
 
-	// Frequency equalizer parameters
-	struct equalizer_t {
-		double treble; // 5.0 = extra-crisp, -200.0 = muffled
-		long bass;     // 0 = deep, 20000 = tinny
-	};
+  // Adjust effective frame rate by changing how many samples are generated each frame.
+  // Allows fine tuning of frame rate to improve synchronization.
+  void set_frame_rate(double rate);
 
-	// Current frequency equalization
-	equalizer_t const& equalizer() const { return equalizer_; }
+  // Number of sound channels for current cartridge
+  int channel_count() const { return channel_count_; }
 
-	// Change frequency equalization
-	void set_equalizer( equalizer_t const& );
+  // Frequency equalizer parameters
+  struct equalizer_t
+  {
+    double treble; // 5.0 = extra-crisp, -200.0 = muffled
+    long bass;     // 0 = deep, 20000 = tinny
+  };
 
-	// Equalizer presets
-	static equalizer_t const nes_eq;        // NES
-	static equalizer_t const famicom_eq;    // Famicom
-	static equalizer_t const tv_eq;         // TV speaker
-	static equalizer_t const flat_eq;       // Flat EQ
-	static equalizer_t const crisp_eq;      // Crisp EQ (Treble boost)
-	static equalizer_t const tinny_eq;      // Tinny EQ (Like a handheld speaker)
+  // Current frequency equalization
+  equalizer_t const &equalizer() const { return equalizer_; }
 
-// File save/load
+  // Change frequency equalization
+  void set_equalizer(equalizer_t const &);
 
-	// Save emulator state
-  size_t serializeState (uint8_t* buffer) const { return emu.serializeState(buffer); }
-	size_t deserializeState (const uint8_t* buffer) { return emu.deserializeState(buffer); }
+  // Equalizer presets
+  static equalizer_t const nes_eq;     // NES
+  static equalizer_t const famicom_eq; // Famicom
+  static equalizer_t const tv_eq;      // TV speaker
+  static equalizer_t const flat_eq;    // Flat EQ
+  static equalizer_t const crisp_eq;   // Crisp EQ (Treble boost)
+  static equalizer_t const tinny_eq;   // Tinny EQ (Like a handheld speaker)
 
-	// True if current cartridge claims it uses battery-backed memory
-	bool has_battery_ram() const { return cart()->has_battery_ram(); }
+  // File save/load
 
-// Graphics
+  // Save emulator state
+  size_t serializeState(uint8_t *buffer) const { return emu.serializeState(buffer); }
+  size_t deserializeState(const uint8_t *buffer) { return emu.deserializeState(buffer); }
 
-	// Number of frames generated per second
-	enum { frame_rate = 60 };
+  // True if current cartridge claims it uses battery-backed memory
+  bool has_battery_ram() const { return cart()->has_battery_ram(); }
 
-	// Size of fixed NES color table (including the 8 color emphasis modes)
-	enum { color_table_size = 8 * 64 };
+  // Graphics
 
-	// NES color lookup table based on standard NTSC TV decoder. Use nes_ntsc.h to
-	// generate a palette with custom parameters.
-	struct rgb_t { unsigned char red, green, blue; };
-	static rgb_t const nes_colors [color_table_size];
+  // Number of frames generated per second
+  enum
+  {
+    frame_rate = 60
+  };
 
-	// Hide/show/enhance sprites. Sprite mode does not affect emulation accuracy.
-	enum sprite_mode_t {
-		sprites_hidden = 0,
-		sprites_visible = 8,  // limit of 8 sprites per scanline as on NES (default)
-		sprites_enhanced = 64 // unlimited sprites per scanline (no flickering)
-	};
-	void set_sprite_mode( sprite_mode_t n ) { emu.ppu.sprite_limit = n; }
+  // Size of fixed NES color table (including the 8 color emphasis modes)
+  enum
+  {
+    color_table_size = 8 * 64
+  };
 
-	// Set range of host palette entries to use in graphics buffer; default uses
-	// all of them. Begin will be rounded up to next multiple of palette_alignment.
-	// Use frame().palette_begin to find the adjusted beginning entry used.
-	enum { palette_alignment = 64 };
-	void set_palette_range( int begin, int end = 256 );
+  // NES color lookup table based on standard NTSC TV decoder. Use nes_ntsc.h to
+  // generate a palette with custom parameters.
+  struct rgb_t
+  {
+    unsigned char red, green, blue;
+  };
+  static rgb_t const nes_colors[color_table_size];
 
-// Access to emulated memory, for viewer/cheater/debugger
+  // Hide/show/enhance sprites. Sprite mode does not affect emulation accuracy.
+  enum sprite_mode_t
+  {
+    sprites_hidden = 0,
+    sprites_visible = 8,  // limit of 8 sprites per scanline as on NES (default)
+    sprites_enhanced = 64 // unlimited sprites per scanline (no flickering)
+  };
+  void set_sprite_mode(sprite_mode_t n) { emu.ppu.sprite_limit = n; }
 
-	// CHR
-	uint8_t const* chr_mem();
-	long chr_size() const;
-	void write_chr( void const*, long count, long offset );
+  // Set range of host palette entries to use in graphics buffer; default uses
+  // all of them. Begin will be rounded up to next multiple of palette_alignment.
+  // Use frame().palette_begin to find the adjusted beginning entry used.
+  enum
+  {
+    palette_alignment = 64
+  };
+  void set_palette_range(int begin, int end = 256);
 
-	// Nametable
-	uint8_t* nametable_mem()       { return emu.ppu.impl->nt_ram; }
-	long nametable_size() const { return 0x1000; }
+  // Access to emulated memory, for viewer/cheater/debugger
 
-	// Built-in 2K memory
-	enum { low_mem_size = 0x800 };
-	uint8_t* low_mem()             { return emu.low_mem; }
+  // CHR
+  uint8_t const *chr_mem();
+  long chr_size() const;
+  void write_chr(void const *, long count, long offset);
 
-	// Optional 8K memory
-	enum { high_mem_size = 0x2000 };
-	uint8_t* high_mem()            { return emu.impl->sram; }
+  // Nametable
+  uint8_t *nametable_mem() { return emu.ppu.impl->nt_ram; }
+  long nametable_size() const { return 0x1000; }
 
-	// Sprite memory
-	uint8_t* spr_mem()            { return emu.ppu.getSpriteRAM(); }
-	uint16_t spr_mem_size()       { return emu.ppu.getSpriteRAMSize(); }
+  // Built-in 2K memory
+  enum
+  {
+    low_mem_size = 0x800
+  };
+  uint8_t *low_mem() { return emu.low_mem; }
 
-	// End of public interface
-public:
-	const char * set_sample_rate( long rate, class Nes_Buffer* );
-	const char * set_sample_rate( long rate, class Nes_Effects_Buffer* );
-	void irq_changed() { emu.irq_changed(); }
-private:
+  // Optional 8K memory
+  enum
+  {
+    high_mem_size = 0x2000
+  };
+  uint8_t *high_mem() { return emu.impl->sram; }
 
-	frame_t* frame_;
-	int buffer_height_;
-	bool fade_sound_in;
-	bool fade_sound_out;
-	virtual const char * init_();
+  // Sprite memory
+  uint8_t *spr_mem() { return emu.ppu.getSpriteRAM(); }
+  uint16_t spr_mem_size() { return emu.ppu.getSpriteRAMSize(); }
 
-	virtual void loading_state( Nes_State const& ) { }
-	long timestamp() const { return emu.nes.frame_count; }
-	void set_timestamp( long t ) { emu.nes.frame_count = t; }
+  // End of public interface
+  public:
+  const char *set_sample_rate(long rate, class Nes_Buffer *);
+  const char *set_sample_rate(long rate, class Nes_Effects_Buffer *);
+  void irq_changed() { emu.irq_changed(); }
 
-private:
-	// noncopyable
-	Nes_Emu( const Nes_Emu& );
-	Nes_Emu& operator = ( const Nes_Emu& );
+  private:
+  frame_t *frame_;
+  int buffer_height_;
+  bool fade_sound_in;
+  bool fade_sound_out;
+  virtual const char *init_();
 
-	// sound
-	Multi_Buffer* default_sound_buf;
-	Multi_Buffer* sound_buf;
-	unsigned sound_buf_changed_count;
-	Silent_Buffer silent_buffer;
-	equalizer_t equalizer_;
-	int channel_count_;
-	bool sound_enabled;
-	void enable_sound( bool );
-	void clear_sound_buf();
-	void fade_samples( blip_sample_t*, int size, int step );
+  virtual void loading_state(Nes_State const &) {}
+  long timestamp() const { return emu.nes.frame_count; }
+  void set_timestamp(long t) { emu.nes.frame_count = t; }
 
-	char* host_pixels;
-	int host_palette_size;
-	frame_t single_frame;
-	Nes_Cart private_cart;
-	Nes_Core emu; // large; keep at end
+  private:
+  // noncopyable
+  Nes_Emu(const Nes_Emu &);
+  Nes_Emu &operator=(const Nes_Emu &);
 
-	bool init_called;
-	const char * auto_init();
+  // sound
+  Multi_Buffer *default_sound_buf;
+  Multi_Buffer *sound_buf;
+  unsigned sound_buf_changed_count;
+  Silent_Buffer silent_buffer;
+  equalizer_t equalizer_;
+  int channel_count_;
+  bool sound_enabled;
+  void enable_sound(bool);
+  void clear_sound_buf();
+  void fade_samples(blip_sample_t *, int size, int step);
 
-	bool extra_fade_sound_in;
-	bool extra_fade_sound_out;
-	unsigned extra_sound_buf_changed_count;
-public:
-	void SaveAudioBufferState();
-	void RestoreAudioBufferState();
+  char *host_pixels;
+  int host_palette_size;
+  frame_t single_frame;
+  Nes_Cart private_cart;
+  Nes_Core emu; // large; keep at end
+
+  bool init_called;
+  const char *auto_init();
+
+  bool extra_fade_sound_in;
+  bool extra_fade_sound_out;
+  unsigned extra_sound_buf_changed_count;
+
+  public:
+  void SaveAudioBufferState();
+  void RestoreAudioBufferState();
 };
 
-inline void Nes_Emu::set_pixels( void* p, long n )
+inline void Nes_Emu::set_pixels(void *p, long n)
 {
-	host_pixels = (char*) p + n;
-	emu.ppu.host_row_bytes = n;
+  host_pixels = (char *)p + n;
+  emu.ppu.host_row_bytes = n;
 }
 
-inline uint8_t const* Nes_Emu::chr_mem()
+inline uint8_t const *Nes_Emu::chr_mem()
 {
-	return cart()->chr_size() ? (uint8_t*) cart()->chr() : emu.ppu.impl->chr_ram;
+  return cart()->chr_size() ? (uint8_t *)cart()->chr() : emu.ppu.impl->chr_ram;
 }
 
 inline long Nes_Emu::chr_size() const
 {
-	return cart()->chr_size() ? cart()->chr_size() : emu.ppu.chr_addr_size;
+  return cart()->chr_size() ? cart()->chr_size() : emu.ppu.chr_addr_size;
 }
-

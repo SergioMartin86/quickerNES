@@ -19,31 +19,32 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // GNROM
 
-class Mapper066 : public Nes_Mapper {
-	uint8_t bank;
-public:
-	Mapper066()
-	{
-		register_state( &bank, 1 );
-	}
-	
-	virtual void apply_mapping()
-	{
-		int b = bank;
-		bank = ~b;
-		write( 0, 0, b );
-	}
-	
-	virtual void write( nes_time_t, nes_addr_t, int data )
-	{
-		int changed = bank ^ data;
-		bank = data;
-		
-		if ( changed & 0x30 )
-			set_prg_bank( 0x8000, bank_32k, bank >> 4 & 3 );
-		
-		if ( changed & 0x03 )
-			set_chr_bank( 0, bank_8k, bank & 3 );
-	}
-};
+class Mapper066 : public Nes_Mapper
+{
+  uint8_t bank;
 
+  public:
+  Mapper066()
+  {
+    register_state(&bank, 1);
+  }
+
+  virtual void apply_mapping()
+  {
+    int b = bank;
+    bank = ~b;
+    write(0, 0, b);
+  }
+
+  virtual void write(nes_time_t, nes_addr_t, int data)
+  {
+    int changed = bank ^ data;
+    bank = data;
+
+    if (changed & 0x30)
+      set_prg_bank(0x8000, bank_32k, bank >> 4 & 3);
+
+    if (changed & 0x03)
+      set_chr_bank(0, bank_8k, bank & 3);
+  }
+};

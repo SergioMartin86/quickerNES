@@ -1,21 +1,21 @@
-#include <sstream>
-#include <chrono>
 #include "argparse/argparse.hpp"
+#include "nlohmann/json.hpp"
 #include "sha1/sha1.hpp"
 #include "utils.hpp"
-#include "nlohmann/json.hpp"
+#include <chrono>
+#include <sstream>
 
 #ifdef _USE_QUICKNES
-#include "quickNESInstance.hpp"
+  #include "quickNESInstance.hpp"
 #endif
 
 #ifdef _USE_QUICKERNES
-#include "quickerNESInstance.hpp"
+  #include "quickerNESInstance.hpp"
 #endif
 
 int main(int argc, char *argv[])
 {
-   // Parsing command line arguments
+  // Parsing command line arguments
   argparse::ArgumentParser program("tester", "1.0");
 
   program.add_argument("scriptFile")
@@ -31,8 +31,14 @@ int main(int argc, char *argv[])
     .default_value(std::string(""));
 
   // Try to parse arguments
-  try { program.parse_args(argc, argv);  }
-  catch (const std::runtime_error &err) { EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str()); }
+  try
+  {
+    program.parse_args(argc, argv);
+  }
+  catch (const std::runtime_error &err)
+  {
+    EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str());
+  }
 
   // Getting test script file path
   std::string scriptFilePath = program.get<std::string>("scriptFile");
@@ -45,9 +51,9 @@ int main(int argc, char *argv[])
 
   // Loading script file
   std::string scriptJsonRaw;
-  if (loadStringFromFile(scriptJsonRaw, scriptFilePath) == false)  EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
+  if (loadStringFromFile(scriptJsonRaw, scriptFilePath) == false) EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
 
-  // Parsing script 
+  // Parsing script
   const auto scriptJson = nlohmann::json::parse(scriptJsonRaw);
 
   // Getting rom file path
@@ -70,21 +76,21 @@ int main(int argc, char *argv[])
   if (scriptJson["Expected ROM SHA1"].is_string() == false) EXIT_WITH_ERROR("Script file 'Expected ROM SHA1' entry is not a string\n");
   std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
 
-  // Creating emulator instance
-  #ifdef _USE_QUICKNES
+// Creating emulator instance
+#ifdef _USE_QUICKNES
   auto e = QuickNESInstance();
-  #endif
+#endif
 
-  #ifdef _USE_QUICKERNES
+#ifdef _USE_QUICKERNES
   auto e = QuickerNESInstance();
-  #endif
+#endif
 
   // Loading ROM File
   e.loadROMFile(romFilePath);
 
   // If an initial state is provided, load it now
   if (initialStateFilePath != "") e.loadStateFile(initialStateFilePath);
-  
+
   // Disable rendering
   e.disableRendering();
 
@@ -129,11 +135,11 @@ int main(int argc, char *argv[])
   printf("[] Full State Size:         %lu bytes\n", stateSize);
   printf("[] Lite State Size:         %lu bytes\n", liteStateSize);
   printf("[] ********** Running Test **********\n");
-  
+
   fflush(stdout);
-  
+
   // Serializing initial state
-  uint8_t* currentState = (uint8_t*) malloc (stateSize);
+  uint8_t *currentState = (uint8_t *)malloc(stateSize);
   e.serializeState(currentState);
 
   // Check whether to perform each action
@@ -143,13 +149,13 @@ int main(int argc, char *argv[])
 
   // Actually running the sequence
   auto t0 = std::chrono::high_resolution_clock::now();
-  for (const std::string& input : sequence)
+  for (const std::string &input : sequence)
   {
     if (doPreAdvance == true) e.advanceState(input);
     if (doDeserialize == true) e.deserializeState(currentState);
     e.advanceState(input);
     if (doSerialize == true) e.serializeState(currentState);
-  } 
+  }
   auto tf = std::chrono::high_resolution_clock::now();
 
   // Calculating running time
@@ -174,4 +180,3 @@ int main(int argc, char *argv[])
   // If reached this point, everything ran ok
   return 0;
 }
-

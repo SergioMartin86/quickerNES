@@ -18,36 +18,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * This mapper was added by retrowertz for Libretro port of QuickNES.
- * 
+ *
  * Mapper 180 Crazy Climber
  *
  */
- 
+
 #include "mappers/mapper.hpp"
- 
+
 // UxROM (inverted)
 
-class Mapper180 : public Nes_Mapper {
-public:
-	Mapper180()
-	{
-		register_state( &bank, 1 );
-	}
+class Mapper180 : public Nes_Mapper
+{
+  public:
+  Mapper180()
+  {
+    register_state(&bank, 1);
+  }
 
-	virtual void reset_state()
-	{ }
+  virtual void reset_state()
+  {
+  }
 
-	virtual void apply_mapping()
-	{
-		set_prg_bank( 0x8000, bank_16k, 0 );
-		write( 0, 0, bank );
-	}
+  virtual void apply_mapping()
+  {
+    set_prg_bank(0x8000, bank_16k, 0);
+    write(0, 0, bank);
+  }
 
-	virtual void write( nes_time_t, nes_addr_t, int data )
-	{
-		bank = data;
-		set_prg_bank( 0xC000, bank_16k, data );
-	}
+  virtual void write(nes_time_t, nes_addr_t, int data)
+  {
+    bank = data;
+    set_prg_bank(0xC000, bank_16k, data);
+  }
 
-	uint8_t bank;
+  uint8_t bank;
 };

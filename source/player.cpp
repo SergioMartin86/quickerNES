@@ -1,15 +1,15 @@
-#include <cstdlib>
 #include "argparse/argparse.hpp"
-#include "utils.hpp"
 #include "emuInstance.hpp"
 #include "playbackInstance.hpp"
+#include "utils.hpp"
+#include <cstdlib>
 
 #ifdef _USE_QUICKNES
-#include "quickNESInstance.hpp"
+  #include "quickNESInstance.hpp"
 #endif
 
 #ifdef _USE_QUICKERNES
-#include "quickerNESInstance.hpp"
+  #include "quickerNESInstance.hpp"
 #endif
 
 int main(int argc, char *argv[])
@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
     .required();
 
   program.add_argument("stateFile")
-  .help("(Optional) Path to the initial state file to load.")
-  .default_value(std::string(""));
+    .help("(Optional) Path to the initial state file to load.")
+    .default_value(std::string(""));
 
   program.add_argument("--reproduce")
     .help("Plays the entire sequence without interruptions and exit at the end.")
@@ -40,8 +40,14 @@ int main(int argc, char *argv[])
     .implicit_value(true);
 
   // Try to parse arguments
-  try { program.parse_args(argc, argv);  }
-  catch (const std::runtime_error &err) { EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str()); }
+  try
+  {
+    program.parse_args(argc, argv);
+  }
+  catch (const std::runtime_error &err)
+  {
+    EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str());
+  }
 
   // Getting ROM file path
   std::string romFilePath = program.get<std::string>("romFile");
@@ -78,14 +84,14 @@ int main(int argc, char *argv[])
 
   refreshTerminal();
 
-  // Creating emulator instance
-  #ifdef _USE_QUICKNES
+// Creating emulator instance
+#ifdef _USE_QUICKNES
   auto e = QuickNESInstance();
-  #endif
+#endif
 
-  #ifdef _USE_QUICKERNES
+#ifdef _USE_QUICKERNES
   auto e = QuickerNESInstance();
-  #endif
+#endif
 
   // Loading ROM File
   e.loadROMFile(romFilePath);
@@ -110,13 +116,13 @@ int main(int argc, char *argv[])
   bool showFrameInfo = true;
 
   // Interactive section
-  while(continueRunning)
+  while (continueRunning)
   {
     // Updating display
     if (disableRender == false) p.renderFrame(currentStep);
 
     // Getting input
-    const auto& input = p.getStateInput(currentStep);
+    const auto &input = p.getStateInput(currentStep);
 
     // Getting state hash
     const auto hash = p.getStateHash(currentStep);
@@ -158,12 +164,12 @@ int main(int argc, char *argv[])
 
     // Correct current step if requested more than possible
     if (currentStep < 0) currentStep = 0;
-    if (currentStep >= sequenceLength) currentStep = sequenceLength-1;
+    if (currentStep >= sequenceLength) currentStep = sequenceLength - 1;
 
     // Quicksave creation command
     if (command == 's')
     {
-        // Storing state file
+      // Storing state file
       std::string saveFileName = "quicksave.state";
 
       std::string saveData;
@@ -186,4 +192,3 @@ int main(int argc, char *argv[])
   // Ending ncurses window
   finalizeTerminal();
 }
-

@@ -18,36 +18,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * This mapper was added by retrowertz for Libretro port of QuickNES.
- * 
+ *
  * Mapper 94 - HVC-UN1ROM
  * Senjou no Ookami (Japanese version of Commando)
  *
  */
 
 #include "mappers/mapper.hpp"
- 
-// Un1rom 
 
-class Mapper094 : public Nes_Mapper {
-public:
-	Mapper094()
-	{
-		register_state( &bank, 1 );
-	}
+// Un1rom
 
-	virtual void reset_state()
-	{ }
+class Mapper094 : public Nes_Mapper
+{
+  public:
+  Mapper094()
+  {
+    register_state(&bank, 1);
+  }
 
-	virtual void apply_mapping()
-	{
-		write( 0, 0, bank );
-	}
+  virtual void reset_state()
+  {
+  }
 
-	virtual void write( nes_time_t, nes_addr_t, int data )
-	{
-		bank = data;
-		set_prg_bank( 0x8000, bank_16k, bank >> 2 );
-	}
+  virtual void apply_mapping()
+  {
+    write(0, 0, bank);
+  }
 
-	uint8_t bank;
+  virtual void write(nes_time_t, nes_addr_t, int data)
+  {
+    bank = data;
+    set_prg_bank(0x8000, bank_16k, bank >> 2);
+  }
+
+  uint8_t bank;
 };
