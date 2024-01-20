@@ -1,7 +1,7 @@
 // Game_Music_Emu 0.3.0. http://www.slack.net/~ant/
 
-#include "Effects_Buffer.hpp"
 #include <cstring>
+#include "effectsBuffer.hpp"
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

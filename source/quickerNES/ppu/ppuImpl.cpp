@@ -1,6 +1,6 @@
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "Nes_Ppu_Impl.hpp"
+#include "ppuImpl.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -31,7 +31,7 @@ inline void set_be32(void *p, unsigned long n)
 
 #define SET_BE32(addr, data) set_be32(addr, data)
 
-Nes_Ppu_Impl::Nes_Ppu_Impl()
+Ppu_Impl::Ppu_Impl()
 {
   impl = NULL;
   chr_data = NULL;
@@ -47,19 +47,19 @@ Nes_Ppu_Impl::Nes_Ppu_Impl()
   mmc24_latched[1] = 0;
 }
 
-Nes_Ppu_Impl::~Nes_Ppu_Impl()
+Ppu_Impl::~Ppu_Impl()
 {
   close_chr();
   delete impl;
 }
 
-void Nes_Ppu_Impl::all_tiles_modified()
+void Ppu_Impl::all_tiles_modified()
 {
   any_tiles_modified = true;
   memset(modified_tiles, ~0, sizeof modified_tiles);
 }
 
-const char *Nes_Ppu_Impl::open_chr(uint8_t const *new_chr, long chr_data_size)
+const char *Ppu_Impl::open_chr(uint8_t const *new_chr, long chr_data_size)
 {
   close_chr();
 
@@ -99,13 +99,13 @@ const char *Nes_Ppu_Impl::open_chr(uint8_t const *new_chr, long chr_data_size)
   return 0;
 }
 
-void Nes_Ppu_Impl::close_chr()
+void Ppu_Impl::close_chr()
 {
   delete[] tile_cache_mem;
   tile_cache_mem = NULL;
 }
 
-void Nes_Ppu_Impl::set_chr_bank(int addr, int size, long data)
+void Ppu_Impl::set_chr_bank(int addr, int size, long data)
 {
   if (data + size > chr_size)
     data %= chr_size;
@@ -121,7 +121,7 @@ void Nes_Ppu_Impl::set_chr_bank(int addr, int size, long data)
   }
 }
 
-void Nes_Ppu_Impl::set_chr_bank_ex(int addr, int size, long data)
+void Ppu_Impl::set_chr_bank_ex(int addr, int size, long data)
 {
   mmc24_enabled = true;
 
@@ -148,7 +148,7 @@ static uint8_t const initial_palette[0x20] =
   {
     0x0f, 0x01, 0x00, 0x01, 0x00, 0x02, 0x02, 0x0D, 0x08, 0x10, 0x08, 0x24, 0x00, 0x00, 0x04, 0x2C, 0x00, 0x01, 0x34, 0x03, 0x00, 0x04, 0x00, 0x14, 0x00, 0x3A, 0x00, 0x02, 0x00, 0x20, 0x2C, 0x08};
 
-void Nes_Ppu_Impl::reset(bool full_reset)
+void Ppu_Impl::reset(bool full_reset)
 {
   w2000 = 0;
   w2001 = 0;
@@ -178,7 +178,7 @@ void Nes_Ppu_Impl::reset(bool full_reset)
     memset(host_palette, 0, max_palette_size * sizeof *host_palette);
 }
 
-void Nes_Ppu_Impl::capture_palette()
+void Ppu_Impl::capture_palette()
 {
   if (palette_size + palette_increment <= max_palette_size)
   {
@@ -203,7 +203,7 @@ void Nes_Ppu_Impl::capture_palette()
   }
 }
 
-void Nes_Ppu_Impl::run_hblank(int count)
+void Ppu_Impl::run_hblank(int count)
 {
   long addr = (vram_addr & 0x7be0) + (vram_temp & 0x41f) + (count * 0x1000);
   if (w2001 & 0x08)
@@ -235,7 +235,7 @@ inline unsigned long reorder(unsigned long n)
   return ((n << 14) | n);
 }
 
-inline void Nes_Ppu_Impl::update_tile(int index)
+inline void Ppu_Impl::update_tile(int index)
 {
   const uint8_t *in = chr_data + (index)*bytes_per_tile;
   uint8_t *out = (uint8_t *)tile_cache[index];
@@ -274,14 +274,14 @@ inline void Nes_Ppu_Impl::update_tile(int index)
   }
 }
 
-void Nes_Ppu_Impl::rebuild_chr(unsigned long begin, unsigned long end)
+void Ppu_Impl::rebuild_chr(unsigned long begin, unsigned long end)
 {
   unsigned end_index = (end + bytes_per_tile - 1) / bytes_per_tile;
   for (unsigned index = begin / bytes_per_tile; index < end_index; index++)
     update_tile(index);
 }
 
-void Nes_Ppu_Impl::update_tiles(int first_tile)
+void Ppu_Impl::update_tiles(int first_tile)
 {
   int chunk = 0;
   do
@@ -351,7 +351,7 @@ struct calc_sprite_max_scanlines
   }
 };
 
-long Nes_Ppu_Impl::recalc_sprite_max(int scanline)
+long Ppu_Impl::recalc_sprite_max(int scanline)
 {
   int const max_scanline_count = image_height;
 

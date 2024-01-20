@@ -2,22 +2,22 @@
 
 // NES video game console emulator with snapshot support
 
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
-#include "Nes_Cart.hpp"
-#include "Nes_Core.hpp"
+#include "cart.hpp"
+#include "core.hpp"
 #include "apu/Multi_Buffer.hpp"
 
 namespace quickerNES
 {
 
-class Nes_State;
+class State;
 
-class Nes_Emu
+class Emu
 {
   public:
-  Nes_Emu();
-  virtual ~Nes_Emu();
+  Emu();
+  virtual ~Emu();
 
   // Basic setup
 
@@ -30,7 +30,7 @@ class Nes_Emu
   // Size and depth of graphics buffer required for rendering. Note that this
   // is larger than the actual image, with a temporary area around the edge
   // that gets filled with junk.
-  static const uint16_t buffer_width = Nes_Ppu::buffer_width;
+  static const uint16_t buffer_width = Ppu::buffer_width;
   uint16_t buffer_height() const { return buffer_height_; }
   static const uint8_t bits_per_pixel = 8;
 
@@ -90,10 +90,10 @@ class Nes_Emu
   // Use already-loaded cartridge. Retains pointer, so it must be kept around until
   // closed. A cartridge can be shared among multiple emulators. After opening,
   // cartridge's CHR data shouldn't be modified since a copy is cached internally.
-  void set_cart(Nes_Cart const *);
+  void set_cart(Cart const *);
 
   // Pointer to current cartridge, or NULL if none is loaded
-  Nes_Cart const *cart() const { return emu.cart; }
+  Cart const *cart() const { return emu.cart; }
 
   // Emulate powering NES off and then back on. If full_reset is false, emulates
   // pressing the reset button only, which doesn't affect memory, otherwise
@@ -108,7 +108,7 @@ class Nes_Emu
   // Sound
 
   // Set sample rate and use a custom sound buffer instead of the default
-  // mono buffer, i.e. Nes_Buffer, Effects_Buffer, etc..
+  // mono buffer, i.e. Buffer, Effects_Buffer, etc..
   const char *set_sample_rate(long rate, Multi_Buffer *);
 
   // Adjust effective frame rate by changing how many samples are generated each frame.
@@ -219,7 +219,7 @@ class Nes_Emu
 
   // End of public interface
   public:
-  const char *set_sample_rate(long rate, class Nes_Buffer *);
+  const char *set_sample_rate(long rate, class Buffer *);
   const char *set_sample_rate(long rate, class Nes_Effects_Buffer *);
   void irq_changed() { emu.irq_changed(); }
 
@@ -230,14 +230,14 @@ class Nes_Emu
   bool fade_sound_out;
   virtual const char *init_();
 
-  virtual void loading_state(Nes_State const &) {}
+  virtual void loading_state(State const &) {}
   long timestamp() const { return emu.nes.frame_count; }
   void set_timestamp(long t) { emu.nes.frame_count = t; }
 
   private:
   // noncopyable
-  Nes_Emu(const Nes_Emu &);
-  Nes_Emu &operator=(const Nes_Emu &);
+  Emu(const Emu &);
+  Emu &operator=(const Emu &);
 
   // sound
   Multi_Buffer *default_sound_buf;
@@ -254,8 +254,8 @@ class Nes_Emu
   char *host_pixels;
   int host_palette_size;
   frame_t single_frame;
-  Nes_Cart private_cart;
-  Nes_Core emu; // large; keep at end
+  Cart private_cart;
+  Core emu; // large; keep at end
 
   bool init_called;
   const char *auto_init();
@@ -269,18 +269,18 @@ class Nes_Emu
   void RestoreAudioBufferState();
 };
 
-inline void Nes_Emu::set_pixels(void *p, long n)
+inline void Emu::set_pixels(void *p, long n)
 {
   host_pixels = (char *)p + n;
   emu.ppu.host_row_bytes = n;
 }
 
-inline uint8_t const *Nes_Emu::chr_mem()
+inline uint8_t const *Emu::chr_mem()
 {
   return cart()->chr_size() ? (uint8_t *)cart()->chr() : emu.ppu.impl->chr_ram;
 }
 
-inline long Nes_Emu::chr_size() const
+inline long Emu::chr_size() const
 {
   return cart()->chr_size() ? cart()->chr_size() : emu.ppu.chr_addr_size;
 }

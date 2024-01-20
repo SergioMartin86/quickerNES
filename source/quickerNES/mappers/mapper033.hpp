@@ -38,7 +38,7 @@ static_assert(sizeof(tc0190_state_t) == 9);
 
 // TaitoTC0190
 
-class Mapper033 : public Nes_Mapper, tc0190_state_t
+class Mapper033 : public Mapper, tc0190_state_t
 {
   public:
   Mapper033()

@@ -37,7 +37,7 @@ struct mapper244_state_t
 };
 static_assert(sizeof(mapper244_state_t) == 2);
 
-class Mapper244 : public Nes_Mapper, mapper244_state_t
+class Mapper244 : public Mapper, mapper244_state_t
 {
   public:
   Mapper244()

@@ -1,10 +1,10 @@
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/nes-emu/
+// Emu 0.7.0. http://www.slack.net/~ant/nes-emu/
 
 #include <cstring>
 #include <climits>
 #include <cstdio>
-#include "Nes_Cpu.hpp"
-#include "Nes_Core.hpp"
+#include "cpu.hpp"
+#include "core.hpp"
 
 /**
  * Optimizations by Sergio Martin (eien86) 2023-2024
@@ -130,7 +130,7 @@ imm##op:                                \
 }
 
 
-void Nes_Cpu::reset( void const* unmapped_page )
+void Cpu::reset( void const* unmapped_page )
 {
  r.status = 0;
  r.sp = 0;
@@ -190,12 +190,12 @@ void Nes_Cpu::reset( void const* unmapped_page )
   nz |= ~in & st_z;                       \
  } while ( 0 )
 
-inline int32_t Nes_Cpu::read( nes_addr_t addr )
+inline int32_t Cpu::read( nes_addr_t addr )
 {
  return READ( addr );
 }
 
-inline void Nes_Cpu::write( nes_addr_t addr, int value )
+inline void Cpu::write( nes_addr_t addr, int value )
 {
  WRITE( addr, value );
 }
@@ -204,7 +204,7 @@ inline void Nes_Cpu::write( nes_addr_t addr, int value )
 extern uint8_t clock_table [256];
 
 __attribute__((optimize("align-functions=" _PAGE_SIZE)))
- Nes_Cpu::result_t Nes_Cpu::run ( nes_time_t end ) 
+ Cpu::result_t Cpu::run ( nes_time_t end ) 
 {
  set_end_time_( end );
  clock_count = 0;

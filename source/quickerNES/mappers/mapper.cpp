@@ -1,8 +1,8 @@
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "mappers/mapper.hpp"
-#include "Nes_Core.hpp"
+#include "core.hpp"
 #include <cstring>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
@@ -79,7 +79,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 namespace quickerNES
 {
 
-Nes_Mapper::Nes_Mapper()
+Mapper::Mapper()
 {
   emu_ = NULL;
   static char c;
@@ -87,13 +87,13 @@ Nes_Mapper::Nes_Mapper()
   state_size = 0;
 }
 
-Nes_Mapper::~Nes_Mapper()
+Mapper::~Mapper()
 {
 }
 
 // Sets mirroring, maps first 8K CHR in, first and last 16K of PRG,
 // intercepts writes to upper half of memory, and clears registered state.
-void Nes_Mapper::default_reset_state()
+void Mapper::default_reset_state()
 {
   int mirroring = cart_->mirroring();
   if (mirroring & 8)
@@ -113,7 +113,7 @@ void Nes_Mapper::default_reset_state()
   memset(state, 0, state_size);
 }
 
-void Nes_Mapper::reset()
+void Mapper::reset()
 {
   default_reset_state();
   reset_state();
@@ -134,19 +134,19 @@ int mapper_state_t::read(void *p, unsigned long s) const
   return s;
 }
 
-void Nes_Mapper::save_state(mapper_state_t &out)
+void Mapper::save_state(mapper_state_t &out)
 {
   out.write(state, state_size);
 }
 
-void Nes_Mapper::load_state(mapper_state_t const &in)
+void Mapper::load_state(mapper_state_t const &in)
 {
   default_reset_state();
   read_state(in);
   apply_mapping();
 }
 
-void Nes_Mapper::read_state(mapper_state_t const &in)
+void Mapper::read_state(mapper_state_t const &in)
 {
   memset(state, 0, state_size);
   in.read(state, state_size);
@@ -155,29 +155,29 @@ void Nes_Mapper::read_state(mapper_state_t const &in)
 
 // Timing
 
-void Nes_Mapper::irq_changed() { emu_->irq_changed(); }
+void Mapper::irq_changed() { emu_->irq_changed(); }
 
-nes_time_t Nes_Mapper::next_irq(nes_time_t) { return no_irq; }
+nes_time_t Mapper::next_irq(nes_time_t) { return no_irq; }
 
-void Nes_Mapper::a12_clocked() {}
+void Mapper::a12_clocked() {}
 
-void Nes_Mapper::run_until(nes_time_t) {}
+void Mapper::run_until(nes_time_t) {}
 
-void Nes_Mapper::end_frame(nes_time_t) {}
+void Mapper::end_frame(nes_time_t) {}
 
-bool Nes_Mapper::ppu_enabled() const { return emu().ppu.w2001 & 0x08; }
+bool Mapper::ppu_enabled() const { return emu().ppu.w2001 & 0x08; }
 
 // Sound
 
-int Nes_Mapper::channel_count() const { return 0; }
+int Mapper::channel_count() const { return 0; }
 
-void Nes_Mapper::set_channel_buf(int, Blip_Buffer *) {}
+void Mapper::set_channel_buf(int, Blip_Buffer *) {}
 
-void Nes_Mapper::set_treble(blip_eq_t const &) {}
+void Mapper::set_treble(blip_eq_t const &) {}
 
 // Memory mapping
 
-void Nes_Mapper::set_prg_bank(nes_addr_t addr, bank_size_t bs, int bank)
+void Mapper::set_prg_bank(nes_addr_t addr, bank_size_t bs, int bank)
 {
   int bank_size = 1 << bs;
 
@@ -194,42 +194,42 @@ void Nes_Mapper::set_prg_bank(nes_addr_t addr, bank_size_t bs, int bank)
     emu().enable_prg_6000();
 }
 
-void Nes_Mapper::set_chr_bank(nes_addr_t addr, bank_size_t bs, int bank)
+void Mapper::set_chr_bank(nes_addr_t addr, bank_size_t bs, int bank)
 {
   emu().ppu.render_until(emu().clock());
   emu().ppu.set_chr_bank(addr, 1 << bs, bank << bs);
 }
 
-void Nes_Mapper::set_chr_bank_ex(nes_addr_t addr, bank_size_t bs, int bank)
+void Mapper::set_chr_bank_ex(nes_addr_t addr, bank_size_t bs, int bank)
 {
   emu().ppu.render_until(emu().clock());
   emu().ppu.set_chr_bank_ex(addr, 1 << bs, bank << bs);
 }
 
-void Nes_Mapper::mirror_manual(int page0, int page1, int page2, int page3)
+void Mapper::mirror_manual(int page0, int page1, int page2, int page3)
 {
   emu().ppu.render_bg_until(emu().clock());
   emu().ppu.set_nt_banks(page0, page1, page2, page3);
 }
 
-void Nes_Mapper::intercept_reads(nes_addr_t addr, unsigned size)
+void Mapper::intercept_reads(nes_addr_t addr, unsigned size)
 {
   emu().add_mapper_intercept(addr, size, true, false);
 }
 
-void Nes_Mapper::intercept_writes(nes_addr_t addr, unsigned size)
+void Mapper::intercept_writes(nes_addr_t addr, unsigned size)
 {
   emu().add_mapper_intercept(addr, size, false, true);
 }
 
-void Nes_Mapper::enable_sram(bool enabled, bool read_only)
+void Mapper::enable_sram(bool enabled, bool read_only)
 {
   emu_->enable_sram(enabled, read_only);
 }
 
-Nes_Mapper *Nes_Mapper::getMapperFromCode(const int mapperCode)
+Mapper *Mapper::getMapperFromCode(const int mapperCode)
 {
-  Nes_Mapper *mapper = nullptr;
+  Mapper *mapper = nullptr;
 
   // Now checking if the detected mapper code is supported
   if (mapperCode == 0) mapper = new Mapper000();

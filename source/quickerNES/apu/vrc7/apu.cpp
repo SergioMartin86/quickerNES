@@ -24,7 +24,7 @@ static bool IsLittleEndian()
   return false;
 }
 
-Nes_Vrc7::Nes_Vrc7()
+Vrc7::Vrc7()
 {
   opll = OPLL_new(3579545);
   output(NULL);
@@ -32,12 +32,12 @@ Nes_Vrc7::Nes_Vrc7()
   reset();
 }
 
-Nes_Vrc7::~Nes_Vrc7()
+Vrc7::~Vrc7()
 {
   OPLL_delete((OPLL *)opll);
 }
 
-void Nes_Vrc7::reset()
+void Vrc7::reset()
 {
   last_time = 0;
   count = 0;
@@ -53,23 +53,23 @@ void Nes_Vrc7::reset()
   OPLL_reset((OPLL *)opll);
 }
 
-void Nes_Vrc7::volume(double v)
+void Vrc7::volume(double v)
 {
   synth.volume(v * 1. / 3.);
 }
 
-void Nes_Vrc7::treble_eq(blip_eq_t const &eq)
+void Vrc7::treble_eq(blip_eq_t const &eq)
 {
   synth.treble_eq(eq);
 }
 
-void Nes_Vrc7::output(Blip_Buffer *buf)
+void Vrc7::output(Blip_Buffer *buf)
 {
   for (int i = 0; i < osc_count; i++)
     osc_output(i, buf);
 }
 
-void Nes_Vrc7::run_until(nes_time_t end_time)
+void Vrc7::run_until(nes_time_t end_time)
 {
   nes_time_t time = last_time;
 
@@ -105,12 +105,12 @@ void Nes_Vrc7::run_until(nes_time_t end_time)
   last_time = end_time;
 }
 
-void Nes_Vrc7::write_reg(int data)
+void Vrc7::write_reg(int data)
 {
   OPLL_writeIO((OPLL *)opll, 0, data);
 }
 
-void Nes_Vrc7::write_data(nes_time_t time, int data)
+void Vrc7::write_data(nes_time_t time, int data)
 {
   if ((unsigned)(((OPLL *)opll)->adr - 0x10) < 0x36)
   {
@@ -124,14 +124,14 @@ void Nes_Vrc7::write_data(nes_time_t time, int data)
   OPLL_writeIO((OPLL *)opll, 1, data);
 }
 
-void Nes_Vrc7::end_frame(nes_time_t time)
+void Vrc7::end_frame(nes_time_t time)
 {
   if (time > last_time)
     run_until(time);
   last_time -= time;
 }
 
-void Nes_Vrc7::save_snapshot(vrc7_snapshot_t *out)
+void Vrc7::save_snapshot(vrc7_snapshot_t *out)
 {
   out->latch = ((OPLL *)opll)->adr;
   memcpy(out->inst, ((OPLL *)opll)->CustInst, 8);
@@ -152,7 +152,7 @@ void Nes_Vrc7::save_snapshot(vrc7_snapshot_t *out)
   OPLL_state_byteswap(&(out->internal_opl_state));
 }
 
-void Nes_Vrc7::load_snapshot(vrc7_snapshot_t &in, int dataSize)
+void Vrc7::load_snapshot(vrc7_snapshot_t &in, int dataSize)
 {
   reset();
   write_reg(in.latch);
@@ -190,7 +190,7 @@ void Nes_Vrc7::load_snapshot(vrc7_snapshot_t &in, int dataSize)
   update_last_amp();
 }
 
-void Nes_Vrc7::update_last_amp()
+void Vrc7::update_last_amp()
 {
   for (unsigned i = 0; i < osc_count; ++i)
   {

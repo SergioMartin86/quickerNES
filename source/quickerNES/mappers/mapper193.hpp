@@ -32,7 +32,7 @@
 namespace quickerNES
 {
 
-class Mapper193 : public Nes_Mapper
+class Mapper193 : public Mapper
 {
   public:
   Mapper193()

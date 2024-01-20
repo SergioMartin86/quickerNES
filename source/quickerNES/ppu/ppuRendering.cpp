@@ -1,6 +1,6 @@
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "Nes_Ppu_Rendering.hpp"
+#include "ppuRendering.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
@@ -21,8 +21,8 @@ namespace quickerNES
 
 static unsigned zero = 0; // helps CodeWarrior optimizer when added to constants
 
-inline Nes_Ppu_Impl::cached_tile_t const &
-Nes_Ppu_Impl::get_sprite_tile(uint8_t const *sprite)
+inline Ppu_Impl::cached_tile_t const &
+Ppu_Impl::get_sprite_tile(uint8_t const *sprite)
 {
   cached_tile_t *tiles = tile_cache;
   if (sprite[2] & 0x40)
@@ -31,19 +31,19 @@ Nes_Ppu_Impl::get_sprite_tile(uint8_t const *sprite)
 
   // use index directly, since cached tile is same size as native tile
   static_assert(sizeof(cached_tile_t) == bytes_per_tile);
-  return *(Nes_Ppu_Impl::cached_tile_t *)((uint8_t *)tiles + map_chr_addr(index * bytes_per_tile));
+  return *(Ppu_Impl::cached_tile_t *)((uint8_t *)tiles + map_chr_addr(index * bytes_per_tile));
 }
 
-inline Nes_Ppu_Impl::cached_tile_t const &Nes_Ppu_Impl::get_bg_tile(int index)
+inline Ppu_Impl::cached_tile_t const &Ppu_Impl::get_bg_tile(int index)
 {
   // use index directly, since cached tile is same size as native tile
   static_assert(sizeof(cached_tile_t) == bytes_per_tile);
-  return *(Nes_Ppu_Impl::cached_tile_t *)((uint8_t *)tile_cache + map_chr_addr(index * bytes_per_tile));
+  return *(Ppu_Impl::cached_tile_t *)((uint8_t *)tile_cache + map_chr_addr(index * bytes_per_tile));
 }
 
 // Fill
 
-void Nes_Ppu_Rendering::fill_background(int count)
+void Ppu_Rendering::fill_background(int count)
 {
   ptrdiff_t const next_line = scanline_row_bytes - image_width;
   uint32_t *pixels = (uint32_t *)scanline_pixels;
@@ -72,7 +72,7 @@ void Nes_Ppu_Rendering::fill_background(int count)
   }
 }
 
-void Nes_Ppu_Rendering::clip_left(int count)
+void Ppu_Rendering::clip_left(int count)
 {
   ptrdiff_t next_line = scanline_row_bytes;
   uint8_t *p = scanline_pixels;
@@ -86,7 +86,7 @@ void Nes_Ppu_Rendering::clip_left(int count)
   }
 }
 
-void Nes_Ppu_Rendering::save_left(int count)
+void Ppu_Rendering::save_left(int count)
 {
   ptrdiff_t next_line = scanline_row_bytes;
   uint8_t *in = scanline_pixels;
@@ -103,7 +103,7 @@ void Nes_Ppu_Rendering::save_left(int count)
   }
 }
 
-void Nes_Ppu_Rendering::restore_left(int count)
+void Ppu_Rendering::restore_left(int count)
 {
   ptrdiff_t next_line = scanline_row_bytes;
   uint8_t *out = scanline_pixels;
@@ -122,7 +122,7 @@ void Nes_Ppu_Rendering::restore_left(int count)
 
 // Background
 
-void Nes_Ppu_Rendering::draw_background_(int remain)
+void Ppu_Rendering::draw_background_(int remain)
 {
   // Draws 'remain' background scanlines. Does not modify vram_addr.
 
@@ -257,7 +257,7 @@ void Nes_Ppu_Rendering::draw_background_(int remain)
 
 // Sprites
 
-void Nes_Ppu_Rendering::draw_sprites_(int begin, int end)
+void Ppu_Rendering::draw_sprites_(int begin, int end)
 {
   // Draws sprites on scanlines begin through end - 1. Handles clipping.
 
@@ -285,7 +285,7 @@ void Nes_Ppu_Rendering::draw_sprites_(int begin, int end)
       int visible = sprite_height;
 
 #define CLIPPED 0
-#include "Nes_Ppu_Sprites.hpp"
+#include "ppuSprites.hpp"
     }
     else
     {
@@ -306,12 +306,12 @@ void Nes_Ppu_Rendering::draw_sprites_(int begin, int end)
       //       begin, end, top_minus_one + 1, skip, visible );
 
 #define CLIPPED 1
-#include "Nes_Ppu_Sprites.hpp"
+#include "ppuSprites.hpp"
     }
   } while (index < 0x100);
 }
 
-void Nes_Ppu_Rendering::check_sprite_hit(int begin, int end)
+void Ppu_Rendering::check_sprite_hit(int begin, int end)
 {
   // Checks for sprite 0 hit on scanlines begin through end - 1.
   // Updates sprite_hit_found. Background (but not sprites) must have
@@ -406,12 +406,12 @@ void Nes_Ppu_Rendering::check_sprite_hit(int begin, int end)
 
 // Draw scanlines
 
-inline bool Nes_Ppu_Rendering::sprite_hit_possible(int scanline) const
+inline bool Ppu_Rendering::sprite_hit_possible(int scanline) const
 {
   return !sprite_hit_found && spr_ram[0] <= scanline && (w2001 & 0x18) == 0x18;
 }
 
-void Nes_Ppu_Rendering::draw_scanlines(int start, int count, uint8_t *pixels, long pitch, int mode)
+void Ppu_Rendering::draw_scanlines(int start, int count, uint8_t *pixels, long pitch, int mode)
 {
   scanline_pixels = pixels + image_left;
   scanline_row_bytes = pitch;
@@ -475,7 +475,7 @@ void Nes_Ppu_Rendering::draw_scanlines(int start, int count, uint8_t *pixels, lo
   scanline_pixels = NULL;
 }
 
-void Nes_Ppu_Rendering::draw_background(int start, int count)
+void Ppu_Rendering::draw_background(int start, int count)
 {
   // always capture palette at least once per frame
   if ((start + count >= 240 && !palette_size) || (w2001 & palette_changed))

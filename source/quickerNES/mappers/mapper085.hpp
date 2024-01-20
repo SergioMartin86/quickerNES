@@ -1,6 +1,6 @@
 #pragma once
 
-// Nes_Emu 0.5.4. http://www.slack.net/~ant/
+// Emu 0.5.4. http://www.slack.net/~ant/
 
 #include "apu/vrc7/apu.hpp"
 #include "mappers/mapper.hpp"
@@ -40,7 +40,7 @@ static_assert(sizeof(vrc7_state_t) == 20 + sizeof(vrc7_snapshot_t));
 
 // Vrc7
 
-class Mapper085 : public Nes_Mapper, vrc7_state_t
+class Mapper085 : public Mapper, vrc7_state_t
 {
   public:
   Mapper085()
@@ -58,12 +58,12 @@ class Mapper085 : public Nes_Mapper, vrc7_state_t
   virtual void save_state(mapper_state_t &out)
   {
     sound.save_snapshot(&sound_state);
-    Nes_Mapper::save_state(out);
+    Mapper::save_state(out);
   }
 
   virtual void load_state(mapper_state_t const &in)
   {
-    Nes_Mapper::load_state(in);
+    Mapper::load_state(in);
     sound.load_snapshot(sound_state, in.size);
   }
 
@@ -218,7 +218,7 @@ class Mapper085 : public Nes_Mapper, vrc7_state_t
       }
   }
 
-  Nes_Vrc7 sound;
+  Vrc7 sound;
   enum
   {
     timer_period = 113 * 4 + 3

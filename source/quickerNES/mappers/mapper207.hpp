@@ -38,7 +38,7 @@ static_assert(sizeof(taito_x1005_state_t) == 11);
 
 // TaitoX1005
 
-class Mapper207 : public Nes_Mapper, taito_x1005_state_t
+class Mapper207 : public Mapper, taito_x1005_state_t
 {
   public:
   Mapper207()

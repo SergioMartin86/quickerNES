@@ -1,19 +1,19 @@
 #pragma once
 
 // NES PPU emulator graphics rendering
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
-#include "Nes_Ppu_Impl.hpp"
+#include "ppuImpl.hpp"
 
 namespace quickerNES
 {
 
-class Nes_Ppu_Rendering : public Nes_Ppu_Impl
+class Ppu_Rendering : public Ppu_Impl
 {
-  typedef Nes_Ppu_Impl base;
+  typedef Ppu_Impl base;
 
   public:
-  Nes_Ppu_Rendering();
+  Ppu_Rendering();
 
   int sprite_limit;
 
@@ -50,13 +50,13 @@ class Nes_Ppu_Rendering : public Nes_Ppu_Impl
   void check_sprite_hit(int begin, int end);
 };
 
-inline Nes_Ppu_Rendering::Nes_Ppu_Rendering()
+inline Ppu_Rendering::Ppu_Rendering()
 {
   sprite_limit = 8;
   host_pixels = nullptr;
 }
 
-inline void Nes_Ppu_Rendering::draw_sprites(int start, int count)
+inline void Ppu_Rendering::draw_sprites(int start, int count)
 {
   draw_scanlines(start, count, host_pixels + host_row_bytes * start, host_row_bytes, 2);
 }

@@ -1,8 +1,8 @@
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include <cstring>
 #include "mappers/mapper.hpp"
-#include "Nes_Emu.hpp"
+#include "emu.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -20,17 +20,17 @@ namespace quickerNES
 
 int const sound_fade_size = 384;
 
-Nes_Emu::equalizer_t const Nes_Emu::nes_eq     = {  -1.0,   80 };
-Nes_Emu::equalizer_t const Nes_Emu::famicom_eq = { -15.0,   80 };
-Nes_Emu::equalizer_t const Nes_Emu::tv_eq      = { -12.0,  180 };
-Nes_Emu::equalizer_t const Nes_Emu::flat_eq    = {   0.0,    1 };
-Nes_Emu::equalizer_t const Nes_Emu::crisp_eq   = {   5.0,    1 };
-Nes_Emu::equalizer_t const Nes_Emu::tinny_eq   = { -47.0, 2000 };
+Emu::equalizer_t const Emu::nes_eq     = {  -1.0,   80 };
+Emu::equalizer_t const Emu::famicom_eq = { -15.0,   80 };
+Emu::equalizer_t const Emu::tv_eq      = { -12.0,  180 };
+Emu::equalizer_t const Emu::flat_eq    = {   0.0,    1 };
+Emu::equalizer_t const Emu::crisp_eq   = {   5.0,    1 };
+Emu::equalizer_t const Emu::tinny_eq   = { -47.0, 2000 };
 
-Nes_Emu::Nes_Emu()
+Emu::Emu()
 {
 	frame_ = &single_frame;
-	buffer_height_ = Nes_Ppu::buffer_height + 2;
+	buffer_height_ = Ppu::buffer_height + 2;
 	default_sound_buf = NULL;
 	sound_buf = &silent_buffer;
 	sound_buf_changed_count = 0;
@@ -49,17 +49,17 @@ Nes_Emu::Nes_Emu()
 	extra_sound_buf_changed_count = 0;
 }
 
-Nes_Emu::~Nes_Emu()
+Emu::~Emu()
 {
 	delete default_sound_buf;
 }
 
-const char * Nes_Emu::init_()
+const char * Emu::init_()
 {
 	return emu.init();
 }
 
-inline const char * Nes_Emu::auto_init()
+inline const char * Emu::auto_init()
 {
 	if ( !init_called )
 	{
@@ -70,40 +70,40 @@ inline const char * Nes_Emu::auto_init()
 }
 
 
-inline void Nes_Emu::clear_sound_buf()
+inline void Emu::clear_sound_buf()
 {
 	fade_sound_out = false;
 	fade_sound_in = true;
 	sound_buf->clear();
 }
 
-void Nes_Emu::set_cart( Nes_Cart const* new_cart )
+void Emu::set_cart( Cart const* new_cart )
 {
 	auto_init();
 	emu.open( new_cart );
 
-	channel_count_ = Nes_Apu::osc_count + emu.mapper->channel_count();
+	channel_count_ = Apu::osc_count + emu.mapper->channel_count();
 	sound_buf->set_channel_count( channel_count() );
 	set_equalizer( equalizer_ );
 	enable_sound( true );
 	reset();
 }
 
-void Nes_Emu::reset( bool full_reset, bool erase_battery_ram )
+void Emu::reset( bool full_reset, bool erase_battery_ram )
 {
 	clear_sound_buf();
 	set_timestamp( 0 );
 	emu.reset( full_reset, erase_battery_ram );
 }
 
-void Nes_Emu::set_palette_range( int begin, int end )
+void Emu::set_palette_range( int begin, int end )
 {
 	// round up to alignment
 	emu.ppu.palette_begin = (begin + palette_alignment - 1) & ~(palette_alignment - 1);
 	host_palette_size = end - emu.ppu.palette_begin;
 }
 
-const char * Nes_Emu::emulate_skip_frame( int joypad1, int joypad2 )
+const char * Emu::emulate_skip_frame( int joypad1, int joypad2 )
 {
 	char *old_host_pixels = host_pixels;
 	host_pixels = NULL;
@@ -112,7 +112,7 @@ const char * Nes_Emu::emulate_skip_frame( int joypad1, int joypad2 )
 	return 0;
 }
 
-const char * Nes_Emu::emulate_frame( int joypad1, int joypad2 )
+const char * Emu::emulate_frame( int joypad1, int joypad2 )
 {
 	emu.ppu.host_pixels = NULL;
 
@@ -166,41 +166,41 @@ const char * Nes_Emu::emulate_frame( int joypad1, int joypad2 )
 
 // Extras
 
-void Nes_Emu::load_ines( const uint8_t* buffer )
+void Emu::load_ines( const uint8_t* buffer )
 {
 	private_cart.load_ines( buffer );
 	set_cart( &private_cart );
 }
 
-void Nes_Emu::write_chr( void const* p, long count, long offset )
+void Emu::write_chr( void const* p, long count, long offset )
 {
 	long end = offset + count;
 	memcpy( (uint8_t*) chr_mem() + offset, p, count );
 	emu.ppu.rebuild_chr( offset, end );
 }
 
-const char * Nes_Emu::set_sample_rate( long rate, class Nes_Buffer* buf )
+const char * Emu::set_sample_rate( long rate, class Buffer* buf )
 {
-	extern Multi_Buffer* set_apu( class Nes_Buffer*, Nes_Apu* );
+	extern Multi_Buffer* set_apu( class Buffer*, Apu* );
 	auto_init();
 	return set_sample_rate( rate, set_apu( buf, &emu.impl->apu ) );
 }
 
-const char * Nes_Emu::set_sample_rate( long rate, class Nes_Effects_Buffer* buf )
+const char * Emu::set_sample_rate( long rate, class Nes_Effects_Buffer* buf )
 {
-	extern Multi_Buffer* set_apu( class Nes_Effects_Buffer*, Nes_Apu* );
+	extern Multi_Buffer* set_apu( class Nes_Effects_Buffer*, Apu* );
 	auto_init();
 	return set_sample_rate( rate, set_apu( buf, &emu.impl->apu ) );
 }
 
 // Sound
 
-void Nes_Emu::set_frame_rate( double rate )
+void Emu::set_frame_rate( double rate )
 {
 	sound_buf->clock_rate( (long) (1789773 / 60.0 * rate) );
 }
 
-const char * Nes_Emu::set_sample_rate( long rate, Multi_Buffer* new_buf )
+const char * Emu::set_sample_rate( long rate, Multi_Buffer* new_buf )
 {
 	auto_init();
 	emu.impl->apu.volume( 1.0 ); // cancel any previous non-linearity
@@ -216,13 +216,13 @@ const char * Nes_Emu::set_sample_rate( long rate, Multi_Buffer* new_buf )
 	return 0;
 }
 
-const char * Nes_Emu::set_sample_rate( long rate )
+const char * Emu::set_sample_rate( long rate )
 {
 	if ( !default_sound_buf ) default_sound_buf = new Mono_Buffer;
 	return set_sample_rate( rate, default_sound_buf );
 }
 
-void Nes_Emu::set_equalizer( equalizer_t const& eq )
+void Emu::set_equalizer( equalizer_t const& eq )
 {
 	equalizer_ = eq;
 	if ( cart() )
@@ -234,14 +234,14 @@ void Nes_Emu::set_equalizer( equalizer_t const& eq )
 	}
 }
 
-void Nes_Emu::enable_sound( bool enabled )
+void Emu::enable_sound( bool enabled )
 {
 	if ( enabled )
 	{
 		for ( int i = channel_count(); i-- > 0; )
 		{
 			Blip_Buffer* buf = sound_buf->channel( i ).center;
-			int mapper_index = i - Nes_Apu::osc_count;
+			int mapper_index = i - Apu::osc_count;
 			if ( mapper_index < 0 )
 				emu.impl->apu.osc_output( i, buf );
 			else
@@ -251,12 +251,12 @@ void Nes_Emu::enable_sound( bool enabled )
 	else
 	{
 		emu.impl->apu.output( NULL );
-		for ( int i = channel_count() - Nes_Apu::osc_count; i-- > 0; )
+		for ( int i = channel_count() - Apu::osc_count; i-- > 0; )
 			emu.mapper->set_channel_buf( i, NULL );
 	}
 }
 
-void Nes_Emu::fade_samples( blip_sample_t* p, int size, int step )
+void Emu::fade_samples( blip_sample_t* p, int size, int step )
 {
 	if ( size >= sound_fade_size )
 	{
@@ -276,7 +276,7 @@ void Nes_Emu::fade_samples( blip_sample_t* p, int size, int step )
 	}
 }
 
-long Nes_Emu::read_samples( short* out, long out_size )
+long Emu::read_samples( short* out, long out_size )
 {
 	long count = sound_buf->read_samples( out, out_size );
 	if ( fade_sound_in )
@@ -296,7 +296,7 @@ long Nes_Emu::read_samples( short* out, long out_size )
 	return count;
 }
 
-Nes_Emu::rgb_t const Nes_Emu::nes_colors [color_table_size] =
+Emu::rgb_t const Emu::nes_colors [color_table_size] =
 {
 	// generated with nes_ntsc default settings
 	{102,102,102},{  0, 42,136},{ 20, 18,168},{ 59,  0,164},
@@ -430,14 +430,14 @@ Nes_Emu::rgb_t const Nes_Emu::nes_colors [color_table_size] =
 	{136,190,197},{184,184,184},{  0,  0,  0},{  0,  0,  0}
 };
 
-void Nes_Emu::SaveAudioBufferState()
+void Emu::SaveAudioBufferState()
 {
 	extra_fade_sound_in = fade_sound_in;
 	extra_fade_sound_out = fade_sound_out;
 	extra_sound_buf_changed_count = sound_buf_changed_count;
 	sound_buf->SaveAudioBufferState();
 }
-void Nes_Emu::RestoreAudioBufferState()
+void Emu::RestoreAudioBufferState()
 {
 	fade_sound_in = extra_fade_sound_in;
 	fade_sound_out = extra_fade_sound_out;

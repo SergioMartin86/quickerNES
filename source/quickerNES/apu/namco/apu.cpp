@@ -1,5 +1,5 @@
 
-// Nes_Snd_Emu 0.1.7. http://www.slack.net/~ant/
+// Snd_Emu 0.1.7. http://www.slack.net/~ant/
 
 #include "apu/namco/apu.hpp"
 #include "apu/Blip_Buffer.hpp"
@@ -18,18 +18,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 namespace quickerNES
 {
 
-Nes_Namco_Apu::Nes_Namco_Apu()
+Namco_Apu::Namco_Apu()
 {
   output(0);
   volume(1.0);
   reset();
 }
 
-Nes_Namco_Apu::~Nes_Namco_Apu()
+Namco_Apu::~Namco_Apu()
 {
 }
 
-void Nes_Namco_Apu::reset()
+void Namco_Apu::reset()
 {
   last_time = 0;
   addr_reg = 0;
@@ -47,14 +47,14 @@ void Nes_Namco_Apu::reset()
   }
 }
 
-void Nes_Namco_Apu::output(Blip_Buffer *buf)
+void Namco_Apu::output(Blip_Buffer *buf)
 {
   for (int i = 0; i < osc_count; i++)
     osc_output(i, buf);
 }
 
 /*
-void Nes_Namco_Apu::reflect_state( Tagged_Data& data )
+void Namco_Apu::reflect_state( Tagged_Data& data )
 {
   reflect_int16( data, 'ADDR', &addr_reg );
 
@@ -71,7 +71,7 @@ void Nes_Namco_Apu::reflect_state( Tagged_Data& data )
 }
 */
 
-void Nes_Namco_Apu::end_frame(nes_time_t time)
+void Namco_Apu::end_frame(nes_time_t time)
 {
   if (time > last_time)
     run_until(time);
@@ -79,7 +79,7 @@ void Nes_Namco_Apu::end_frame(nes_time_t time)
   last_time -= time;
 }
 
-void Nes_Namco_Apu::run_until(nes_time_t nes_end_time)
+void Namco_Apu::run_until(nes_time_t nes_end_time)
 {
   int active_oscs = (reg[0x7F] >> 4 & 7) + 1;
   for (int i = osc_count - active_oscs; i < osc_count; i++)
@@ -147,7 +147,7 @@ void Nes_Namco_Apu::run_until(nes_time_t nes_end_time)
   last_time = nes_end_time;
 }
 
-void Nes_Namco_Apu::save_state(namco_state_t *out) const
+void Namco_Apu::save_state(namco_state_t *out) const
 {
   out->addr = addr_reg;
   for (int r = 0; r < reg_count; r++)
@@ -162,7 +162,7 @@ void Nes_Namco_Apu::save_state(namco_state_t *out) const
   }
 }
 
-void Nes_Namco_Apu::load_state(namco_state_t const &in)
+void Namco_Apu::load_state(namco_state_t const &in)
 {
   reset();
   addr_reg = in.addr;

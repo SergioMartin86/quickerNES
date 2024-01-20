@@ -2,7 +2,7 @@
 
 // Common simple mappers
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "mappers/mapper.hpp"
 
@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 namespace quickerNES
 {
 
-class Mapper000 : public Nes_Mapper
+class Mapper000 : public Mapper
 {
   public:
   Mapper000() {}

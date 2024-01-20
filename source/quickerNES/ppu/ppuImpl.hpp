@@ -1,7 +1,7 @@
 #pragma once
 
 // NES PPU misc functions and setup
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
 #include <cstdint>
 
@@ -28,11 +28,11 @@ struct ppu_state_t
 };
 static_assert(sizeof(ppu_state_t) == 20 + 0x20);
 
-class Nes_Ppu_Impl : public ppu_state_t
+class Ppu_Impl : public ppu_state_t
 {
   public:
-  Nes_Ppu_Impl();
-  ~Nes_Ppu_Impl();
+  Ppu_Impl();
+  ~Ppu_Impl();
 
   void reset(bool full_reset);
 
@@ -101,7 +101,7 @@ class Nes_Ppu_Impl : public ppu_state_t
   void run_hblank(int);
   int sprite_height() const { return (w2000 >> 2 & 8) + 8; }
 
-  protected:    // friend class Nes_Ppu; private:
+  protected:    // friend class Ppu; private:
   int addr_inc; // pre-calculated $2007 increment (based on w2001 & 0x04)
   int read_2007(int addr);
 
@@ -109,7 +109,7 @@ class Nes_Ppu_Impl : public ppu_state_t
   long recalc_sprite_max(int scanline);
   int first_opaque_sprite_line();
 
-  protected: // friend class Nes_Ppu_Rendering; private:
+  protected: // friend class Ppu_Rendering; private:
   unsigned long palette_offset;
   int palette_changed;
   void capture_palette();
@@ -173,7 +173,7 @@ class Nes_Ppu_Impl : public ppu_state_t
   void update_tile(int index);
 };
 
-inline void Nes_Ppu_Impl::set_nt_banks(int bank0, int bank1, int bank2, int bank3)
+inline void Ppu_Impl::set_nt_banks(int bank0, int bank1, int bank2, int bank3)
 {
   uint8_t *nt_ram = impl->nt_ram;
   nt_banks[0] = &nt_ram[bank0 * 0x400];
@@ -182,14 +182,14 @@ inline void Nes_Ppu_Impl::set_nt_banks(int bank0, int bank1, int bank2, int bank
   nt_banks[3] = &nt_ram[bank3 * 0x400];
 }
 
-inline int Nes_Ppu_Impl::map_palette(int addr)
+inline int Ppu_Impl::map_palette(int addr)
 {
   if ((addr & 3) == 0)
     addr &= 0x0f; // 0x10, 0x14, 0x18, 0x1c map to 0x00, 0x04, 0x08, 0x0c
   return addr & 0x1f;
 }
 
-inline int Nes_Ppu_Impl::sprite_tile_index(uint8_t const *sprite) const
+inline int Ppu_Impl::sprite_tile_index(uint8_t const *sprite) const
 {
   int tile = sprite[1] + (w2000 << 5 & 0x100);
   if (w2000 & 0x20)
@@ -197,7 +197,7 @@ inline int Nes_Ppu_Impl::sprite_tile_index(uint8_t const *sprite) const
   return tile;
 }
 
-inline int Nes_Ppu_Impl::write_2007(int data)
+inline int Ppu_Impl::write_2007(int data)
 {
   int addr = vram_addr;
   uint8_t *chr_ram = this->chr_ram; // pre-read
@@ -235,7 +235,7 @@ inline int Nes_Ppu_Impl::write_2007(int data)
   return changed;
 }
 
-inline void Nes_Ppu_Impl::begin_frame()
+inline void Ppu_Impl::begin_frame()
 {
   palette_changed = 0x18;
   palette_size = 0;

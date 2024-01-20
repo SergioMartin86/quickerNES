@@ -2,7 +2,7 @@
 #pragma once
 
 // Konami VRC6 sound chip emulator
-// Nes_Snd_Emu 0.1.7
+// Snd_Emu 0.1.7
 
 #include <cstdint>
 #include "apu/Blip_Buffer.hpp"
@@ -13,13 +13,13 @@ namespace quickerNES
 
 struct vrc6_apu_state_t;
 
-class Nes_Vrc6_Apu
+class Vrc6_Apu
 {
   public:
-  Nes_Vrc6_Apu();
-  ~Nes_Vrc6_Apu();
+  Vrc6_Apu();
+  ~Vrc6_Apu();
 
-  // See Nes_Apu.h for reference
+  // See Apu.h for reference
   void reset();
   void volume(double);
   void treble_eq(blip_eq_t const &);
@@ -52,8 +52,8 @@ class Nes_Vrc6_Apu
 
   private:
   // noncopyable
-  Nes_Vrc6_Apu(const Nes_Vrc6_Apu &);
-  Nes_Vrc6_Apu &operator=(const Nes_Vrc6_Apu &);
+  Vrc6_Apu(const Vrc6_Apu &);
+  Vrc6_Apu &operator=(const Vrc6_Apu &);
 
   struct Vrc6_Osc
   {
@@ -91,19 +91,19 @@ struct vrc6_apu_state_t
 };
 static_assert(sizeof(vrc6_apu_state_t) == 20);
 
-inline void Nes_Vrc6_Apu::osc_output(int i, Blip_Buffer *buf)
+inline void Vrc6_Apu::osc_output(int i, Blip_Buffer *buf)
 {
   oscs[i].output = buf;
 }
 
-inline void Nes_Vrc6_Apu::volume(double v)
+inline void Vrc6_Apu::volume(double v)
 {
   double const factor = 0.0967 * 2;
   saw_synth.volume(factor / 31 * v);
   square_synth.volume(factor * 0.5 / 15 * v);
 }
 
-inline void Nes_Vrc6_Apu::treble_eq(blip_eq_t const &eq)
+inline void Vrc6_Apu::treble_eq(blip_eq_t const &eq)
 {
   saw_synth.treble_eq(eq);
   square_synth.treble_eq(eq);

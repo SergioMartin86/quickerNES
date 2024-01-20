@@ -39,7 +39,7 @@ static_assert(sizeof(mapper32_state_t) == 12);
 
 // Irem_G101
 
-class Mapper032 : public Nes_Mapper, mapper32_state_t
+class Mapper032 : public Mapper, mapper32_state_t
 {
   public:
   Mapper032()

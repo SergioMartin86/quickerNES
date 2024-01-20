@@ -40,7 +40,7 @@ static_assert(sizeof(namco_34xx_state_t) == 10);
 
 // Namco_34xx
 
-class Mapper206 : public Nes_Mapper, namco_34xx_state_t
+class Mapper206 : public Mapper, namco_34xx_state_t
 {
   public:
   Mapper206()

@@ -1,10 +1,10 @@
 #pragma once
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "mappers/mapper.hpp"
 
-#include "Nes_Core.hpp"
+#include "core.hpp"
 #include <cstring>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
@@ -24,8 +24,8 @@ namespace quickerNES
 // 264 or less breaks Gargoyle's Quest II
 // 267 or less breaks Magician
 int const irq_fine_tune = 268;
-nes_time_t const first_scanline = 20 * Nes_Ppu::scanline_len + irq_fine_tune;
-nes_time_t const last_scanline = first_scanline + 240 * Nes_Ppu::scanline_len;
+nes_time_t const first_scanline = 20 * Ppu::scanline_len + irq_fine_tune;
+nes_time_t const last_scanline = first_scanline + 240 * Ppu::scanline_len;
 
 // MMC3
 
@@ -42,7 +42,7 @@ struct mmc3_state_t
 };
 static_assert(sizeof(mmc3_state_t) == 15);
 
-class Mapper004 : public Nes_Mapper, mmc3_state_t
+class Mapper004 : public Mapper, mmc3_state_t
 {
   public:
   Mapper004()
@@ -144,7 +144,7 @@ class Mapper004 : public Nes_Mapper, mmc3_state_t
     {
       if (bg_enabled)
         clock_counter();
-      next_time += Nes_Ppu::scanline_len;
+      next_time += Ppu::scanline_len;
     }
   }
 

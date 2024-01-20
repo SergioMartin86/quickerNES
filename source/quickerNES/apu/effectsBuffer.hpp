@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 namespace quickerNES
-{
+{ 
 
 // Effects_Buffer uses several buffers and outputs stereo sample pairs.
 class Effects_Buffer : public Multi_Buffer

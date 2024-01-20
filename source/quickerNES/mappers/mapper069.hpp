@@ -2,7 +2,7 @@
 
 // Sunsoft FME-7 mapper
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
+// Emu 0.7.0. http://www.slack.net/~ant/libs/
 
 #include "apu/fme7/apu.hpp"
 #include "mappers/mapper.hpp"
@@ -37,7 +37,7 @@ static_assert(sizeof(fme7_state_t) == 18 + sizeof(fme7_apu_state_t));
 
 // Fme7
 
-class Mapper069 : public Nes_Mapper, fme7_state_t
+class Mapper069 : public Mapper, fme7_state_t
 {
   public:
   Mapper069()
@@ -62,12 +62,12 @@ class Mapper069 : public Nes_Mapper, fme7_state_t
   virtual void save_state(mapper_state_t &out)
   {
     sound.save_state(&sound_state);
-    Nes_Mapper::save_state(out);
+    Mapper::save_state(out);
   }
 
   virtual void read_state(mapper_state_t const &in)
   {
-    Nes_Mapper::read_state(in);
+    Mapper::read_state(in);
     sound.load_state(sound_state);
   }
 
@@ -187,7 +187,7 @@ class Mapper069 : public Nes_Mapper, fme7_state_t
   }
 
   nes_time_t last_time;
-  Nes_Fme7_Apu sound;
+  Fme7_Apu sound;
 };
 
 } // namespace quickNES

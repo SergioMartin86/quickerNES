@@ -2,9 +2,9 @@
 
 // NES MMC5 mapper, currently only tailored for Castlevania 3 (U)
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "Nes_Core.hpp"
+#include "core.hpp"
 #include "mappers/mapper.hpp"
 #include <cstring>
 
@@ -35,7 +35,7 @@ static_assert(sizeof(mmc5_state_t) == 0x31);
 
 // MMC5
 
-class Mapper005 : public Nes_Mapper, mmc5_state_t
+class Mapper005 : public Mapper, mmc5_state_t
 {
   public:
   Mapper005()
@@ -57,7 +57,7 @@ class Mapper005 : public Nes_Mapper, mmc5_state_t
 
   virtual void read_state(mapper_state_t const &in)
   {
-    Nes_Mapper::read_state(in);
+    Mapper::read_state(in);
     irq_time = no_irq;
   }
 

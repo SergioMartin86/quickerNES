@@ -1,7 +1,7 @@
 #pragma once
 
 // Namco 106 sound chip emulator
-// Nes_Snd_Emu 0.1.7
+// Snd_Emu 0.1.7
 
 #include <cstdint>
 #include "apu/apu.hpp"
@@ -19,13 +19,13 @@ struct namco_state_t
 };
 static_assert(sizeof(namco_state_t) == 172);
 
-class Nes_Namco_Apu
+class Namco_Apu
 {
   public:
-  Nes_Namco_Apu();
-  ~Nes_Namco_Apu();
+  Namco_Apu();
+  ~Namco_Apu();
 
-  // See Nes_Apu.h for reference.
+  // See Apu.h for reference.
   void volume(double);
   void treble_eq(const blip_eq_t &);
   void output(Blip_Buffer *);
@@ -58,8 +58,8 @@ class Nes_Namco_Apu
 
   private:
   // noncopyable
-  Nes_Namco_Apu(const Nes_Namco_Apu &);
-  Nes_Namco_Apu &operator=(const Nes_Namco_Apu &);
+  Namco_Apu(const Namco_Apu &);
+  Namco_Apu &operator=(const Namco_Apu &);
 
   struct Namco_Osc
   {
@@ -85,7 +85,7 @@ class Nes_Namco_Apu
   void run_until(nes_time_t);
 };
 
-inline uint8_t &Nes_Namco_Apu::access()
+inline uint8_t &Namco_Apu::access()
 {
   int addr = addr_reg & 0x7f;
   if (addr_reg & 0x80)
@@ -93,20 +93,20 @@ inline uint8_t &Nes_Namco_Apu::access()
   return reg[addr];
 }
 
-inline void Nes_Namco_Apu::volume(double v) { synth.volume(0.10 / +osc_count * v); }
+inline void Namco_Apu::volume(double v) { synth.volume(0.10 / +osc_count * v); }
 
-inline void Nes_Namco_Apu::treble_eq(const blip_eq_t &eq) { synth.treble_eq(eq); }
+inline void Namco_Apu::treble_eq(const blip_eq_t &eq) { synth.treble_eq(eq); }
 
-inline void Nes_Namco_Apu::write_addr(int v) { addr_reg = v; }
+inline void Namco_Apu::write_addr(int v) { addr_reg = v; }
 
-inline int Nes_Namco_Apu::read_data() { return access(); }
+inline int Namco_Apu::read_data() { return access(); }
 
-inline void Nes_Namco_Apu::osc_output(int i, Blip_Buffer *buf)
+inline void Namco_Apu::osc_output(int i, Blip_Buffer *buf)
 {
   oscs[i].output = buf;
 }
 
-inline void Nes_Namco_Apu::write_data(nes_time_t time, int data)
+inline void Namco_Apu::write_data(nes_time_t time, int data)
 {
   run_until(time);
   access() = data;

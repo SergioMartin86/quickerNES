@@ -1,5 +1,5 @@
 
-// Nes_Snd_Emu 0.1.7. http://www.slack.net/~ant/
+// Snd_Emu 0.1.7. http://www.slack.net/~ant/
 
 #include "apu.hpp"
 
@@ -17,15 +17,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 namespace quickerNES
 {
 
-// Nes_Osc
+// Osc
 
-void Nes_Osc::clock_length(int halt_mask)
+void Osc::clock_length(int halt_mask)
 {
   if (length_counter && !(regs[0] & halt_mask))
     length_counter--;
 }
 
-void Nes_Envelope::clock_envelope()
+void Envelope::clock_envelope()
 {
   int period = regs[0] & 15;
   if (reg_written[3])
@@ -42,15 +42,15 @@ void Nes_Envelope::clock_envelope()
   }
 }
 
-int Nes_Envelope::volume() const
+int Envelope::volume() const
 {
   return length_counter == 0 ? 0 : (regs[0] & 0x10) ? (regs[0] & 15)
                                                     : envelope;
 }
 
-// Nes_Square
+// Square
 
-void Nes_Square::clock_sweep(int negative_adjust)
+void Square::clock_sweep(int negative_adjust)
 {
   int sweep = regs[1];
 
@@ -85,7 +85,7 @@ void Nes_Square::clock_sweep(int negative_adjust)
 }
 
 // TODO: clean up
-inline nes_time_t Nes_Square::maintain_phase(nes_time_t time, nes_time_t end_time, nes_time_t timer_period)
+inline nes_time_t Square::maintain_phase(nes_time_t time, nes_time_t end_time, nes_time_t timer_period)
 {
   long remain = end_time - time;
   if (remain > 0)
@@ -97,7 +97,7 @@ inline nes_time_t Nes_Square::maintain_phase(nes_time_t time, nes_time_t end_tim
   return time;
 }
 
-void Nes_Square::run(nes_time_t time, nes_time_t end_time)
+void Square::run(nes_time_t time, nes_time_t end_time)
 {
   const int period = this->period();
   const int timer_period = (period + 1) * 2;
@@ -168,9 +168,9 @@ void Nes_Square::run(nes_time_t time, nes_time_t end_time)
   delay = time - end_time;
 }
 
-// Nes_Triangle
+// Triangle
 
-void Nes_Triangle::clock_linear_counter()
+void Triangle::clock_linear_counter()
 {
   if (reg_written[3])
     linear_counter = regs[0] & 0x7f;
@@ -181,7 +181,7 @@ void Nes_Triangle::clock_linear_counter()
     reg_written[3] = false;
 }
 
-inline int Nes_Triangle::calc_amp() const
+inline int Triangle::calc_amp() const
 {
   int amp = phase_range - phase;
   if (amp < 0)
@@ -190,7 +190,7 @@ inline int Nes_Triangle::calc_amp() const
 }
 
 // TODO: clean up
-inline nes_time_t Nes_Triangle::maintain_phase(nes_time_t time, nes_time_t end_time, nes_time_t timer_period)
+inline nes_time_t Triangle::maintain_phase(nes_time_t time, nes_time_t end_time, nes_time_t timer_period)
 {
   long remain = end_time - time;
   if (remain > 0)
@@ -203,7 +203,7 @@ inline nes_time_t Nes_Triangle::maintain_phase(nes_time_t time, nes_time_t end_t
   return time;
 }
 
-void Nes_Triangle::run(nes_time_t time, nes_time_t end_time)
+void Triangle::run(nes_time_t time, nes_time_t end_time)
 {
   const int timer_period = period() + 1;
   if (!output)
@@ -261,9 +261,9 @@ void Nes_Triangle::run(nes_time_t time, nes_time_t end_time)
   delay = time - end_time;
 }
 
-// Nes_Dmc
+// Dmc
 
-void Nes_Dmc::reset()
+void Dmc::reset()
 {
   address = 0;
   dac = 0;
@@ -272,17 +272,17 @@ void Nes_Dmc::reset()
   bits = 0;
   buf_full = false;
   silence = true;
-  next_irq = Nes_Apu::no_irq;
+  next_irq = Apu::no_irq;
   irq_flag = false;
   irq_enabled = false;
 
-  Nes_Osc::reset();
+  Osc::reset();
   period = 0x1ac;
 }
 
-void Nes_Dmc::recalc_irq()
+void Dmc::recalc_irq()
 {
-  nes_time_t irq = Nes_Apu::no_irq;
+  nes_time_t irq = Apu::no_irq;
   if (irq_enabled && length_counter)
     irq = apu->last_dmc_time + delay +
           ((length_counter - 1) * 8 + bits_remain - 1) * nes_time_t(period) + 1;
@@ -293,7 +293,7 @@ void Nes_Dmc::recalc_irq()
   }
 }
 
-int Nes_Dmc::count_reads(nes_time_t time, nes_time_t *last_read) const
+int Dmc::count_reads(nes_time_t time, nes_time_t *last_read) const
 {
   if (last_read)
     *last_read = time;
@@ -338,7 +338,7 @@ static const short dmc_period_table[2][16] = {
    0x032} // to do: verify PAL periods
 };
 
-inline void Nes_Dmc::reload_sample()
+inline void Dmc::reload_sample()
 {
   address = 0x4000 + regs[2] * 0x40;
   length_counter = regs[3] * 0x10 + 1;
@@ -476,7 +476,7 @@ static const unsigned char dac_table[128] =
     83,
 };
 
-void Nes_Dmc::write_register(int addr, int data)
+void Dmc::write_register(int addr, int data)
 {
   if (addr == 0)
   {
@@ -498,14 +498,14 @@ void Nes_Dmc::write_register(int addr, int data)
   }
 }
 
-void Nes_Dmc::start()
+void Dmc::start()
 {
   reload_sample();
   fill_buffer();
   recalc_irq();
 }
 
-void Nes_Dmc::fill_buffer()
+void Dmc::fill_buffer()
 {
   if (!buf_full && length_counter)
   {
@@ -522,14 +522,14 @@ void Nes_Dmc::fill_buffer()
       {
         apu->osc_enables &= ~0x10;
         irq_flag = irq_enabled;
-        next_irq = Nes_Apu::no_irq;
+        next_irq = Apu::no_irq;
         apu->irq_changed();
       }
     }
   }
 }
 
-void Nes_Dmc::run(nes_time_t time, nes_time_t end_time)
+void Dmc::run(nes_time_t time, nes_time_t end_time)
 {
   int delta = update_amp(dac);
   if (!output)
@@ -597,12 +597,12 @@ void Nes_Dmc::run(nes_time_t time, nes_time_t end_time)
   delay = time - end_time;
 }
 
-// Nes_Noise
+// Noise
 
 static const short noise_period_table[16] = {
   0x004, 0x008, 0x010, 0x020, 0x040, 0x060, 0x080, 0x0A0, 0x0CA, 0x0FE, 0x17C, 0x1FC, 0x2FA, 0x3F8, 0x7F2, 0xFE4};
 
-void Nes_Noise::run(nes_time_t time, nes_time_t end_time)
+void Noise::run(nes_time_t time, nes_time_t end_time)
 {
   int period = noise_period_table[regs[2] & 15];
 #if NES_APU_NOISE_LOW_CPU

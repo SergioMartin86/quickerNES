@@ -1,4 +1,4 @@
-// Nes_Snd_Emu 0.1.7. http://www.slack.net/~ant/
+// Snd_Emu 0.1.7. http://www.slack.net/~ant/
 
 #include "apu.hpp"
 
@@ -18,7 +18,7 @@ namespace quickerNES
 
 int const amp_range = 15;
 
-Nes_Apu::Nes_Apu() : square1(&square_synth),
+Apu::Apu() : square1(&square_synth),
                      square2(&square_synth)
 {
   dmc.apu = this;
@@ -36,11 +36,11 @@ Nes_Apu::Nes_Apu() : square1(&square_synth),
   reset(false);
 }
 
-Nes_Apu::~Nes_Apu()
+Apu::~Apu()
 {
 }
 
-void Nes_Apu::treble_eq(const blip_eq_t &eq)
+void Apu::treble_eq(const blip_eq_t &eq)
 {
   square_synth.treble_eq(eq);
   triangle.synth.treble_eq(eq);
@@ -48,7 +48,7 @@ void Nes_Apu::treble_eq(const blip_eq_t &eq)
   dmc.synth.treble_eq(eq);
 }
 
-void Nes_Apu::enable_nonlinear(double v)
+void Apu::enable_nonlinear(double v)
 {
   dmc.nonlinear = true;
   square_synth.volume(1.3 * 0.25751258 / 0.742467605 * 0.25 / amp_range * v);
@@ -65,7 +65,7 @@ void Nes_Apu::enable_nonlinear(double v)
   dmc.last_amp = 0;
 }
 
-void Nes_Apu::volume(double v)
+void Apu::volume(double v)
 {
   dmc.nonlinear = false;
   square_synth.volume(0.1128 / amp_range * v);
@@ -74,13 +74,13 @@ void Nes_Apu::volume(double v)
   dmc.synth.volume(0.42545 / 127 * v);
 }
 
-void Nes_Apu::output(Blip_Buffer *buffer)
+void Apu::output(Blip_Buffer *buffer)
 {
   for (int i = 0; i < osc_count; i++)
     osc_output(i, buffer);
 }
 
-void Nes_Apu::reset(bool pal_mode, int initial_dmc_dac)
+void Apu::reset(bool pal_mode, int initial_dmc_dac)
 {
   // to do: time pal frame periods exactly
   frame_period = pal_mode ? 8314 : 7458;
@@ -111,7 +111,7 @@ void Nes_Apu::reset(bool pal_mode, int initial_dmc_dac)
   //   dmc.last_amp = initial_dmc_dac; // prevent output transition
 }
 
-void Nes_Apu::irq_changed()
+void Apu::irq_changed()
 {
   nes_time_t new_irq = dmc.next_irq;
   if (dmc.irq_flag | irq_flag)
@@ -133,7 +133,7 @@ void Nes_Apu::irq_changed()
 
 // frames
 
-void Nes_Apu::run_until(nes_time_t end_time)
+void Apu::run_until(nes_time_t end_time)
 {
   if (end_time > next_dmc_read_time())
   {
@@ -143,7 +143,7 @@ void Nes_Apu::run_until(nes_time_t end_time)
   }
 }
 
-void Nes_Apu::run_until_(nes_time_t end_time)
+void Apu::run_until_(nes_time_t end_time)
 {
   if (end_time == last_time)
     return;
@@ -227,7 +227,7 @@ inline void zero_apu_osc(T *osc, nes_time_t time)
     osc->synth.offset(time, -last_amp, output);
 }
 
-void Nes_Apu::end_frame(nes_time_t end_time)
+void Apu::end_frame(nes_time_t end_time)
 {
   if (end_time > last_time)
     run_until_(end_time);
@@ -266,7 +266,7 @@ void Nes_Apu::end_frame(nes_time_t end_time)
 static const unsigned char length_table[0x20] = {
   0x0A, 0xFE, 0x14, 0x02, 0x28, 0x04, 0x50, 0x06, 0xA0, 0x08, 0x3C, 0x0A, 0x0E, 0x0C, 0x1A, 0x0E, 0x0C, 0x10, 0x18, 0x12, 0x30, 0x14, 0x60, 0x16, 0xC0, 0x18, 0x48, 0x1A, 0x10, 0x1C, 0x20, 0x1E};
 
-void Nes_Apu::write_register(nes_time_t time, nes_addr_t addr, int data)
+void Apu::write_register(nes_time_t time, nes_addr_t addr, int data)
 {
   // Ignore addresses outside range
   if (addr < start_addr || end_addr < addr)
@@ -278,7 +278,7 @@ void Nes_Apu::write_register(nes_time_t time, nes_addr_t addr, int data)
   {
     // Write to channel
     int osc_index = (addr - start_addr) >> 2;
-    Nes_Osc *osc = oscs[osc_index];
+    Osc *osc = oscs[osc_index];
 
     int reg = addr & 3;
     osc->regs[reg] = data;
@@ -297,7 +297,7 @@ void Nes_Apu::write_register(nes_time_t time, nes_addr_t addr, int data)
 
       // reset square phase
       if (osc_index < 2)
-        ((Nes_Square *)osc)->phase = Nes_Square::phase_range - 1;
+        ((Square *)osc)->phase = Square::phase_range - 1;
     }
   }
   else if (addr == 0x4015)
@@ -351,7 +351,7 @@ void Nes_Apu::write_register(nes_time_t time, nes_addr_t addr, int data)
   }
 }
 
-int Nes_Apu::read_status(nes_time_t time)
+int Apu::read_status(nes_time_t time)
 {
   run_until_(time - 1);
 

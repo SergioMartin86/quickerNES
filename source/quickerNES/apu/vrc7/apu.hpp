@@ -2,7 +2,7 @@
 #pragma once
 
 // Konami VRC7 sound chip emulator
-// Nes_Snd_Emu 0.1.7. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
+// Snd_Emu 0.1.7. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
 
 #include <cstdint>
 #include "apu/Blip_Buffer.hpp"
@@ -14,13 +14,13 @@ namespace quickerNES
 struct vrc7_snapshot_t;
 typedef long nes_time_t;
 
-class Nes_Vrc7
+class Vrc7
 {
   public:
-  Nes_Vrc7();
-  ~Nes_Vrc7();
+  Vrc7();
+  ~Vrc7();
 
-  // See Nes_Apu.h for reference
+  // See Apu.h for reference
   void reset();
   void volume(double);
   void treble_eq(blip_eq_t const &);
@@ -40,8 +40,8 @@ class Nes_Vrc7
 
   private:
   // noncopyable
-  Nes_Vrc7(const Nes_Vrc7 &);
-  Nes_Vrc7 &operator=(const Nes_Vrc7 &);
+  Vrc7(const Vrc7 &);
+  Vrc7 &operator=(const Vrc7 &);
 
   struct Vrc7_Osc
   {
@@ -71,7 +71,7 @@ struct vrc7_snapshot_t
 };
 static_assert(sizeof(vrc7_snapshot_t) == 28 + 440 + 4);
 
-inline void Nes_Vrc7::osc_output(int i, Blip_Buffer *buf)
+inline void Vrc7::osc_output(int i, Blip_Buffer *buf)
 {
   oscs[i].output = buf;
 }

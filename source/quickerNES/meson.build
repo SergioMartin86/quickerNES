@@ -2,11 +2,11 @@
 
 quickerNESAPUSrc = [
  'apu/apu.cpp', 
- 'apu/Nes_Oscs.cpp', 
- 'apu/Nes_Buffer.cpp', 
+ 'apu/oscs.cpp', 
+ 'apu/buffer.cpp', 
  'apu/Blip_Buffer.cpp', 
- 'apu/Effects_Buffer.cpp', 
- 'apu/Nes_Effects_Buffer.cpp', 
+ 'apu/NESEffectsBuffer.cpp', 
+ 'apu/effectsBuffer.cpp', 
  'apu/Multi_Buffer.cpp',
  'apu/namco/apu.cpp', 
  'apu/vrc6/apu.cpp', 
@@ -17,15 +17,15 @@ quickerNESAPUSrc = [
 ]
 
 quickerNESPPUSrc = [
- 'ppu/Nes_Ppu.cpp', 
- 'ppu/Nes_Ppu_Impl.cpp', 
- 'ppu/Nes_Ppu_Rendering.cpp',
+ 'ppu/ppu.cpp', 
+ 'ppu/ppuImpl.cpp', 
+ 'ppu/ppuRendering.cpp',
 ]
 
 quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
  'mappers/mapper.cpp', 
- 'Nes_Emu.cpp', 
- 'Nes_Cpu.cpp'
+ 'emu.cpp', 
+ 'cpu.cpp'
 ]
 
 # quickerNES Core Configuration

@@ -1,5 +1,5 @@
 
-// Nes_Snd_Emu 0.1.7. http://www.slack.net/~ant/
+// Snd_Emu 0.1.7. http://www.slack.net/~ant/
 
 #include "apu/vrc6/apu.hpp"
 
@@ -17,18 +17,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 namespace quickerNES
 {
 
-Nes_Vrc6_Apu::Nes_Vrc6_Apu()
+Vrc6_Apu::Vrc6_Apu()
 {
   output(0);
   volume(1.0);
   reset();
 }
 
-Nes_Vrc6_Apu::~Nes_Vrc6_Apu()
+Vrc6_Apu::~Vrc6_Apu()
 {
 }
 
-void Nes_Vrc6_Apu::reset()
+void Vrc6_Apu::reset()
 {
   last_time = 0;
   for (int i = 0; i < osc_count; i++)
@@ -43,13 +43,13 @@ void Nes_Vrc6_Apu::reset()
   }
 }
 
-void Nes_Vrc6_Apu::output(Blip_Buffer *buf)
+void Vrc6_Apu::output(Blip_Buffer *buf)
 {
   for (int i = 0; i < osc_count; i++)
     osc_output(i, buf);
 }
 
-void Nes_Vrc6_Apu::run_until(nes_time_t time)
+void Vrc6_Apu::run_until(nes_time_t time)
 {
   run_square(oscs[0], time);
   run_square(oscs[1], time);
@@ -57,13 +57,13 @@ void Nes_Vrc6_Apu::run_until(nes_time_t time)
   last_time = time;
 }
 
-void Nes_Vrc6_Apu::write_osc(nes_time_t time, int osc_index, int reg, int data)
+void Vrc6_Apu::write_osc(nes_time_t time, int osc_index, int reg, int data)
 {
   run_until(time);
   oscs[osc_index].regs[reg] = data;
 }
 
-void Nes_Vrc6_Apu::end_frame(nes_time_t time)
+void Vrc6_Apu::end_frame(nes_time_t time)
 {
   if (time > last_time)
     run_until(time);
@@ -71,7 +71,7 @@ void Nes_Vrc6_Apu::end_frame(nes_time_t time)
   last_time -= time;
 }
 
-void Nes_Vrc6_Apu::save_state(vrc6_apu_state_t *out) const
+void Vrc6_Apu::save_state(vrc6_apu_state_t *out) const
 {
   out->saw_amp = oscs[2].amp;
   for (int i = 0; i < osc_count; i++)
@@ -85,7 +85,7 @@ void Nes_Vrc6_Apu::save_state(vrc6_apu_state_t *out) const
   }
 }
 
-void Nes_Vrc6_Apu::load_state(vrc6_apu_state_t const &in)
+void Vrc6_Apu::load_state(vrc6_apu_state_t const &in)
 {
   reset();
   oscs[2].amp = in.saw_amp;
@@ -105,7 +105,7 @@ void Nes_Vrc6_Apu::load_state(vrc6_apu_state_t const &in)
   this->run_until(this->last_time);
 }
 
-void Nes_Vrc6_Apu::run_square(Vrc6_Osc &osc, nes_time_t end_time)
+void Vrc6_Apu::run_square(Vrc6_Osc &osc, nes_time_t end_time)
 {
   Blip_Buffer *output = osc.output;
   if (!output)
@@ -157,7 +157,7 @@ void Nes_Vrc6_Apu::run_square(Vrc6_Osc &osc, nes_time_t end_time)
   }
 }
 
-void Nes_Vrc6_Apu::run_saw(nes_time_t end_time)
+void Vrc6_Apu::run_saw(nes_time_t end_time)
 {
   Vrc6_Osc &osc = oscs[2];
   Blip_Buffer *output = osc.output;

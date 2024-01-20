@@ -1,7 +1,7 @@
 
 // Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "apu/Nes_Effects_Buffer.hpp"
+#include "apu/NESEffectsBuffer.hpp"
 #include "apu/apu.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
@@ -27,7 +27,7 @@ Nes_Effects_Buffer::Nes_Effects_Buffer() : Effects_Buffer(true) // nes never use
 
 Nes_Effects_Buffer::~Nes_Effects_Buffer() {}
 
-Multi_Buffer *set_apu(Nes_Effects_Buffer *buf, Nes_Apu *apu)
+Multi_Buffer *set_apu(Nes_Effects_Buffer *buf, Apu *apu)
 {
   buf->set_apu(apu);
   return buf;
@@ -35,9 +35,8 @@ Multi_Buffer *set_apu(Nes_Effects_Buffer *buf, Nes_Apu *apu)
 
 void Nes_Effects_Buffer::enable_nonlinearity(bool b)
 {
-  if (b)
-    clear();
-  Nes_Apu *apu = nonlin.enable(b, channel(2).center);
+  if (b) clear();
+  Apu *apu = nonlin.enable(b, channel(2).center);
   apu->osc_output(0, channel(0).center);
   apu->osc_output(1, channel(1).center);
 }

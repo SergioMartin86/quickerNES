@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Nes_Emu.hpp>
+#include <quickerNES/emu.hpp>
 #include <emuInstance.hpp>
 
 namespace quickerNES
@@ -12,7 +12,7 @@ class QuickerNESInstance : public EmuInstance
   QuickerNESInstance() : EmuInstance()
   {
     // Creating new emulator
-    _nes = new Nes_Emu;
+    _nes = new Emu;
 
     // Allocating video buffer
     video_buffer = (uint8_t *)malloc(image_width * image_height);
@@ -73,7 +73,7 @@ class QuickerNESInstance : public EmuInstance
   uint8_t *video_buffer;
 
   // Emulator instance
-  Nes_Emu *_nes;
+  Emu *_nes;
 };
 
 } // namespace quickNES

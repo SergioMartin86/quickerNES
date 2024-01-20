@@ -31,7 +31,7 @@ namespace quickerNES
 {
 
 template <int mapperId>
-class Mapper_74x161x162x32 : public Nes_Mapper
+class Mapper_74x161x162x32 : public Mapper
 {
   public:
   Mapper_74x161x162x32()

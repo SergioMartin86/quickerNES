@@ -1,6 +1,6 @@
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/libs/
+// Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "apu/Nes_Buffer.hpp"
+#include "apu/buffer.hpp"
 #include "apu/apu.hpp"
 
 /* Library Copyright (C) 2003-2006 Shay Green. This library is free software;
@@ -17,29 +17,29 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 namespace quickerNES
 {
 
-// Nes_Buffer
+// Buffer
 
-Nes_Buffer::Nes_Buffer() : Multi_Buffer(1) {}
+Buffer::Buffer() : Multi_Buffer(1) {}
 
-Nes_Buffer::~Nes_Buffer() {}
+Buffer::~Buffer() {}
 
-Multi_Buffer *set_apu(Nes_Buffer *buf, Nes_Apu *apu)
+Multi_Buffer *set_apu(Buffer *buf, Apu *apu)
 {
   buf->set_apu(apu);
   return buf;
 }
 
-void Nes_Buffer::enable_nonlinearity(bool b)
+void Buffer::enable_nonlinearity(bool b)
 {
   if (b)
     clear();
 
-  Nes_Apu *apu = nonlin.enable(b, &tnd);
+  Apu *apu = nonlin.enable(b, &tnd);
   apu->osc_output(0, &buf);
   apu->osc_output(1, &buf);
 }
 
-const char *Nes_Buffer::set_sample_rate(long rate, int msec)
+const char *Buffer::set_sample_rate(long rate, int msec)
 {
   enable_nonlinearity(nonlin.enabled); // reapply
   buf.set_sample_rate(rate, msec);
@@ -47,26 +47,26 @@ const char *Nes_Buffer::set_sample_rate(long rate, int msec)
   return Multi_Buffer::set_sample_rate(buf.sample_rate(), buf.length());
 }
 
-void Nes_Buffer::clock_rate(long rate)
+void Buffer::clock_rate(long rate)
 {
   buf.clock_rate(rate);
   tnd.clock_rate(rate);
 }
 
-void Nes_Buffer::bass_freq(int freq)
+void Buffer::bass_freq(int freq)
 {
   buf.bass_freq(freq);
   tnd.bass_freq(freq);
 }
 
-void Nes_Buffer::clear()
+void Buffer::clear()
 {
   nonlin.clear();
   buf.clear();
   tnd.clear();
 }
 
-Nes_Buffer::channel_t Nes_Buffer::channel(int i)
+Buffer::channel_t Buffer::channel(int i)
 {
   channel_t c;
   c.center = &buf;
@@ -77,18 +77,18 @@ Nes_Buffer::channel_t Nes_Buffer::channel(int i)
   return c;
 }
 
-void Nes_Buffer::end_frame(blip_time_t length, bool)
+void Buffer::end_frame(blip_time_t length, bool)
 {
   buf.end_frame(length);
   tnd.end_frame(length);
 }
 
-long Nes_Buffer::samples_avail() const
+long Buffer::samples_avail() const
 {
   return buf.samples_avail();
 }
 
-long Nes_Buffer::read_samples(blip_sample_t *out, long count)
+long Buffer::read_samples(blip_sample_t *out, long count)
 {
   count = nonlin.make_nonlinear(tnd, count);
   if (count)
@@ -132,7 +132,7 @@ long Nes_Buffer::read_samples(blip_sample_t *out, long count)
   return count;
 }
 
-void Nes_Buffer::SaveAudioBufferState()
+void Buffer::SaveAudioBufferState()
 {
   SaveAudioBufferStatePrivate();
   nonlin.SaveAudioBufferState();
@@ -140,7 +140,7 @@ void Nes_Buffer::SaveAudioBufferState()
   tnd.SaveAudioBufferState();
 }
 
-void Nes_Buffer::RestoreAudioBufferState()
+void Buffer::RestoreAudioBufferState()
 {
   RestoreAudioBufferStatePrivate();
   nonlin.RestoreAudioBufferState();
@@ -148,16 +148,16 @@ void Nes_Buffer::RestoreAudioBufferState()
   tnd.RestoreAudioBufferState();
 }
 
-// Nes_Nonlinearizer
+// Nonlinearizer
 
-Nes_Nonlinearizer::Nes_Nonlinearizer()
+Nonlinearizer::Nonlinearizer()
 {
   apu = nullptr;
   enabled = true;
 
   float const gain = 0x7fff * 1.3f;
   // don't use entire range, so any overflow will stay within table
-  int const range = (int)((double)table_size * Nes_Apu::nonlinear_tnd_gain());
+  int const range = (int)((double)table_size * Apu::nonlinear_tnd_gain());
   for (int i = 0; i < table_size; i++)
   {
     int const offset = table_size - range;
@@ -174,7 +174,7 @@ Nes_Nonlinearizer::Nes_Nonlinearizer()
   extra_prev = 0;
 }
 
-Nes_Apu *Nes_Nonlinearizer::enable(bool b, Blip_Buffer *buf)
+Apu *Nonlinearizer::enable(bool b, Blip_Buffer *buf)
 {
   apu->osc_output(2, buf);
   apu->osc_output(3, buf);
@@ -189,7 +189,7 @@ Nes_Apu *Nes_Nonlinearizer::enable(bool b, Blip_Buffer *buf)
 
 #define ENTRY(s) table[(s) >> (blip_sample_bits - table_bits - 1) & (table_size - 1)]
 
-long Nes_Nonlinearizer::make_nonlinear(Blip_Buffer &buf, long count)
+long Nonlinearizer::make_nonlinear(Blip_Buffer &buf, long count)
 {
   long avail = buf.samples_avail();
   if (count > avail)
@@ -214,20 +214,20 @@ long Nes_Nonlinearizer::make_nonlinear(Blip_Buffer &buf, long count)
   return count;
 }
 
-void Nes_Nonlinearizer::clear()
+void Nonlinearizer::clear()
 {
   accum = 0;
   prev = ENTRY(86016000); // avoid thump due to APU's triangle dc bias
                           // TODO: still results in slight clicks and thumps
 }
 
-void Nes_Nonlinearizer::SaveAudioBufferState()
+void Nonlinearizer::SaveAudioBufferState()
 {
   extra_accum = accum;
   extra_prev = prev;
 }
 
-void Nes_Nonlinearizer::RestoreAudioBufferState()
+void Nonlinearizer::RestoreAudioBufferState()
 {
   accum = extra_accum;
   prev = extra_prev;

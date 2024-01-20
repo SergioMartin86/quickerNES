@@ -2,7 +2,7 @@
 
 // Namco 106 mapper
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "apu/namco/apu.hpp"
 #include "mappers/mapper.hpp"
@@ -35,7 +35,7 @@ static_assert(sizeof(namco106_state_t) == 20 + sizeof(namco_state_t));
 
 // Namco106
 
-class Mapper019 : public Nes_Mapper, namco106_state_t
+class Mapper019 : public Mapper, namco106_state_t
 {
   public:
   Mapper019()
@@ -128,7 +128,7 @@ class Mapper019 : public Nes_Mapper, namco106_state_t
       return irq_ctr >> 8;
     }
 
-    return Nes_Mapper::read(time, addr);
+    return Mapper::read(time, addr);
   }
 
   virtual bool write_intercepted(nes_time_t time, nes_addr_t addr, int data)
@@ -186,16 +186,16 @@ class Mapper019 : public Nes_Mapper, namco106_state_t
   void save_state(mapper_state_t &out)
   {
     sound.save_state(&sound_state);
-    Nes_Mapper::save_state(out);
+    Mapper::save_state(out);
   }
 
   void read_state(mapper_state_t const &in)
   {
-    Nes_Mapper::read_state(in);
+    Mapper::read_state(in);
     sound.load_state(sound_state);
   }
 
-  Nes_Namco_Apu sound;
+  Namco_Apu sound;
   nes_time_t last_time;
 };
 

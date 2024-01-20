@@ -7,7 +7,7 @@
 namespace quickerNES
 {
 
-class Mapper078 : public Nes_Mapper
+class Mapper078 : public Mapper
 {
   // lower 8 bits are the reg at 8000:ffff
   // next two bits are autodetecting type

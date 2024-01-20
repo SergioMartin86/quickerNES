@@ -1,7 +1,7 @@
 #pragma once
 
 // NES 6502 CPU emulator
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
 #include <cstdint>
 
@@ -11,7 +11,7 @@ namespace quickerNES
 typedef long nes_time_t;     // clock cycle count
 typedef unsigned nes_addr_t; // 16-bit address
 
-class Nes_Cpu
+class Cpu
 {
   public:
   // NES 6502 registers. *Not* kept updated during a call to run().

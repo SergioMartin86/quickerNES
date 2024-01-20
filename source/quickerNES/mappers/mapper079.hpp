@@ -31,7 +31,7 @@ namespace quickerNES
 {
 
 template <bool multicart>
-class Mapper_AveNina : public Nes_Mapper
+class Mapper_AveNina : public Mapper
 {
   public:
   Mapper_AveNina()

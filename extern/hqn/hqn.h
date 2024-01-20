@@ -1,7 +1,6 @@
 #ifndef __HQN_H__
 #define __HQN_H__
 
-#include <Nes_Emu.hpp>
 #include <cstdint>
 #include <stdio.h>
 
@@ -9,14 +8,14 @@
 
 // Creating emulator instance
 #ifdef _USE_QUICKNES
+  #include <Nes_Emu.hpp>
   typedef Nes_Emu emulator_t;
 #endif
 
 #ifdef _USE_QUICKERNES
-  typedef quickerNES::Nes_Emu emulator_t;
+  #include <emu.hpp>
+  typedef quickerNES::Emu emulator_t;
 #endif
-
-
 
 namespace hqn
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 // Konami VRC6 mapper
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "apu/vrc6/apu.hpp"
 #include "mappers/mapper.hpp"
@@ -44,7 +44,7 @@ struct vrc6_state_t
 static_assert(sizeof(vrc6_state_t) == 26 + sizeof(vrc6_apu_state_t));
 
 template <int swapMask>
-class Mapper_Vrc6 : public Nes_Mapper, vrc6_state_t
+class Mapper_Vrc6 : public Mapper, vrc6_state_t
 {
   public:
   Mapper_Vrc6()
@@ -69,7 +69,7 @@ class Mapper_Vrc6 : public Nes_Mapper, vrc6_state_t
   virtual void save_state(mapper_state_t &out)
   {
     sound.save_state(&sound_state);
-    Nes_Mapper::save_state(out);
+    Mapper::save_state(out);
   }
 
   virtual void apply_mapping()
@@ -139,7 +139,7 @@ class Mapper_Vrc6 : public Nes_Mapper, vrc6_state_t
       write_irq(time, addr, data);
   }
   int swap_mask;
-  Nes_Vrc6_Apu sound;
+  Vrc6_Apu sound;
   enum
   {
     timer_period = 113 * 4 + 3
@@ -147,7 +147,7 @@ class Mapper_Vrc6 : public Nes_Mapper, vrc6_state_t
 
   void read_state(mapper_state_t const &in)
   {
-    Nes_Mapper::read_state(in);
+    Mapper::read_state(in);
 
     // to do: eliminate when format is updated
     // old-style registers

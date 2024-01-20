@@ -1,6 +1,6 @@
 #pragma once
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "mappers/mapper.hpp"
 #include <cstring>
@@ -29,7 +29,7 @@ struct mmc1_state_t
 };
 static_assert(sizeof(mmc1_state_t) == 6);
 
-class Mapper001 : public Nes_Mapper, mmc1_state_t
+class Mapper001 : public Mapper, mmc1_state_t
 {
   public:
   Mapper001()

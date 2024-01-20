@@ -1,7 +1,7 @@
 #pragma once
 
 // NES non-linear audio buffer
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
 #include "Multi_Buffer.hpp"
 #include <cstdint>
@@ -9,9 +9,9 @@
 namespace quickerNES
 {
 
-class Nes_Apu;
+class Apu;
 
-class Nes_Nonlinearizer
+class Nonlinearizer
 {
   private:
   enum
@@ -23,7 +23,7 @@ class Nes_Nonlinearizer
     table_size = 1 << table_bits
   };
   int16_t table[table_size];
-  Nes_Apu *apu;
+  Apu *apu;
   long accum;
   long prev;
 
@@ -31,25 +31,25 @@ class Nes_Nonlinearizer
   long extra_prev;
 
   public:
-  Nes_Nonlinearizer();
+  Nonlinearizer();
   bool enabled;
   void clear();
-  void set_apu(Nes_Apu *a) { apu = a; }
-  Nes_Apu *enable(bool, Blip_Buffer *tnd);
+  void set_apu(Apu *a) { apu = a; }
+  Apu *enable(bool, Blip_Buffer *tnd);
   long make_nonlinear(Blip_Buffer &buf, long count);
   void SaveAudioBufferState();
   void RestoreAudioBufferState();
 };
 
-class Nes_Buffer : public Multi_Buffer
+class Buffer : public Multi_Buffer
 {
   public:
-  Nes_Buffer();
-  ~Nes_Buffer();
+  Buffer();
+  ~Buffer();
 
   // Setup APU for use with buffer, including setting its output to this buffer.
-  // If you're using Nes_Emu, this is automatically called for you.
-  void set_apu(Nes_Apu *apu) { nonlin.set_apu(apu); }
+  // If you're using Emu, this is automatically called for you.
+  void set_apu(Apu *apu) { nonlin.set_apu(apu); }
 
   // Enable/disable non-linear output
   void enable_nonlinearity(bool = true);
@@ -71,8 +71,8 @@ class Nes_Buffer : public Multi_Buffer
   private:
   Blip_Buffer buf;
   Blip_Buffer tnd;
-  Nes_Nonlinearizer nonlin;
-  friend Multi_Buffer *set_apu(Nes_Buffer *, Nes_Apu *);
+  Nonlinearizer nonlin;
+  friend Multi_Buffer *set_apu(Buffer *, Apu *);
 
   public:
   virtual void SaveAudioBufferState();

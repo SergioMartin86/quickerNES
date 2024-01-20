@@ -33,7 +33,7 @@ static_assert(sizeof(vrc1_state_t) == 8);
 
 // VRC1
 
-class Mapper075 : public Nes_Mapper, vrc1_state_t
+class Mapper075 : public Mapper, vrc1_state_t
 {
   public:
   Mapper075()

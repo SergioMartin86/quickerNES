@@ -1,28 +1,28 @@
 #pragma once
 
 // NES PPU emulator
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
 #include <climits>
-#include "Nes_Ppu_Rendering.hpp"
+#include "ppuRendering.hpp"
 
 namespace quickerNES
 {
 
-class Nes_Mapper;
-class Nes_Core;
+class Mapper;
+class Core;
 
 typedef long nes_time_t;
 typedef long ppu_time_t; // ppu_time_t = nes_time_t * ppu_overclock
 
 ppu_time_t const ppu_overclock = 3; // PPU clocks for each CPU clock
 
-class Nes_Ppu : public Nes_Ppu_Rendering
+class Ppu : public Ppu_Rendering
 {
-  typedef Nes_Ppu_Rendering base;
+  typedef Ppu_Rendering base;
 
   public:
-  Nes_Ppu(Nes_Core *);
+  Ppu(Core *);
 
   // Begin PPU frame and return beginning CPU timestamp
   nes_time_t begin_frame(ppu_time_t);
@@ -49,7 +49,7 @@ class Nes_Ppu : public Nes_Ppu_Rendering
   int burst_phase;
 
   private:
-  Nes_Core &emu;
+  Core &emu;
 
   enum
   {
@@ -109,35 +109,35 @@ class Nes_Ppu : public Nes_Ppu_Rendering
   void invalidate_sprite_max_();
   void invalidate_sprite_max(nes_time_t);
 
-  friend int nes_cpu_read_likely_ppu(class Nes_Core *, unsigned, nes_time_t);
+  friend int nes_cpu_read_likely_ppu(class Core *, unsigned, nes_time_t);
 };
 
-inline void Nes_Ppu::suspend_rendering()
+inline void Ppu::suspend_rendering()
 {
   next_bg_time = indefinite_time;
   next_sprites_time = indefinite_time;
   extra_clocks = 0;
 }
 
-inline Nes_Ppu::Nes_Ppu(Nes_Core *e) : emu(*e)
+inline Ppu::Ppu(Core *e) : emu(*e)
 {
   burst_phase = 0;
   suspend_rendering();
 }
 
-inline void Nes_Ppu::render_until(nes_time_t t)
+inline void Ppu::render_until(nes_time_t t)
 {
   if (t > next_sprites_time)
     render_until_(t);
 }
 
-inline void Nes_Ppu::render_bg_until(nes_time_t t)
+inline void Ppu::render_bg_until(nes_time_t t)
 {
   if (t > next_bg_time)
     render_bg_until_(t);
 }
 
-inline void Nes_Ppu::update_open_bus(nes_time_t time)
+inline void Ppu::update_open_bus(nes_time_t time)
 {
   if (time >= decay_low) open_bus &= ~0x1F;
   if (time >= decay_high) open_bus &= ~0xE0;

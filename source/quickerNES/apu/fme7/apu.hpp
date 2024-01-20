@@ -1,7 +1,7 @@
 #pragma once
 
 // Sunsoft FME-7 sound emulator
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
 #include <cstdint>
 #include "apu/Blip_Buffer.hpp"
@@ -22,12 +22,12 @@ struct fme7_apu_state_t
 };
 static_assert(sizeof(fme7_apu_state_t) == 24);
 
-class Nes_Fme7_Apu : private fme7_apu_state_t
+class Fme7_Apu : private fme7_apu_state_t
 {
   public:
-  Nes_Fme7_Apu();
+  Fme7_Apu();
 
-  // See Nes_Apu.h for reference
+  // See Apu.h for reference
   void reset();
   void volume(double);
   void treble_eq(blip_eq_t const &);
@@ -64,8 +64,8 @@ class Nes_Fme7_Apu : private fme7_apu_state_t
   // End of public interface
   private:
   // noncopyable
-  Nes_Fme7_Apu(const Nes_Fme7_Apu &);
-  Nes_Fme7_Apu &operator=(const Nes_Fme7_Apu &);
+  Fme7_Apu(const Fme7_Apu &);
+  Fme7_Apu &operator=(const Fme7_Apu &);
 
   static unsigned char amp_table[16];
 
@@ -85,37 +85,37 @@ class Nes_Fme7_Apu : private fme7_apu_state_t
   void run_until(blip_time_t);
 };
 
-inline void Nes_Fme7_Apu::volume(double v)
+inline void Fme7_Apu::volume(double v)
 {
   synth.volume(0.38 / +amp_range * v); // to do: fine-tune
 }
 
-inline void Nes_Fme7_Apu::treble_eq(blip_eq_t const &eq)
+inline void Fme7_Apu::treble_eq(blip_eq_t const &eq)
 {
   synth.treble_eq(eq);
 }
 
-inline void Nes_Fme7_Apu::osc_output(int i, Blip_Buffer *buf)
+inline void Fme7_Apu::osc_output(int i, Blip_Buffer *buf)
 {
   oscs[i].output = buf;
 }
 
-inline void Nes_Fme7_Apu::output(Blip_Buffer *buf)
+inline void Fme7_Apu::output(Blip_Buffer *buf)
 {
   for (int i = 0; i < osc_count; i++)
     osc_output(i, buf);
 }
 
-inline Nes_Fme7_Apu::Nes_Fme7_Apu()
+inline Fme7_Apu::Fme7_Apu()
 {
   output(0);
   volume(1.0);
   reset();
 }
 
-inline void Nes_Fme7_Apu::write_latch(int data) { latch = data; }
+inline void Fme7_Apu::write_latch(int data) { latch = data; }
 
-inline void Nes_Fme7_Apu::write_data(blip_time_t time, int data)
+inline void Fme7_Apu::write_data(blip_time_t time, int data)
 {
   if ((unsigned)latch >= reg_count)
   {
@@ -129,7 +129,7 @@ inline void Nes_Fme7_Apu::write_data(blip_time_t time, int data)
   regs[latch] = data;
 }
 
-inline void Nes_Fme7_Apu::end_frame(blip_time_t time)
+inline void Fme7_Apu::end_frame(blip_time_t time)
 {
   if (time > last_time)
     run_until(time);
@@ -137,12 +137,12 @@ inline void Nes_Fme7_Apu::end_frame(blip_time_t time)
   last_time -= time;
 }
 
-inline void Nes_Fme7_Apu::save_state(fme7_apu_state_t *out) const
+inline void Fme7_Apu::save_state(fme7_apu_state_t *out) const
 {
   *out = *this;
 }
 
-inline void Nes_Fme7_Apu::load_state(fme7_apu_state_t const &in)
+inline void Fme7_Apu::load_state(fme7_apu_state_t const &in)
 {
   reset();
   fme7_apu_state_t *state = this;

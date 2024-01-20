@@ -17,7 +17,7 @@
 #endif
 
 #ifdef _USE_QUICKERNES
-  typedef quickerNES::Nes_Emu emulator_t;
+  typedef quickerNES::Emu emulator_t;
 #endif
 
 struct stepData_t

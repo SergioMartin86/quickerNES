@@ -1,16 +1,16 @@
 #pragma once
 
 // NES 2A03 APU sound chip emulator
-// Nes_Snd_Emu 0.1.7
+// Snd_Emu 0.1.7
 
 #include <climits>
 #include <cstdint>
-#include "Nes_Oscs.hpp"
+#include "oscs.hpp"
 
 namespace quickerNES
 {
 
-class Nes_Apu
+class Apu
 {
   public:
   typedef uint8_t env_t[3];
@@ -82,8 +82,8 @@ class Nes_Apu
   };
   static_assert(sizeof(apu_state_t) == 72);
 
-  Nes_Apu();
-  ~Nes_Apu();
+  Apu();
+  ~Apu();
 
   // Set buffer to generate all sound into, or disable sound if NULL
   void output(Blip_Buffer *);
@@ -162,23 +162,23 @@ class Nes_Apu
 
   // End of public interface.
   private:
-  friend class Nes_Nonlinearizer;
+  friend class Nonlinearizer;
   void enable_nonlinear(double volume);
   static double nonlinear_tnd_gain() { return 0.75; }
 
   private:
-  friend struct Nes_Dmc;
+  friend struct Dmc;
 
   // noncopyable
-  Nes_Apu(const Nes_Apu &);
-  Nes_Apu &operator=(const Nes_Apu &);
+  Apu(const Apu &);
+  Apu &operator=(const Apu &);
 
-  Nes_Osc *oscs[osc_count];
-  Nes_Square square1;
-  Nes_Square square2;
-  Nes_Noise noise;
-  Nes_Triangle triangle;
-  Nes_Dmc dmc;
+  Osc *oscs[osc_count];
+  Square square1;
+  Square square2;
+  Noise noise;
+  Triangle triangle;
+  Dmc dmc;
 
   nes_time_t last_time; // has been run until this time in current frame
   nes_time_t last_dmc_time;
@@ -192,66 +192,66 @@ class Nes_Apu
   bool irq_flag;
   void (*irq_notifier_)(void *user_data);
   void *irq_data;
-  Nes_Square::Synth square_synth; // shared by squares
+  Square::Synth square_synth; // shared by squares
 
   void irq_changed();
   void state_restored();
   void run_until_(nes_time_t);
 
   // TODO: remove
-  friend class Nes_Core;
+  friend class Core;
 };
 
-inline void Nes_Apu::osc_output(int osc, Blip_Buffer *buf)
+inline void Apu::osc_output(int osc, Blip_Buffer *buf)
 {
   oscs[osc]->output = buf;
 }
 
-inline nes_time_t Nes_Apu::earliest_irq(nes_time_t) const
+inline nes_time_t Apu::earliest_irq(nes_time_t) const
 {
   return earliest_irq_;
 }
 
-inline void Nes_Apu::dmc_reader(int (*func)(void *, nes_addr_t), void *user_data)
+inline void Apu::dmc_reader(int (*func)(void *, nes_addr_t), void *user_data)
 {
   dmc.prg_reader_data = user_data;
   dmc.prg_reader = func;
 }
 
-inline void Nes_Apu::irq_notifier(void (*func)(void *user_data), void *user_data)
+inline void Apu::irq_notifier(void (*func)(void *user_data), void *user_data)
 {
   irq_notifier_ = func;
   irq_data = user_data;
 }
 
-inline int Nes_Apu::count_dmc_reads(nes_time_t time, nes_time_t *last_read) const
+inline int Apu::count_dmc_reads(nes_time_t time, nes_time_t *last_read) const
 {
   return dmc.count_reads(time, last_read);
 }
 
-inline nes_time_t Nes_Dmc::next_read_time() const
+inline nes_time_t Dmc::next_read_time() const
 {
   if (length_counter == 0)
-    return Nes_Apu::no_irq; // not reading
+    return Apu::no_irq; // not reading
 
   return apu->last_dmc_time + delay + long(bits_remain - 1) * period;
 }
 
-inline nes_time_t Nes_Apu::next_dmc_read_time() const { return dmc.next_read_time(); }
+inline nes_time_t Apu::next_dmc_read_time() const { return dmc.next_read_time(); }
 
 template <int mode>
 struct apu_reflection
 {
 #define REFLECT(apu, state) (mode ? void(apu = state) : void(state = apu))
 
-  static void reflect_env(Nes_Apu::env_t *state, Nes_Envelope &osc)
+  static void reflect_env(Apu::env_t *state, Envelope &osc)
   {
     REFLECT((*state)[0], osc.env_delay);
     REFLECT((*state)[1], osc.envelope);
     REFLECT((*state)[2], osc.reg_written[3]);
   }
 
-  static void reflect_square(Nes_Apu::square_t &state, Nes_Square &osc)
+  static void reflect_square(Apu::square_t &state, Square &osc)
   {
     reflect_env(&state.env, osc);
     REFLECT(state.delay, osc.delay);
@@ -261,7 +261,7 @@ struct apu_reflection
     REFLECT(state.swp_reset, osc.reg_written[1]);
   }
 
-  static void reflect_triangle(Nes_Apu::triangle_t &state, Nes_Triangle &osc)
+  static void reflect_triangle(Apu::triangle_t &state, Triangle &osc)
   {
     REFLECT(state.delay, osc.delay);
     REFLECT(state.length_counter, osc.length_counter);
@@ -270,7 +270,7 @@ struct apu_reflection
     REFLECT(state.linear_mode, osc.reg_written[3]);
   }
 
-  static void reflect_noise(Nes_Apu::noise_t &state, Nes_Noise &osc)
+  static void reflect_noise(Apu::noise_t &state, Noise &osc)
   {
     reflect_env(&state.env, osc);
     REFLECT(state.delay, osc.delay);
@@ -278,7 +278,7 @@ struct apu_reflection
     REFLECT(state.shift_reg, osc.noise);
   }
 
-  static void reflect_dmc(Nes_Apu::dmc_t &state, Nes_Dmc &osc)
+  static void reflect_dmc(Apu::dmc_t &state, Dmc &osc)
   {
     REFLECT(state.delay, osc.delay);
     REFLECT(state.remain, osc.length_counter);
@@ -295,7 +295,7 @@ struct apu_reflection
   }
 };
 
-inline void Nes_Apu::save_state(apu_state_t *state) const
+inline void Apu::save_state(apu_state_t *state) const
 {
   for (int i = 0; i < osc_count * 4; i++)
   {
@@ -313,7 +313,7 @@ inline void Nes_Apu::save_state(apu_state_t *state) const
   state->apu.irq_flag = irq_flag;
 
   typedef apu_reflection<1> refl;
-  Nes_Apu &apu = *(Nes_Apu *)this; // const_cast
+  Apu &apu = *(Apu *)this; // const_cast
   refl::reflect_square(state->square1, apu.square1);
   refl::reflect_square(state->square2, apu.square2);
   refl::reflect_triangle(state->triangle, apu.triangle);
@@ -321,7 +321,7 @@ inline void Nes_Apu::save_state(apu_state_t *state) const
   refl::reflect_dmc(state->dmc, apu.dmc);
 }
 
-inline void Nes_Apu::load_state(apu_state_t const &state)
+inline void Apu::load_state(apu_state_t const &state)
 {
   reset();
 

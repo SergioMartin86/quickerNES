@@ -13,19 +13,19 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
-#include "Nes_Cpu.hpp"
+#include "cpu.hpp"
 #include "apu/apu.hpp"
 #include "mappers/mapper.hpp"
-#include "ppu/Nes_Ppu.hpp"
+#include "ppu/ppu.hpp"
 #include <cstdio>
 #include <string>
 
 namespace quickerNES
 {
 
-class Nes_Cart;
+class Cart;
 
 #undef NES_EMU_CPU_HOOK
 #ifndef NES_EMU_CPU_HOOK
@@ -34,7 +34,7 @@ class Nes_Cart;
 
 bool const wait_states_enabled = true;
 bool const single_instruction_mode = false; // for debugging irq/nmi timing issues
-const int unmapped_fill = Nes_Cpu::page_wrap_opcode;
+const int unmapped_fill = Cpu::page_wrap_opcode;
 unsigned const low_ram_size = 0x800;
 unsigned const low_ram_end = 0x2000;
 unsigned const sram_end = 0x8000;
@@ -68,12 +68,12 @@ struct cpu_state_t
 };
 static_assert(sizeof(cpu_state_t) == 8);
 
-class Nes_Core : private Nes_Cpu
+class Core : private Cpu
 {
-  typedef Nes_Cpu cpu;
+  typedef Cpu cpu;
 
   public:
-  Nes_Core() : ppu(this)
+  Core() : ppu(this)
   {
     cart = NULL;
     impl = NULL;
@@ -82,7 +82,7 @@ class Nes_Core : private Nes_Cpu
     memset(&joypad, 0, sizeof joypad);
   }
 
-  ~Nes_Core()
+  ~Core()
   {
     close();
     delete impl;
@@ -100,7 +100,7 @@ class Nes_Core : private Nes_Cpu
     return 0;
   }
 
-  void open(Nes_Cart const *new_cart)
+  void open(Cart const *new_cart)
   {
     close();
     init();
@@ -109,7 +109,7 @@ class Nes_Core : private Nes_Cpu
     auto mapperCode = new_cart->mapper_code();
 
     // Getting mapper corresponding to that code
-    mapper = Nes_Mapper::getMapperFromCode(mapperCode);
+    mapper = Mapper::getMapperFromCode(mapperCode);
 
     // If no mapper was found, return null (error) now
     if (mapper == nullptr)
@@ -136,11 +136,11 @@ class Nes_Core : private Nes_Cpu
     size += sizeof(nes_state_t);
     size += sizeof(registers_t);
     size += sizeof(ppu_state_t);
-    size += sizeof(Nes_Apu::apu_state_t);
+    size += sizeof(Apu::apu_state_t);
     size += sizeof(joypad_state_t);
     size += mapper->state_size;
     size += low_ram_size;
-    size += Nes_Ppu::spr_ram_size;
+    size += Ppu::spr_ram_size;
     size_t nametable_size = 0x800;
     if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
     size += nametable_size;
@@ -171,7 +171,7 @@ class Nes_Core : private Nes_Cpu
 
     size += sizeof(char[4]);  // APUR Block
     size += sizeof(uint32_t); // Block Size
-    size += sizeof(Nes_Apu::apu_state_t);
+    size += sizeof(Apu::apu_state_t);
 
     size += sizeof(char[4]);  // CTRL Block
     size += sizeof(uint32_t); // Block Size
@@ -187,7 +187,7 @@ class Nes_Core : private Nes_Cpu
 
     size += sizeof(char[4]);  // SPRT Block
     size += sizeof(uint32_t); // Block Size
-    size += Nes_Ppu::spr_ram_size;
+    size += Ppu::spr_ram_size;
 
     size += sizeof(char[4]);  // NTAB Block
     size += sizeof(uint32_t); // Block Size
@@ -271,9 +271,9 @@ class Nes_Core : private Nes_Cpu
     pos += blockSize;
 
     headerCode = "APUR"; // APUR Block
-    Nes_Apu::apu_state_t apuState;
+    Apu::apu_state_t apuState;
     impl->apu.save_state(&apuState);
-    blockSize = sizeof(Nes_Apu::apu_state_t);
+    blockSize = sizeof(Apu::apu_state_t);
     memcpy(&buffer[pos], headerCode.data(), headerSize);
     pos += headerSize;
     memcpy(&buffer[pos], &blockSize, headerSize);
@@ -312,7 +312,7 @@ class Nes_Core : private Nes_Cpu
     pos += blockSize;
 
     headerCode = "SPRT"; // SPRT Block
-    blockSize = Nes_Ppu::spr_ram_size;
+    blockSize = Ppu::spr_ram_size;
     dataSource = (void *)ppu.spr_ram;
     memcpy(&buffer[pos], headerCode.data(), headerSize);
     pos += headerSize;
@@ -415,8 +415,8 @@ class Nes_Core : private Nes_Cpu
     pos += blockSize;
 
     // APUR Block
-    Nes_Apu::apu_state_t apuState;
-    blockSize = sizeof(Nes_Apu::apu_state_t);
+    Apu::apu_state_t apuState;
+    blockSize = sizeof(Apu::apu_state_t);
     pos += headerSize;
     pos += headerSize;
     memcpy(&apuState, &buffer[pos], blockSize);
@@ -448,7 +448,7 @@ class Nes_Core : private Nes_Cpu
     pos += blockSize;
 
     // SPRT Block
-    blockSize = Nes_Ppu::spr_ram_size;
+    blockSize = Ppu::spr_ram_size;
     pos += headerSize;
     pos += headerSize;
     memcpy((void *)ppu.spr_ram, &buffer[pos], blockSize);
@@ -588,7 +588,7 @@ class Nes_Core : private Nes_Cpu
 
   public:
   private:
-  friend class Nes_Emu;
+  friend class Emu;
 
   struct impl_t
   {
@@ -597,11 +597,11 @@ class Nes_Core : private Nes_Cpu
       sram_size = 0x2000
     };
     uint8_t sram[sram_size];
-    Nes_Apu apu;
+    Apu apu;
 
     // extra byte allows CPU to always read operand of instruction, which
     // might go past end of data
-    uint8_t unmapped_page[Nes_Cpu::page_size + 1];
+    uint8_t unmapped_page[Cpu::page_size + 1];
   };
   impl_t *impl; // keep large arrays separate
   unsigned long error_count;
@@ -609,15 +609,15 @@ class Nes_Core : private Nes_Cpu
 
   public:
   unsigned long current_joypad[2];
-  Nes_Cart const *cart;
-  Nes_Mapper *mapper;
+  Cart const *cart;
+  Mapper *mapper;
   nes_state_t nes;
-  Nes_Ppu ppu;
+  Ppu ppu;
 
   private:
   // noncopyable
-  Nes_Core(const Nes_Core &);
-  Nes_Core &operator=(const Nes_Core &);
+  Core(const Core &);
+  Core &operator=(const Core &);
 
   // Timing
   nes_time_t ppu_2002_time;
@@ -672,7 +672,7 @@ class Nes_Core : private Nes_Cpu
       return result & 1;
     }
 
-    if (addr == Nes_Apu::status_addr)
+    if (addr == Apu::status_addr)
       return impl->apu.read_status(clock());
 
     return addr >> 8; // simulate open bus
@@ -719,7 +719,7 @@ class Nes_Core : private Nes_Cpu
 
   static inline int read_dmc(void *data, nes_addr_t addr)
   {
-    Nes_Core *emu = (Nes_Core *)data;
+    Core *emu = (Core *)data;
     int result = *emu->cpu::get_code(addr);
     if (wait_states_enabled)
       emu->cpu_adjust_time(4);
@@ -728,7 +728,7 @@ class Nes_Core : private Nes_Cpu
 
   static inline void apu_irq_changed(void *emu)
   {
-    ((Nes_Core *)emu)->irq_changed();
+    ((Core *)emu)->irq_changed();
   }
 
   // CPU
@@ -740,7 +740,7 @@ class Nes_Core : private Nes_Cpu
 
   nes_time_t emulate_frame_()
   {
-    Nes_Cpu::result_t last_result = cpu::result_cycles;
+    Cpu::result_t last_result = cpu::result_cycles;
     int extra_instructions = 0;
     while (true)
     {
@@ -852,12 +852,12 @@ class Nes_Core : private Nes_Cpu
 
   public:
   private:
-  friend class Nes_Ppu;
+  friend class Ppu;
   void set_ppu_2002_time(nes_time_t t) { ppu_2002_time = t - 1 - cpu_time_offset; }
 
   public:
   private:
-  friend class Nes_Mapper;
+  friend class Mapper;
 
   void enable_prg_6000()
   {
@@ -903,7 +903,7 @@ class Nes_Core : private Nes_Cpu
 
   public:
   private:
-  friend class Nes_Cpu;
+  friend class Cpu;
   int cpu_read_ppu(nes_addr_t, nes_time_t);
   int cpu_read(nes_addr_t, nes_time_t);
   void cpu_write(nes_addr_t, int data, nes_time_t);
@@ -914,7 +914,7 @@ class Nes_Core : private Nes_Cpu
   unsigned char data_writer_mapped[page_count + 1];
 };
 
-inline int Nes_Core::cpu_read(nes_addr_t addr, nes_time_t time)
+inline int Core::cpu_read(nes_addr_t addr, nes_time_t time)
 {
   {
     int result = cpu::low_mem[addr & 0x7FF];
@@ -952,7 +952,7 @@ inline int Nes_Core::cpu_read(nes_addr_t addr, nes_time_t time)
   return addr >> 8; // simulate open bus
 }
 
-inline int Nes_Core::cpu_read_ppu(nes_addr_t addr, nes_time_t time)
+inline int Core::cpu_read_ppu(nes_addr_t addr, nes_time_t time)
 {
   // LOG_FREQ( "cpu_read_ppu", 16, addr >> 12 );
 
@@ -976,14 +976,14 @@ inline int Nes_Core::cpu_read_ppu(nes_addr_t addr, nes_time_t time)
   return result;
 }
 
-inline void Nes_Core::cpu_write_2007(int data)
+inline void Core::cpu_write_2007(int data)
 {
   // ppu.write_2007() is inlined
-  if (ppu.write_2007(data) & Nes_Ppu::vaddr_clock_mask)
+  if (ppu.write_2007(data) & Ppu::vaddr_clock_mask)
     mapper->a12_clocked();
 }
 
-inline void Nes_Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
+inline void Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
 {
   // LOG_FREQ( "cpu_write", 16, addr >> 12 );
 
@@ -1027,14 +1027,14 @@ inline void Nes_Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
 }
 
 #define NES_CPU_READ_PPU(cpu, addr, time) \
-  static_cast<Nes_Core &>(*cpu).cpu_read_ppu(addr, time)
+  static_cast<Core &>(*cpu).cpu_read_ppu(addr, time)
 
 #define NES_CPU_READ(cpu, addr, time) \
-  static_cast<Nes_Core &>(*cpu).cpu_read(addr, time)
+  static_cast<Core &>(*cpu).cpu_read(addr, time)
 
 #define NES_CPU_WRITEX(cpu, addr, data, time)                  \
   {                                                            \
-    static_cast<Nes_Core &>(*cpu).cpu_write(addr, data, time); \
+    static_cast<Core &>(*cpu).cpu_write(addr, data, time); \
   }
 
 #define NES_CPU_WRITE(cpu, addr, data, time)                     \
@@ -1042,9 +1042,9 @@ inline void Nes_Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
     if (addr < 0x800)                                            \
       cpu->low_mem[addr] = data;                                 \
     else if (addr == 0x2007)                                     \
-      static_cast<Nes_Core &>(*cpu).cpu_write_2007(data);        \
+      static_cast<Core &>(*cpu).cpu_write_2007(data);        \
     else                                                         \
-      static_cast<Nes_Core &>(*cpu).cpu_write(addr, data, time); \
+      static_cast<Core &>(*cpu).cpu_write(addr, data, time); \
   }
 
 } // namespace quickNES

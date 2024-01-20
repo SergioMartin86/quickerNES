@@ -47,7 +47,7 @@ struct vrc2_state_t
 static_assert(sizeof(vrc2_state_t) == 18);
 
 template <bool type_a, bool type_b>
-class Mapper_VRC2_4 : public Nes_Mapper, vrc2_state_t
+class Mapper_VRC2_4 : public Mapper, vrc2_state_t
 {
   public:
   Mapper_VRC2_4()

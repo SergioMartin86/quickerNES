@@ -39,7 +39,7 @@ struct namco_34x3_state_t
 static_assert(sizeof(namco_34x3_state_t) == 10);
 
 template <bool _is154>
-class Mapper_Namco_34x3 : public Nes_Mapper, namco_34x3_state_t
+class Mapper_Namco_34x3 : public Mapper, namco_34x3_state_t
 {
   public:
   Mapper_Namco_34x3()

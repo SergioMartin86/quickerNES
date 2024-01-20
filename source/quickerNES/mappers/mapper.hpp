@@ -1,18 +1,18 @@
 #pragma once
 
 // NES mapper interface
-// Nes_Emu 0.7.0
+// Emu 0.7.0
 
-#include "Nes_Cart.hpp"
-#include "Nes_Cpu.hpp"
 #include <climits>
+#include "cart.hpp"
+#include "cpu.hpp"
 
 namespace quickerNES
 {
 
 class Blip_Buffer;
 class blip_eq_t;
-class Nes_Core;
+class Core;
 
 // Increase this (and let me know) if your mapper requires more state. This only
 // sets the size of the in-memory buffer; it doesn't affect the file format at all.
@@ -30,10 +30,10 @@ struct mapper_state_t
   int read(void *p, unsigned long s) const;
 };
 
-class Nes_Mapper
+class Mapper
 {
   public:
-  virtual ~Nes_Mapper();
+  virtual ~Mapper();
 
   // Reset mapper to power-up state.
   virtual void reset();
@@ -94,7 +94,7 @@ class Nes_Mapper
 
   protected:
   // Services provided for derived mapper classes
-  Nes_Mapper();
+  Mapper();
 
   // Register state data to automatically save and load. Be sure the binary
   // layout is suitable for use in a file, including any byte-order issues.
@@ -106,12 +106,12 @@ class Nes_Mapper
 
   // Cause CPU writes within given address range to call mapper's write() function.
   // Might map a larger address range, which the mapper can ignore and pass to
-  // Nes_Mapper::write(). The range 0x8000-0xffff is always intercepted by the mapper.
+  // Mapper::write(). The range 0x8000-0xffff is always intercepted by the mapper.
   void intercept_writes(nes_addr_t addr, unsigned size);
 
   // Cause CPU reads within given address range to call mapper's read() function.
   // Might map a larger address range, which the mapper can ignore and pass to
-  // Nes_Mapper::read(). CPU opcode/operand reads and low-memory reads always
+  // Mapper::read(). CPU opcode/operand reads and low-memory reads always
   // go directly to memory and cannot be intercepted.
   void intercept_reads(nes_addr_t addr, unsigned size);
 
@@ -152,7 +152,7 @@ class Nes_Mapper
   bool ppu_enabled() const;
 
   // Cartridge being emulated
-  Nes_Cart const &cart() const { return *cart_; }
+  Cart const &cart() const { return *cart_; }
 
   // Must be called when next_irq()'s return value is earlier than previous,
   // current CPU run can be stopped earlier. Best to call whenever time may
@@ -166,7 +166,7 @@ class Nes_Mapper
   int handle_bus_conflict(nes_addr_t addr, int data);
 
   // Reference to emulator that uses this mapper.
-  Nes_Core &emu() const { return *emu_; }
+  Core &emu() const { return *emu_; }
 
   protected:
   // Services derived classes provide
@@ -181,8 +181,8 @@ class Nes_Mapper
   // End of general interface
 
   public:
-  Nes_Cart const *cart_;
-  Nes_Core *emu_;
+  Cart const *cart_;
+  Core *emu_;
 
   // Apply current mapping state to hardware. Called after reading mapper state
   // from a snapshot.
@@ -190,23 +190,23 @@ class Nes_Mapper
 
   void default_reset_state();
 
-  static Nes_Mapper *getMapperFromCode(const int mapperCode);
+  static Mapper *getMapperFromCode(const int mapperCode);
 };
 
-inline int Nes_Mapper::handle_bus_conflict(nes_addr_t addr, int data) { return data; }
-inline void Nes_Mapper::mirror_horiz(int p) { mirror_manual(p, p, p ^ 1, p ^ 1); }
-inline void Nes_Mapper::mirror_vert(int p) { mirror_manual(p, p ^ 1, p, p ^ 1); }
-inline void Nes_Mapper::mirror_single(int p) { mirror_manual(p, p, p, p); }
-inline void Nes_Mapper::mirror_full() { mirror_manual(0, 1, 2, 3); }
+inline int Mapper::handle_bus_conflict(nes_addr_t addr, int data) { return data; }
+inline void Mapper::mirror_horiz(int p) { mirror_manual(p, p, p ^ 1, p ^ 1); }
+inline void Mapper::mirror_vert(int p) { mirror_manual(p, p ^ 1, p, p ^ 1); }
+inline void Mapper::mirror_single(int p) { mirror_manual(p, p, p, p); }
+inline void Mapper::mirror_full() { mirror_manual(0, 1, 2, 3); }
 
-inline void Nes_Mapper::register_state(void *p, unsigned s)
+inline void Mapper::register_state(void *p, unsigned s)
 {
   state = p;
   state_size = s;
 }
 
-inline bool Nes_Mapper::write_intercepted(nes_time_t, nes_addr_t, int) { return false; }
+inline bool Mapper::write_intercepted(nes_time_t, nes_addr_t, int) { return false; }
 
-inline int Nes_Mapper::read(nes_time_t, nes_addr_t) { return -1; } // signal to caller
+inline int Mapper::read(nes_time_t, nes_addr_t) { return -1; } // signal to caller
 
 } // namespace quickNES

@@ -14,7 +14,7 @@ struct m156_state_t
 };
 static_assert(sizeof(m156_state_t) == 9);
 
-class Mapper156 : public Nes_Mapper, m156_state_t
+class Mapper156 : public Mapper, m156_state_t
 {
   public:
   Mapper156()

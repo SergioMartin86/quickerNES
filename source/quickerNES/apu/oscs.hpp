@@ -1,20 +1,20 @@
 
 #pragma once
 
-// Private oscillators used by Nes_Apu
-// Nes_Snd_Emu 0.1.7
+// Private oscillators used by Apu
+// Snd_Emu 0.1.7
 
 #include "Blip_Buffer.hpp"
 
 namespace quickerNES
 {
 
-class Nes_Apu;
+class Apu;
 
 typedef long nes_time_t;     // CPU clock cycle count
 typedef unsigned nes_addr_t; // 16-bit memory address
 
-struct Nes_Osc
+struct Osc
 {
   unsigned char regs[4];
   bool reg_written[4];
@@ -41,7 +41,7 @@ struct Nes_Osc
   }
 };
 
-struct Nes_Envelope : Nes_Osc
+struct Envelope : Osc
 {
   int envelope;
   int env_delay;
@@ -52,12 +52,12 @@ struct Nes_Envelope : Nes_Osc
   {
     envelope = 0;
     env_delay = 0;
-    Nes_Osc::reset();
+    Osc::reset();
   }
 };
 
-// Nes_Square
-struct Nes_Square : Nes_Envelope
+// Square
+struct Square : Envelope
 {
   enum
   {
@@ -77,20 +77,20 @@ struct Nes_Square : Nes_Envelope
   typedef Blip_Synth<blip_good_quality, 1> Synth;
   Synth const &synth; // shared between squares
 
-  Nes_Square(Synth const *s) : synth(*s) {}
+  Square(Synth const *s) : synth(*s) {}
 
   void clock_sweep(int adjust);
   void run(nes_time_t, nes_time_t);
   void reset()
   {
     sweep_delay = 0;
-    Nes_Envelope::reset();
+    Envelope::reset();
   }
   nes_time_t maintain_phase(nes_time_t time, nes_time_t end_time, nes_time_t timer_period);
 };
 
-// Nes_Triangle
-struct Nes_Triangle : Nes_Osc
+// Triangle
+struct Triangle : Osc
 {
   enum
   {
@@ -107,13 +107,13 @@ struct Nes_Triangle : Nes_Osc
   {
     linear_counter = 0;
     phase = 1;
-    Nes_Osc::reset();
+    Osc::reset();
   }
   nes_time_t maintain_phase(nes_time_t time, nes_time_t end_time, nes_time_t timer_period);
 };
 
-// Nes_Noise
-struct Nes_Noise : Nes_Envelope
+// Noise
+struct Noise : Envelope
 {
   int noise;
   Blip_Synth<blip_med_quality, 1> synth;
@@ -122,16 +122,16 @@ struct Nes_Noise : Nes_Envelope
   void reset()
   {
     noise = 1 << 14;
-    Nes_Envelope::reset();
+    Envelope::reset();
   }
 };
 
-// Nes_Dmc
-struct Nes_Dmc : Nes_Osc
+// Dmc
+struct Dmc : Osc
 {
   int address; // address of next byte to read
   int period;
-  // int length_counter; // bytes remaining to play (already defined in Nes_Osc)
+  // int length_counter; // bytes remaining to play (already defined in Osc)
   int buf;
   int bits_remain;
   int bits;
@@ -154,7 +154,7 @@ struct Nes_Dmc : Nes_Osc
   int (*prg_reader)(void *, nes_addr_t); // needs to be initialized to prg read function
   void *prg_reader_data;
 
-  Nes_Apu *apu;
+  Apu *apu;
 
   Blip_Synth<blip_med_quality, 1> synth;
 

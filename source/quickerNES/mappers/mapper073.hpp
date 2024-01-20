@@ -41,7 +41,7 @@ struct vrc3_state_t
 
 // VRC3
 
-class Mapper073 : public Nes_Mapper, vrc3_state_t
+class Mapper073 : public Mapper, vrc3_state_t
 {
   public:
   Mapper073()

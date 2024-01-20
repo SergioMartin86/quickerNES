@@ -1,5 +1,5 @@
 
-// Nes_Emu 0.7.0. http://www.slack.net/~ant/
+// Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "apu/fme7/apu.hpp"
 #include <cstring>
@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 namespace quickerNES
 {
 
-void Nes_Fme7_Apu::reset()
+void Fme7_Apu::reset()
 {
   last_time = 0;
 
@@ -29,14 +29,14 @@ void Nes_Fme7_Apu::reset()
   memset(state, 0, sizeof *state);
 }
 
-unsigned char Nes_Fme7_Apu::amp_table[16] =
+unsigned char Fme7_Apu::amp_table[16] =
   {
 #define ENTRY(n) (unsigned char)(n * +amp_range + 0.5)
     ENTRY(0.0000), ENTRY(0.0078), ENTRY(0.0110), ENTRY(0.0156), ENTRY(0.0221), ENTRY(0.0312), ENTRY(0.0441), ENTRY(0.0624), ENTRY(0.0883), ENTRY(0.1249), ENTRY(0.1766), ENTRY(0.2498), ENTRY(0.3534), ENTRY(0.4998), ENTRY(0.7070), ENTRY(1.0000)
 #undef ENTRY
 };
 
-void Nes_Fme7_Apu::run_until(blip_time_t end_time)
+void Fme7_Apu::run_until(blip_time_t end_time)
 {
   for (int index = 0; index < osc_count; index++)
   {

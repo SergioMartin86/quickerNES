@@ -32,7 +32,7 @@ static_assert(sizeof(Mapper015_state_t) == 5);
 
 // K-1029, K-1030P
 
-class Mapper015 : public Nes_Mapper, Mapper015_state_t
+class Mapper015 : public Mapper, Mapper015_state_t
 {
   public:
   Mapper015()

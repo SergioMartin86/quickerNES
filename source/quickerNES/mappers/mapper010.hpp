@@ -7,7 +7,7 @@ namespace quickerNES
 
 // MMC4
 
-class Mapper010 : public Nes_Mapper
+class Mapper010 : public Mapper
 {
   uint8_t regs[6]; // A,B,C,D,E,F
 
