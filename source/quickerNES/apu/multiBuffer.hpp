@@ -4,7 +4,7 @@
 // Multi-channel sound buffer interface, and basic mono and stereo buffers
 // Blip_Buffer 0.4.0
 
-#include "Blip_Buffer.hpp"
+#include "blipBuffer.hpp"
 
 namespace quickerNES
 {

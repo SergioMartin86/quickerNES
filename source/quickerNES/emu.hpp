@@ -6,7 +6,7 @@
 
 #include "cart.hpp"
 #include "core.hpp"
-#include "apu/Multi_Buffer.hpp"
+#include "apu/multiBuffer.hpp"
 
 namespace quickerNES
 {
@@ -44,8 +44,15 @@ class Emu
 
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
-  size_t getLiteStateSize() const { return emu.getLiteStateSize(); }
-  size_t getStateSize() const { return emu.getStateSize(); }
+// Save emulator state variants
+  size_t serializeFullState(uint8_t *buffer) const   { return emu.serializeFullState(buffer); }
+  size_t serializeLiteState(uint8_t *buffer) const   { return emu.serializeLiteState(buffer); }
+
+  size_t deserializeFullState(const uint8_t *buffer) { return emu.deserializeFullState(buffer); }
+  size_t deserializeLiteState(const uint8_t *buffer) { return emu.deserializeLiteState(buffer); }
+
+  size_t getLiteStateSize() const { return emu.serializeLiteState(nullptr); }
+  size_t getFullStateSize() const { return emu.serializeFullState(nullptr); }
 
   // Basic emulation
 
@@ -140,10 +147,6 @@ class Emu
   static equalizer_t const tinny_eq;   // Tinny EQ (Like a handheld speaker)
 
   // File save/load
-
-  // Save emulator state
-  size_t serializeState(uint8_t *buffer) const { return emu.serializeState(buffer); }
-  size_t deserializeState(const uint8_t *buffer) { return emu.deserializeState(buffer); }
 
   // True if current cartridge claims it uses battery-backed memory
   bool has_battery_ram() const { return cart()->has_battery_ram(); }

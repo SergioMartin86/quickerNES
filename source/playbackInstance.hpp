@@ -29,13 +29,16 @@ struct stepData_t
 
 class PlaybackInstance
 {
+  static const uint16_t image_width = 256;
+  static const uint16_t image_height = 240;
+
   public:
   void addStep(const std::string &input)
   {
     stepData_t step;
     step.input = input;
-    step.stateData = (uint8_t *)malloc(_emu->getStateSize());
-    _emu->serializeState(step.stateData);
+    step.stateData = (uint8_t *)malloc(_emu->getFullStateSize());
+    _emu->serializeFullState(step.stateData);
     step.hash = _emu->getStateHash();
 
     // Adding the step into the sequence
@@ -50,8 +53,8 @@ class PlaybackInstance
 
     // Loading Emulator instance HQN
     _hqnState.setEmulatorPointer(_emu->getInternalEmulatorPointer());
-    static uint8_t video_buffer[emulator_t::image_width * emulator_t::image_height];
-    _hqnState.m_emu->set_pixels(video_buffer, emulator_t::image_width + 8);
+    static uint8_t video_buffer[image_width * image_height];
+    _hqnState.m_emu->set_pixels(video_buffer, image_width + 8);
 
     // Building sequence information
     for (const auto &input : sequence)
@@ -166,7 +169,7 @@ class PlaybackInstance
     if (stepId > 0)
     {
       const auto stateData = getStateData(stepId - 1);
-      _emu->deserializeState(stateData);
+      _emu->deserializeFullState(stateData);
       _emu->advanceState(getStateInput(stepId - 1));
     }
 

@@ -64,38 +64,14 @@ class EmuInstance
     std::string moveString = "|..|........|";
 #endif
 
-    if (move & 0b00010000)
-      moveString += 'U';
-    else
-      moveString += '.';
-    if (move & 0b00100000)
-      moveString += 'D';
-    else
-      moveString += '.';
-    if (move & 0b01000000)
-      moveString += 'L';
-    else
-      moveString += '.';
-    if (move & 0b10000000)
-      moveString += 'R';
-    else
-      moveString += '.';
-    if (move & 0b00001000)
-      moveString += 'S';
-    else
-      moveString += '.';
-    if (move & 0b00000100)
-      moveString += 's';
-    else
-      moveString += '.';
-    if (move & 0b00000010)
-      moveString += 'B';
-    else
-      moveString += '.';
-    if (move & 0b00000001)
-      moveString += 'A';
-    else
-      moveString += '.';
+    if (move & 0b00010000) moveString += 'U'; else  moveString += '.';
+    if (move & 0b00100000) moveString += 'D'; else  moveString += '.';
+    if (move & 0b01000000) moveString += 'L'; else  moveString += '.';
+    if (move & 0b10000000) moveString += 'R'; else  moveString += '.';
+    if (move & 0b00001000) moveString += 'S'; else  moveString += '.';
+    if (move & 0b00000100) moveString += 's'; else  moveString += '.';
+    if (move & 0b00000010) moveString += 'B'; else  moveString += '.';
+    if (move & 0b00000001) moveString += 'A'; else  moveString += '.';
 
     moveString += "|";
     return moveString;
@@ -108,8 +84,6 @@ class EmuInstance
     advanceStateImpl(moveStringToCode(move), 0);
   }
 
-  inline size_t getStateSize() const { return _stateSize; }
-  inline size_t getLiteStateSize() const { return _liteStateSize; }
   inline std::string getRomSHA1() const { return _romSHA1String; }
 
   inline hash_t getStateHash() const
@@ -134,14 +108,14 @@ class EmuInstance
     std::string stateData;
     bool status = loadStringFromFile(stateData, stateFilePath);
     if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
-    deserializeState((uint8_t *)stateData.data());
+    deserializeFullState((uint8_t *)stateData.data());
   }
 
   inline void saveStateFile(const std::string &stateFilePath) const
   {
     std::string stateData;
-    stateData.resize(_stateSize);
-    serializeState((uint8_t *)stateData.data());
+    stateData.resize(_fullStateSize);
+    serializeFullState((uint8_t *)stateData.data());
     saveStringToFile(stateData, stateFilePath.c_str());
   }
 
@@ -159,10 +133,10 @@ class EmuInstance
     if (status == false) EXIT_WITH_ERROR("Could not process ROM file: %s\n", romFilePath.c_str());
 
     // Detecting full state size
-    _stateSize = getStateSizeImpl();
+    _fullStateSize = getFullStateSize();
 
     // Detecting lite state size
-    _liteStateSize = getLiteStateSizeImpl();
+    _liteStateSize = getLiteStateSize();
   }
 
   // Virtual functions
@@ -174,10 +148,12 @@ class EmuInstance
   virtual uint8_t *getHighMem() const = 0;
   virtual const uint8_t *getChrMem() const = 0;
   virtual size_t getChrMemSize() const = 0;
-  virtual void serializeState(uint8_t *state) const = 0;
-  virtual void deserializeState(const uint8_t *state) = 0;
-  virtual size_t getStateSizeImpl() const = 0;
-  virtual size_t getLiteStateSizeImpl() const { return getStateSizeImpl(); };
+  virtual void serializeFullState(uint8_t *state) const = 0;
+  virtual void deserializeFullState(const uint8_t *state) = 0;
+  virtual void serializeLiteState(uint8_t *state) const = 0;
+  virtual void deserializeLiteState(const uint8_t *state) = 0;
+  virtual size_t getFullStateSize() const = 0;
+  virtual size_t getLiteStateSize() const = 0;
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;
@@ -190,7 +166,7 @@ class EmuInstance
   size_t _liteStateSize;
 
   // Storage for the full state size
-  size_t _stateSize;
+  size_t _fullStateSize;
 
   // Flag to determine whether to enable/disable rendering
   bool _doRendering = true;

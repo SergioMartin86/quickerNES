@@ -45,18 +45,32 @@ class QuickNESInstance : public EmuInstance
   const uint8_t *getChrMem() const override { return _nes->chr_mem(); };
   size_t getChrMemSize() const override { return _nes->chr_size(); };
 
-  void serializeState(uint8_t *state) const override
+  void serializeLiteState(uint8_t *state) const override { serializeFullState(state); }
+  void deserializeLiteState(const uint8_t *state) override { deserializeFullState(state); }
+  inline size_t getLiteStateSize() const override { return getFullStateSize(); }
+
+  void serializeFullState(uint8_t *state) const override
   {
-    Mem_Writer w(state, _stateSize, 0);
+    Mem_Writer w(state, _fullStateSize, 0);
     Auto_File_Writer a(w);
     _nes->save_state(a);
   }
 
-  void deserializeState(const uint8_t *state) override
+  void deserializeFullState(const uint8_t *state) override
   {
-    Mem_File_Reader r(state, _stateSize);
+    Mem_File_Reader r(state, _fullStateSize);
     Auto_File_Reader a(r);
     _nes->load_state(a);
+  }
+
+  inline size_t getFullStateSize() const override
+  {
+    uint8_t *data = (uint8_t *)malloc(_DUMMY_SIZE);
+    Mem_Writer w(data, _DUMMY_SIZE);
+    Auto_File_Writer a(w);
+    _nes->save_state(a);
+    free(data);
+    return w.size();
   }
 
   void advanceStateImpl(const inputType controller1, const inputType controller2) override
@@ -72,15 +86,6 @@ class QuickNESInstance : public EmuInstance
   void *getInternalEmulatorPointer() const override { return _nes; }
 
   private:
-  inline size_t getStateSizeImpl() const override
-  {
-    uint8_t *data = (uint8_t *)malloc(_DUMMY_SIZE);
-    Mem_Writer w(data, _DUMMY_SIZE);
-    Auto_File_Writer a(w);
-    _nes->save_state(a);
-    free(data);
-    return w.size();
-  }
 
   // Video buffer
   uint8_t *video_buffer;

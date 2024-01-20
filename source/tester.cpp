@@ -76,14 +76,14 @@ int main(int argc, char *argv[])
   if (scriptJson["Expected ROM SHA1"].is_string() == false) EXIT_WITH_ERROR("Script file 'Expected ROM SHA1' entry is not a string\n");
   std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
 
-// Creating emulator instance
-#ifdef _USE_QUICKNES
+  // Creating emulator instance
+  #ifdef _USE_QUICKNES
   auto e = QuickNESInstance();
-#endif
+  #endif
 
-#ifdef _USE_QUICKERNES
+  #ifdef _USE_QUICKERNES
   auto e = quickerNES::QuickerNESInstance();
-#endif
+  #endif
 
   // Loading ROM File
   e.loadROMFile(romFilePath);
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
   auto initialHash = e.getStateHash();
 
   // Getting full state size
-  const auto stateSize = e.getStateSize();
+  const auto fullStateSize = e.getFullStateSize();
 
   // Getting lite state size
   const auto liteStateSize = e.getLiteStateSize();
@@ -132,15 +132,15 @@ int main(int argc, char *argv[])
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
   printf("[] Initial State Hash:      0x%lX%lX\n", initialHash.first, initialHash.second);
-  printf("[] Full State Size:         %lu bytes\n", stateSize);
+  printf("[] Full State Size:         %lu bytes\n", fullStateSize);
   printf("[] Lite State Size:         %lu bytes\n", liteStateSize);
   printf("[] ********** Running Test **********\n");
 
   fflush(stdout);
 
   // Serializing initial state
-  uint8_t *currentState = (uint8_t *)malloc(stateSize);
-  e.serializeState(currentState);
+  uint8_t *currentState = (uint8_t *)malloc(liteStateSize);
+  e.serializeLiteState(currentState);
 
   // Check whether to perform each action
   bool doPreAdvance = cycleType == "Full";
@@ -152,9 +152,9 @@ int main(int argc, char *argv[])
   for (const std::string &input : sequence)
   {
     if (doPreAdvance == true) e.advanceState(input);
-    if (doDeserialize == true) e.deserializeState(currentState);
+    if (doDeserialize == true) e.deserializeLiteState(currentState);
     e.advanceState(input);
-    if (doSerialize == true) e.serializeState(currentState);
+    if (doSerialize == true) e.serializeLiteState(currentState);
   }
   auto tf = std::chrono::high_resolution_clock::now();
 

@@ -1,8 +1,8 @@
 
 // Blip_Buffer 0.4.0. http://www.slack.net/~ant/
 
-#include "Multi_Buffer.hpp"
 #include <cstdint>
+#include "multiBuffer.hpp"
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

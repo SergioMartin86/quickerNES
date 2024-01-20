@@ -4,7 +4,7 @@
 // Emu 0.7.0
 
 #include <cstdint>
-#include "apu/Blip_Buffer.hpp"
+#include "apu/blipBuffer.hpp"
 
 namespace quickerNES
 {

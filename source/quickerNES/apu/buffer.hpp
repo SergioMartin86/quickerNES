@@ -3,8 +3,8 @@
 // NES non-linear audio buffer
 // Emu 0.7.0
 
-#include "Multi_Buffer.hpp"
 #include <cstdint>
+#include "multiBuffer.hpp"
 
 namespace quickerNES
 {
