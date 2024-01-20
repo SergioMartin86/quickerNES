@@ -14,7 +14,7 @@ jobs:
       with:
         submodules: recursive
     - name: List files
-      run: ls -la ../../
+      run: ls -la ~/quickerNES/tests/roms
     - name: Create build directory
       run: mkdir build
     - name: Installing meson and ninja
