@@ -871,10 +871,10 @@ size_t serializeLiteState(uint8_t *buffer) const
       // to do: to aid with recording, doesn't emulate transparent latch,
       // so a game that held strobe at 1 and read $4016 or $4017 would not get
       // the current A status as occurs on a NES
-      unsigned long result = joypad.joypad_latches[addr & 1];
-      if (!(joypad.w4016 & 1))
-        joypad.joypad_latches[addr & 1] = (result >> 1) | 0x80000000;
-      return result & 1;
+      if (joypad.w4016 & 1) return 0;
+      const uint8_t result = joypad.joypad_latches[addr & 1] & 1;
+      joypad.joypad_latches[addr & 1] >>= 1;
+      return result;
     }
 
     if (addr == Apu::status_addr)
