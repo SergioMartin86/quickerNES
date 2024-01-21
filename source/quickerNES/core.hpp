@@ -406,6 +406,7 @@ class Core : private Cpu
       pos += headerSize;
       memcpy((void *)ppu.impl->chr_ram, &buffer[pos], blockSize);
       pos += blockSize;
+      ppu.all_tiles_modified();
     }
 
     if (sram_present)
