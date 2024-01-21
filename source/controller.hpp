@@ -29,7 +29,7 @@ public:
     bool isValid = true;
 
     // Converting input into a stream for parsing
-    std::stringstream ss(input);
+    std::istringstream ss(input);
 
     // Start separator
     if (ss.get() != '|') isValid = false;
@@ -46,6 +46,10 @@ public:
     // End separator
     if (ss.get() != '|') isValid = false;
 
+    // If its not the end of the stream, then extra values remain and its invalid
+    ss.get();
+    if (ss.eof() == false) isValid = false;
+
     // Returning valid flag
     return isValid;
   };
@@ -60,7 +64,7 @@ public:
 
   private:
 
-  static bool parseJoyPadInput(uint8_t& code, std::stringstream& ss)
+  static bool parseJoyPadInput(uint8_t& code, std::istringstream& ss)
   {
     // Currently read character
     char c;
@@ -111,7 +115,7 @@ public:
     return true;
   }
 
-  static bool parseControllerInputs(const controller_t type, port_t& port, std::stringstream& ss)
+  static bool parseControllerInputs(const controller_t type, port_t& port, std::istringstream& ss)
   {
     // Parse valid flag
     bool isValid = true; 
@@ -172,7 +176,7 @@ public:
     return isValid;
   }
 
-  static bool parseConsoleInputs(bool& reset, bool& power, std::stringstream& ss)
+  static bool parseConsoleInputs(bool& reset, bool& power, std::istringstream& ss)
   {
     // Parse valid flag
     bool isValid = true; 
