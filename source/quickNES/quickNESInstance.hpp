@@ -76,7 +76,7 @@ class QuickNESInstance : public EmuInstance
     return w.size();
   }
 
-  void advanceStateImpl(const inputType controller1, const inputType controller2) override
+  void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) override
   {
     if (_doRendering == true) _nes->emulate_frame(controller1, controller2);
     if (_doRendering == false) _nes->emulate_skip_frame(controller1, controller2);

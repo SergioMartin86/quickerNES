@@ -20,6 +20,7 @@ protectedTestSet = [
   'ninjaGaiden2.pacifist.test',
   'novaTheSquirrel.anyPercent.test',
   'princeOfPersia.anyPercent.test',
+  'rcProAmII.race1.test',
   'saintSeiyaKanketsuHen.anyPercent.test',
   'saintSeiyaOugonDensetsu.anyPercent.test',
   'saiyuukiWorld.anyPercent.test',

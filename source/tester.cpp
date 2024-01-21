@@ -90,6 +90,16 @@ int main(int argc, char *argv[])
     stateDisabledBlocksOutput += entry.get<std::string>() + std::string(" ");
   } 
   
+  // Getting Controller 1 type
+  if (scriptJson.contains("Controller 1 Type") == false) EXIT_WITH_ERROR("Script file missing 'Controller 1 Type' entry\n");
+  if (scriptJson["Controller 1 Type"].is_string() == false) EXIT_WITH_ERROR("Script file 'Controller 1 Type' entry is not a string\n");
+  std::string controller1Type = scriptJson["Controller 1 Type"].get<std::string>();
+
+  // Getting Controller 2 type
+  if (scriptJson.contains("Controller 2 Type") == false) EXIT_WITH_ERROR("Script file missing 'Controller 2 Type' entry\n");
+  if (scriptJson["Controller 2 Type"].is_string() == false) EXIT_WITH_ERROR("Script file 'Controller 2 Type' entry is not a string\n");
+  std::string controller2Type = scriptJson["Controller 2 Type"].get<std::string>();
+
   // Creating emulator instance
   #ifdef _USE_QUICKNES
   auto e = QuickNESInstance();
@@ -98,6 +108,10 @@ int main(int argc, char *argv[])
   #ifdef _USE_QUICKERNES
   auto e = quickerNES::QuickerNESInstance();
   #endif
+
+  // Setting controller types
+  e.setController1Type(controller1Type);
+  e.setController2Type(controller2Type);
 
   // Disabling requested blocks from light state serialization
   for (const auto& block : stateDisabledBlocks) e.disableLiteStateBlock(block);
@@ -139,6 +153,7 @@ int main(int argc, char *argv[])
   printf("[] Cycle Type:              '%s'\n", cycleType.c_str());
   printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                '%s'\n", romFilePath.c_str());
+  printf("[] Controller Types:        '%s' / '%s'\n", controller1Type.c_str(), controller2Type.c_str());
   //printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);

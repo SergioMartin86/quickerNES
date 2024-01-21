@@ -31,11 +31,13 @@ quickNESHashFile="/tmp/quickNES.${folder}.${script}.${mode}.${pid}.hash"
 rm -f ${quickerNESHashFile}
 rm -f ${quickNESHashFile}
 
+set -x
 # Running script on quickerNES
 ${quickerNESExecutable} ${script} --hashOutputFile ${quickerNESHashFile} ${testerArgs}
 
 # Running script on quickNES
 ${quickNESExecutable} ${script} --hashOutputFile ${quickNESHashFile} ${testerArgs}
+set +x
 
 # Comparing hashes
 quickerNESHash=`cat ${quickerNESHashFile}`
