@@ -39,6 +39,14 @@ int main(int argc, char *argv[])
     .default_value(false)
     .implicit_value(true);
 
+  program.add_argument("--controller1")
+    .help("Specifies the controller 1 type.")
+    .default_value(std::string("Joypad"));
+
+  program.add_argument("--controller2")
+    .help("Specifies the controller 2 type.")
+    .default_value(std::string("None"));
+
   // Try to parse arguments
   try
   {
@@ -63,6 +71,12 @@ int main(int argc, char *argv[])
 
   // Getting reproduce flag
   bool disableRender = program.get<bool>("--disableRender");
+
+  // Getting controller 1 Type
+  std::string controller1Type = program.get<std::string>("--controller1");
+
+  // Getting controller 2 Type
+  std::string controller2Type = program.get<std::string>("--controller2");
 
   // Loading sequence file
   std::string inputSequence;
@@ -93,6 +107,10 @@ int main(int argc, char *argv[])
   auto e = quickerNES::QuickerNESInstance();
 #endif
 
+  // Setting controller types
+  e.setController1Type(controller1Type);
+  e.setController2Type(controller2Type);
+  
   // Loading ROM File
   e.loadROMFile(romFilePath);
 

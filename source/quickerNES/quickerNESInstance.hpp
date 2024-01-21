@@ -48,7 +48,7 @@ class QuickerNESInstance : public EmuInstance
   void enableLiteStateBlock(const std::string& block) override { _nes->enableLiteStateBlock(block); };
   void disableLiteStateBlock(const std::string& block) override { _nes->disableLiteStateBlock(block); };
 
-  void advanceStateImpl(const inputType controller1, const inputType controller2) override
+  void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) override
   {
     if (_doRendering == true) _nes->emulate_frame(controller1, controller2);
     if (_doRendering == false) _nes->emulate_skip_frame(controller1, controller2);

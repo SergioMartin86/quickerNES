@@ -2,6 +2,7 @@
 
 #include "sha1/sha1.hpp"
 #include <utils.hpp>
+#include <controller.hpp>
 
 #define _LOW_MEM_SIZE 0x800
 #define _HIGH_MEM_SIZE 0x2000
@@ -14,74 +15,50 @@ static const uint16_t image_height = 240;
 class EmuInstance
 {
   public:
-  typedef uint8_t inputType;
 
-  // Deleting default constructors
+  EmuInstance() = default;
   virtual ~EmuInstance() = default;
-
-  // Controller input bits
-  // 0 - A / 1
-  // 1 - B / 2
-  // 2 - Select / 4
-  // 3 - Start / 8
-  // 4 - Up / 16
-  // 5 - Down / 32
-  // 6 - Left / 64
-  // 7 - Right / 128
-
-  // Move Format:
-  // RLDUTSBA
-  // ........
-
-  static inline inputType moveStringToCode(const std::string &move)
-  {
-    inputType moveCode = 0;
-
-    for (size_t i = 0; i < move.size(); i++) switch (move[i])
-      {
-      case 'U': moveCode |= 0b00010000; break;
-      case 'D': moveCode |= 0b00100000; break;
-      case 'L': moveCode |= 0b01000000; break;
-      case 'R': moveCode |= 0b10000000; break;
-      case 'S': moveCode |= 0b00001000; break;
-      case 's': moveCode |= 0b00000100; break;
-      case 'B': moveCode |= 0b00000010; break;
-      case 'A': moveCode |= 0b00000001; break;
-      case 'r': break;
-      case '.': break;
-      case '|': break;
-      default: EXIT_WITH_ERROR("Move provided cannot be parsed: '%s', unrecognized character: '%c'\n", move.c_str(), move[i]);
-      }
-
-    return moveCode;
-  }
-
-  static inline std::string moveCodeToString(const inputType move)
-  {
-#ifndef _NES_PLAYER_2
-    std::string moveString = "|..|";
-#else
-    std::string moveString = "|..|........|";
-#endif
-
-    if (move & 0b00010000) moveString += 'U'; else  moveString += '.';
-    if (move & 0b00100000) moveString += 'D'; else  moveString += '.';
-    if (move & 0b01000000) moveString += 'L'; else  moveString += '.';
-    if (move & 0b10000000) moveString += 'R'; else  moveString += '.';
-    if (move & 0b00001000) moveString += 'S'; else  moveString += '.';
-    if (move & 0b00000100) moveString += 's'; else  moveString += '.';
-    if (move & 0b00000010) moveString += 'B'; else  moveString += '.';
-    if (move & 0b00000001) moveString += 'A'; else  moveString += '.';
-
-    moveString += "|";
-    return moveString;
-  }
 
   inline void advanceState(const std::string &move)
   {
-    if (move.find("r") != std::string::npos) doSoftReset();
+    bool isInputValid = _controller.parseInputString(move);
+    if (isInputValid == false) EXIT_WITH_ERROR("Move provided cannot be parsed: '%s'\n", move.c_str());
 
-    advanceStateImpl(moveStringToCode(move), 0);
+    // Parsing power
+    if (_controller.getPowerButtonState() == true) EXIT_WITH_ERROR("Power button pressed, but not supported: '%s'\n", move.c_str());
+
+    // Parsing reset
+    if (_controller.getResetButtonState() == true) doSoftReset();
+
+    // Parsing Controllers
+    const auto controller1 = _controller.getController1Code();
+    const auto controller2 = _controller.getController2Code();
+
+    advanceStateImpl(controller1, controller2);
+  }
+
+  inline void setController1Type(const std::string& type)
+  {
+    bool isTypeRecognized = false;
+
+    if (type == "None") { _controller.setController1Type(Controller::controller_t::none); isTypeRecognized = true; }
+    if (type == "Joypad") { _controller.setController1Type(Controller::controller_t::joypad); isTypeRecognized = true; }
+    if (type == "FourScore1") { _controller.setController1Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
+    if (type == "FourScore2") { _controller.setController1Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
+
+    if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
+  }
+
+  inline void setController2Type(const std::string& type)
+  {
+    bool isTypeRecognized = false;
+
+    if (type == "None") { _controller.setController2Type(Controller::controller_t::none); isTypeRecognized = true; }
+    if (type == "Joypad") { _controller.setController2Type(Controller::controller_t::joypad); isTypeRecognized = true; }
+    if (type == "FourScore1") { _controller.setController2Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
+    if (type == "FourScore2") { _controller.setController2Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
+    
+    if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
   }
 
   inline std::string getRomSHA1() const { return _romSHA1String; }
@@ -142,7 +119,7 @@ class EmuInstance
   // Virtual functions
 
   virtual bool loadROMFileImpl(const std::string &romFilePath) = 0;
-  virtual void advanceStateImpl(const inputType controller1, const inputType controller2) = 0;
+  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
   virtual uint8_t *getLowMem() const = 0;
   virtual uint8_t *getNametableMem() const = 0;
   virtual uint8_t *getHighMem() const = 0;
@@ -163,7 +140,6 @@ class EmuInstance
   virtual void *getInternalEmulatorPointer() const = 0;
 
   protected:
-  EmuInstance() = default;
 
   // Storage for the light state size
   size_t _liteStateSize;
@@ -180,4 +156,7 @@ class EmuInstance
 
   // SHA1 rom hash
   std::string _romSHA1String;
+
+  // Controller class for input parsing
+  Controller _controller;
 };

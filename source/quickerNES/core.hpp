@@ -740,10 +740,10 @@ size_t serializeLiteState(uint8_t *buffer) const
     error_count = 0;
   }
 
-  nes_time_t emulate_frame(int joypad1, int joypad2)
+  nes_time_t emulate_frame(uint32_t joypad1, uint32_t joypad2)
   {
-    current_joypad[0] = (joypad1 |= ~0xFF);
-    current_joypad[1] = (joypad2 |= ~0xFF);
+    current_joypad[0] = joypad1;
+    current_joypad[1] = joypad2;
 
     cpu_time_offset = ppu.begin_frame(nes.timestamp) - 1;
     ppu_2002_time = 0;
@@ -812,7 +812,7 @@ size_t serializeLiteState(uint8_t *buffer) const
   bool sram_present;
 
   public:
-  unsigned long current_joypad[2];
+  uint32_t current_joypad[2];
   Cart const *cart;
   Mapper *mapper;
   nes_state_t nes;

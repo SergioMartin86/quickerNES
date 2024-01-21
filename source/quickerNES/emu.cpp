@@ -103,7 +103,7 @@ void Emu::set_palette_range( int begin, int end )
 	host_palette_size = end - emu.ppu.palette_begin;
 }
 
-const char * Emu::emulate_skip_frame( int joypad1, int joypad2 )
+const char * Emu::emulate_skip_frame( uint32_t joypad1, uint32_t joypad2 )
 {
 	char *old_host_pixels = host_pixels;
 	host_pixels = NULL;
@@ -112,7 +112,7 @@ const char * Emu::emulate_skip_frame( int joypad1, int joypad2 )
 	return 0;
 }
 
-const char * Emu::emulate_frame( int joypad1, int joypad2 )
+const char * Emu::emulate_frame( uint32_t joypad1, uint32_t joypad2 )
 {
 	emu.ppu.host_pixels = NULL;
 

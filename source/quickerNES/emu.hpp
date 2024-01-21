@@ -61,11 +61,11 @@ class Emu
 
   // Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image
   // and sound are available for output using the accessors below.
-  virtual const char *emulate_frame(int joypad1, int joypad2 = 0);
+  virtual const char *emulate_frame(uint32_t joypad1, uint32_t joypad2 = 0);
 
   // Emulate one video frame using joypad1 and joypad2 as input, but skips drawing.
   // Afterwards, audio is available for output using the accessors below.
-  virtual const char *emulate_skip_frame(int joypad1, int joypad2 = 0);
+  virtual const char *emulate_skip_frame(uint32_t joypad1, uint32_t joypad2 = 0);
 
   // Maximum size of palette that can be generated
   static const uint16_t max_palette_size = 256;
