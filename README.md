@@ -12,16 +12,16 @@ quickerNES is an attempt to modernizing [quickNES](https://github.com/kode54/Qui
 
 The main aim is to improve the performance of headless re-recording for TASing and botting (See: [JaffarPlus](https://github.com/SergioMartin86/jaffarPlus)) purposes. However, if this work can help regular play emulation, then much better.
 
-Changes
---------
+Improvements
+-------------
 
 - Optimizations made in the CPU emulation core, including:
   + Forced alignment at the start of a page to prevent crossing cache line boundaries
   + Simplifying the 6502 CPU instruction fetching and decoding
   + Multiple branch optimizations
-- Minimize compiled code size to reduce pressure on L1i cache
-- Assuming little endiannes to reduce unnecessary conversion operations (not portable to big endian systems)
-- Reduce heap allocations
+  + Assuming little endiannes to reduce unnecessary conversion operations (not portable to big endian systems)
+  + Minimize compiled code size to reduce pressure on L1i cache
+- Added support for FourScore controller
 - General code reorganization (make it header only to help compiler optimizations)
 
 Credits
