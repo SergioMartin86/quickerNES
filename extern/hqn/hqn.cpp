@@ -1,7 +1,6 @@
 #include <cmath>
 #include <SDL_timer.h>
 #include "hqn.h"
-#include "hqn_util.h"
 
 namespace hqn
 {

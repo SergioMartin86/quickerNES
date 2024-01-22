@@ -57,7 +57,7 @@ inline int getKeyPress()
   return getch();
 }
 
-void initializeTerminal()
+inline void initializeTerminal()
 {
   // Initializing ncurses screen
   initscr();
@@ -67,17 +67,17 @@ void initializeTerminal()
   scrollok(stdscr, TRUE);
 }
 
-void clearTerminal()
+inline void clearTerminal()
 {
   clear();
 }
 
-void finalizeTerminal()
+inline void finalizeTerminal()
 {
   endwin();
 }
 
-void refreshTerminal()
+inline void refreshTerminal()
 {
   refresh();
 }

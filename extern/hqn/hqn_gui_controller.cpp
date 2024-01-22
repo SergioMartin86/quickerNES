@@ -1,5 +1,4 @@
 #include "hqn_gui_controller.h"
-#include "hqn_util.h"
 #include <algorithm>
 #include <cstring>
 #include <SDL.h>
