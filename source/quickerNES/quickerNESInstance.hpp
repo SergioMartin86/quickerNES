@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quickerNES/emu.hpp>
+#include <core/emu.hpp>
 #include <emuInstance.hpp>
 
 namespace quickerNES
