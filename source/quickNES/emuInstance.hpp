@@ -2,18 +2,20 @@
 
 #include <Nes_Emu.h>
 #include <Nes_State.h>
-#include <emuInstance.hpp>
+#include <emuInstanceBase.hpp>
 
 #define _DUMMY_SIZE 65536
+
+typedef Nes_Emu emulator_t;
 
 extern void register_misc_mappers();
 extern void register_extra_mappers();
 extern void register_mapper_70();
 
-class QuickNESInstance : public EmuInstance
+class EmuInstance : public EmuInstanceBase
 {
   public:
-  QuickNESInstance() : EmuInstance()
+  EmuInstance() : EmuInstanceBase()
   {
     // Creating new emulator
     _nes = new Nes_Emu;

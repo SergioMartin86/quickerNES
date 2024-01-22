@@ -1,18 +1,17 @@
 #pragma once
 
 #include <core/emu.hpp>
-#include <emuInstance.hpp>
+#include <emuInstanceBase.hpp>
 
-namespace quickerNES
-{
+typedef quickerNES::Emu emulator_t;
 
-class QuickerNESInstance : public EmuInstance
+class EmuInstance : public EmuInstanceBase
 {
   public:
-  QuickerNESInstance() : EmuInstance()
+  EmuInstance() : EmuInstanceBase()
   {
     // Creating new emulator
-    _nes = new Emu;
+    _nes = new emulator_t;
 
     // Allocating video buffer
     video_buffer = (uint8_t *)malloc(image_width * image_height);
@@ -21,7 +20,7 @@ class QuickerNESInstance : public EmuInstance
     _nes->set_pixels(video_buffer, image_width + 8);
   }
 
-  ~QuickerNESInstance() = default;
+  ~EmuInstance() = default;
 
   virtual bool loadROMFileImpl(const std::string &romData) override
   {
@@ -64,7 +63,5 @@ class QuickerNESInstance : public EmuInstance
   uint8_t *video_buffer;
 
   // Emulator instance
-  Emu *_nes;
+  emulator_t *_nes;
 };
-
-} // namespace quickNES
