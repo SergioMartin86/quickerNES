@@ -31,7 +31,7 @@ quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
 # quickerNES Core Configuration
 
  quickerNESDependency = declare_dependency(
-  compile_args        : [ '-D_USE_QUICKERNES', '-D_PAGE_SIZE="' + pageSize.to_string() + '"'],
+  compile_args        : [ '-D_PAGE_SIZE="' + pageSize.to_string() + '"'],
   include_directories : include_directories(['.', 'core']),
   sources             : [ quickerNESSrc ]
  )

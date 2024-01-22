@@ -71,7 +71,7 @@ quickNESSrc = [
 # quickNES Core Configuration
 
  quickNESDependency = declare_dependency(
-  compile_args        : [ '-D_USE_QUICKNES' ],
+  compile_args        : [  ],
   include_directories : include_directories(['.', 'core/nes_emu']),
   sources             : [ quickNESSrc ]
  )

@@ -19,8 +19,6 @@ quickerNESPlayerSrc = [
   'extern/hqn/hqn.cpp',
   'extern/hqn/hqn_gui_controller.cpp',
   'extern/hqn/hqn_surface.cpp',
-  'extern/hqn/hqn_util.cpp',
-  'extern/hqn/options.cpp',
 ]
 
 if get_option('buildPlayer') == true

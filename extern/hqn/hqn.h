@@ -3,19 +3,11 @@
 
 #include <cstdint>
 #include <stdio.h>
+#include <emuInstance.hpp>
 
 #define BLIT_SIZE 65536
 
 // Creating emulator instance
-#ifdef _USE_QUICKNES
-  #include <Nes_Emu.hpp>
-  typedef Nes_Emu emulator_t;
-#endif
-
-#ifdef _USE_QUICKERNES
-  #include <emu.hpp>
-  typedef quickerNES::Emu emulator_t;
-#endif
 
 namespace hqn
 {
