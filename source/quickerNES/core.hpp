@@ -677,6 +677,7 @@ size_t serializeLiteState(uint8_t *buffer) const
         blockSize = ppu.chr_size;
         memcpy((void *)ppu.impl->chr_ram, &buffer[pos], blockSize);
         pos += blockSize;
+        ppu.all_tiles_modified();
       }
     }
 
