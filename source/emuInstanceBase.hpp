@@ -12,12 +12,12 @@
 static const uint16_t image_width = 256;
 static const uint16_t image_height = 240;
 
-class EmuInstance
+class EmuInstanceBase
 {
   public:
 
-  EmuInstance() = default;
-  virtual ~EmuInstance() = default;
+  EmuInstanceBase() = default;
+  virtual ~EmuInstanceBase() = default;
 
   inline void advanceState(const std::string &move)
   {

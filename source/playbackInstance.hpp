@@ -11,15 +11,6 @@
 
 #define _INVERSE_FRAME_RATE 16667
 
-// Creating emulator instance
-#ifdef _USE_QUICKNES
-  typedef Nes_Emu emulator_t;
-#endif
-
-#ifdef _USE_QUICKERNES
-  typedef quickerNES::Emu emulator_t;
-#endif
-
 struct stepData_t
 {
   std::string input;

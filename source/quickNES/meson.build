@@ -27,6 +27,7 @@ quickNESSrc = [
 	'core/nes_emu/nes_mappers.cpp',
 	'core/nes_emu/Nes_Mmc1.cpp',
 	'core/nes_emu/Nes_Mmc3.cpp',
+	'core/nes_emu/Mapper_70.cpp',
 	'core/nes_emu/Mapper_Misc.cpp',
 	'core/nes_emu/Mapper_Unrom512.cpp',
 	'core/nes_emu/Mapper_Vrc1.cpp',
@@ -64,8 +65,7 @@ quickNESSrc = [
 	'core/nes_emu/Mapper_TaitoX1005.cpp',
 	'core/nes_emu/Mapper_TaitoTC0190.cpp',
 	'core/nes_emu/Mapper_Un1rom.cpp',
-	'core/nes_emu/nes_ntsc.cpp',
-	'Mapper_70.cpp'
+	'core/nes_emu/nes_ntsc.cpp'
 ]
 
 # quickNES Core Configuration
