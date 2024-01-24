@@ -4,8 +4,8 @@
 set -e
 
 # Getting executable paths
-quickerNESExecutable=${1}
-quickNESExecutable=${2}
+baseExecutable=${1}
+newExecutable=${2}
 
 # Getting script name
 script=${3}
@@ -24,32 +24,32 @@ folder=`basename $PWD`
 pid=$$
 
 # Hash files
-quickerNESHashFile="/tmp/quickerNES.${folder}.${script}.${mode}.${pid}.hash"
-quickNESHashFile="/tmp/quickNES.${folder}.${script}.${mode}.${pid}.hash"
+baseHashFile="/tmp/quickerNES.${folder}.${script}.${mode}.${pid}.hash"
+newHashFile="/tmp/quickNES.${folder}.${script}.${mode}.${pid}.hash"
 
 # Removing them if already present
-rm -f ${quickerNESHashFile}
-rm -f ${quickNESHashFile}
+rm -f ${baseHashFile}
+rm -f ${newHashFile}
 
 set -x
 # Running script on quickerNES
-${quickerNESExecutable} ${script} --hashOutputFile ${quickerNESHashFile} ${testerArgs}
+${baseExecutable} ${script} --hashOutputFile ${baseHashFile} ${testerArgs}
 
 # Running script on quickNES
-${quickNESExecutable} ${script} --hashOutputFile ${quickNESHashFile} ${testerArgs}
+${newExecutable} ${script} --hashOutputFile ${newHashFile} ${testerArgs}
 set +x
 
 # Comparing hashes
-quickerNESHash=`cat ${quickerNESHashFile}`
+baseHash=`cat ${baseHashFile}`
  
 # Comparing hashes
-quickNESHash=`cat ${quickNESHashFile}`
+newHash=`cat ${newHashFile}`
 
 # Removing temporary files
-rm -f ${quickerNESHashFile} ${quickNESHashFile}
+rm -f ${baseHashFile} ${newHashFile}
 
 # Compare hashes
-if [ "${quickerNESHash}" = "${quickNESHash}" ]; then
+if [ "${baseHash}" = "${newHash}" ]; then
  echo "[] Test Passed"
  exit 0
 else
