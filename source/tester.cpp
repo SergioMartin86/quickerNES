@@ -144,12 +144,7 @@ int main(int argc, char *argv[])
   //printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
-  #ifdef _USE_QUICKNES
-  printf("[] State Size:              %lu bytes\n", e.getFullStateSize());
-  #endif
-  #ifdef _USE_QUICKERNES
   printf("[] State Size:              %lu bytes - Disabled Blocks:  [ %s ]\n", e.getLiteStateSize(), stateDisabledBlocksOutput.c_str());
-  #endif
   printf("[] ********** Running Test **********\n");
 
   fflush(stdout);
