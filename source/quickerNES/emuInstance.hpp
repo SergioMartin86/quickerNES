@@ -35,17 +35,11 @@ class EmuInstance : public EmuInstanceBase
   const uint8_t *getChrMem() const override { return _nes->chr_mem(); };
   size_t getChrMemSize() const override { return _nes->chr_size(); };
 
-  void serializeFullState(uint8_t *state) const override {  _nes->serializeFullState(state); }
-  void deserializeFullState(const uint8_t *state) override { _nes->deserializeFullState(state); }
-
-  void serializeLiteState(uint8_t *state) const override {  _nes->serializeLiteState(state); }
-  void deserializeLiteState(const uint8_t *state) override { _nes->deserializeLiteState(state); }
-
-  size_t getFullStateSize() const override { return _nes->getFullStateSize(); }
-  size_t getLiteStateSize() const override { return _nes->getLiteStateSize(); }
-
-  void enableLiteStateBlock(const std::string& block) override { _nes->enableLiteStateBlock(block); };
-  void disableLiteStateBlock(const std::string& block) override { _nes->disableLiteStateBlock(block); };
+  void serializeState(uint8_t *state) const override {  _nes->serializeState(state); }
+  void deserializeState(const uint8_t *state) override { _nes->deserializeState(state); }
+  size_t getStateSize() const override { return _nes->getStateSize(); }
+  void enableStateBlockImpl(const std::string& block) override { _nes->enableStateBlock(block); };
+  void disableStateBlockImpl(const std::string& block) override { _nes->disableStateBlock(block); };
 
   void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) override
   {

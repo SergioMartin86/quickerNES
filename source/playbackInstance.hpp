@@ -28,8 +28,8 @@ class PlaybackInstance
   {
     stepData_t step;
     step.input = input;
-    step.stateData = (uint8_t *)malloc(_emu->getFullStateSize());
-    _emu->serializeFullState(step.stateData);
+    step.stateData = (uint8_t *)malloc(_emu->getStateSize());
+    _emu->serializeState(step.stateData);
     step.hash = _emu->getStateHash();
 
     // Adding the step into the sequence
@@ -160,7 +160,7 @@ class PlaybackInstance
     if (stepId > 0)
     {
       const auto stateData = getStateData(stepId - 1);
-      _emu->deserializeFullState(stateData);
+      _emu->deserializeState(stateData);
       _emu->advanceState(getStateInput(stepId - 1));
     }
 

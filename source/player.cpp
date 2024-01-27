@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
   auto p = PlaybackInstance(&e, sequence);
 
   // Getting state size
-  auto stateSize = e.getFullStateSize();
+  auto stateSize = e.getStateSize();
 
   // Flag to continue running playback
   bool continueRunning = true;

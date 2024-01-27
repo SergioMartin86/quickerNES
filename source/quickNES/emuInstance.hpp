@@ -47,28 +47,24 @@ class EmuInstance : public EmuInstanceBase
   const uint8_t *getChrMem() const override { return _nes->chr_mem(); };
   size_t getChrMemSize() const override { return _nes->chr_size(); };
 
-  void serializeLiteState(uint8_t *state) const override { serializeFullState(state); }
-  void deserializeLiteState(const uint8_t *state) override { deserializeFullState(state); }
-  inline size_t getLiteStateSize() const override { return getFullStateSize(); }
+  void enableStateBlockImpl(const std::string& block) override {};
+  void disableStateBlockImpl(const std::string& block) override {};
 
-  void enableLiteStateBlock(const std::string& block) override {};
-  void disableLiteStateBlock(const std::string& block) override {};
-
-  void serializeFullState(uint8_t *state) const override
+  void serializeState(uint8_t *state) const override
   {
-    Mem_Writer w(state, _fullStateSize, 0);
+    Mem_Writer w(state, _stateSize, 0);
     Auto_File_Writer a(w);
     _nes->save_state(a);
   }
 
-  void deserializeFullState(const uint8_t *state) override
+  void deserializeState(const uint8_t *state) override
   {
-    Mem_File_Reader r(state, _fullStateSize);
+    Mem_File_Reader r(state, _stateSize);
     Auto_File_Reader a(r);
     _nes->load_state(a);
   }
 
-  inline size_t getFullStateSize() const override
+  inline size_t getStateSize() const override
   {
     uint8_t *data = (uint8_t *)malloc(_DUMMY_SIZE);
     Mem_Writer w(data, _DUMMY_SIZE);

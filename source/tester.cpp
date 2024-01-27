@@ -100,20 +100,20 @@ int main(int argc, char *argv[])
   e.setController1Type(controller1Type);
   e.setController2Type(controller2Type);
 
-  // Disabling requested blocks from light state serialization
-  for (const auto& block : stateDisabledBlocks) e.disableLiteStateBlock(block);
-
   // Loading ROM File
   e.loadROMFile(romFilePath);
 
   // If an initial state is provided, load it now
   if (initialStateFilePath != "") e.loadStateFile(initialStateFilePath);
 
+  // Disabling requested blocks from state serialization
+  for (const auto& block : stateDisabledBlocks) e.disableStateBlock(block);
+
   // Disable rendering
   e.disableRendering();
 
-  // Getting lite state size
-  const auto liteStateSize = e.getLiteStateSize();
+  // Getting state size
+  const auto stateSize = e.getStateSize();
 
   // Getting actual ROM SHA1
   auto romSHA1 = e.getRomSHA1();
@@ -144,14 +144,14 @@ int main(int argc, char *argv[])
   //printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
   printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:         %lu\n", sequenceLength);
-  printf("[] State Size:              %lu bytes - Disabled Blocks:  [ %s ]\n", e.getLiteStateSize(), stateDisabledBlocksOutput.c_str());
+  printf("[] State Size:              %lu bytes - Disabled Blocks:  [ %s ]\n", e.getStateSize(), stateDisabledBlocksOutput.c_str());
   printf("[] ********** Running Test **********\n");
 
   fflush(stdout);
 
   // Serializing initial state
-  uint8_t *currentState = (uint8_t *)malloc(liteStateSize);
-  e.serializeLiteState(currentState);
+  uint8_t *currentState = (uint8_t *)malloc(stateSize);
+  e.serializeState(currentState);
 
   // Check whether to perform each action
   bool doPreAdvance = cycleType == "Full";
@@ -163,9 +163,9 @@ int main(int argc, char *argv[])
   for (const std::string &input : sequence)
   {
     if (doPreAdvance == true) e.advanceState(input);
-    if (doDeserialize == true) e.deserializeLiteState(currentState);
+    if (doDeserialize == true) e.deserializeState(currentState);
     e.advanceState(input);
-    if (doSerialize == true) e.serializeLiteState(currentState);
+    if (doSerialize == true) e.serializeState(currentState);
   }
   auto tf = std::chrono::high_resolution_clock::now();
 
