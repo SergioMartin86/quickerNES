@@ -3,7 +3,7 @@
   "Expected ROM SHA1": "6B58F149F34FA829135619C58700CAAA95B9CDE3",
   "Initial State File": "",
   "Sequence File": "princeOfPersia.anyPercent.sol",
-  "Disable State Blocks": [ "SRAM", "CHRR", "NTAB", "SPRT", "CTRL" ],
+  "Disable State Blocks": [ "HEAD", "SRAM", "CHRR", "NTAB", "SPRT", "CTRL" ],
   "Controller 1 Type": "Joypad",
   "Controller 2 Type": "None"
 }

@@ -137,9 +137,6 @@ public:
 
       // Pushing input code into the port
       port = code;
-
-      // Adding joypad signature
-      port |= ~0xFF;
     }
 
     // If its fourscore, its like two joypads separated by a |

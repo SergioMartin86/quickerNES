@@ -85,14 +85,14 @@ class EmuInstanceBase
     std::string stateData;
     bool status = loadStringFromFile(stateData, stateFilePath);
     if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
-    deserializeFullState((uint8_t *)stateData.data());
+    deserializeState((uint8_t *)stateData.data());
   }
 
   inline void saveStateFile(const std::string &stateFilePath) const
   {
     std::string stateData;
-    stateData.resize(_fullStateSize);
-    serializeFullState((uint8_t *)stateData.data());
+    stateData.resize(_stateSize);
+    serializeState((uint8_t *)stateData.data());
     saveStringToFile(stateData, stateFilePath.c_str());
   }
 
@@ -110,30 +110,38 @@ class EmuInstanceBase
     if (status == false) EXIT_WITH_ERROR("Could not process ROM file: %s\n", romFilePath.c_str());
 
     // Detecting full state size
-    _fullStateSize = getFullStateSize();
+    _stateSize = getStateSize();
+  }
 
-    // Detecting lite state size
-    _liteStateSize = getLiteStateSize();
+  void enableStateBlock(const std::string& block)
+  {
+    // Calling implementation
+    enableStateBlockImpl(block);
+
+    // Recalculating State size
+    _stateSize = getStateSize();
+  }
+
+  void disableStateBlock(const std::string& block)
+  {
+    // Calling implementation
+    disableStateBlockImpl(block);
+
+    // Recalculating State Size
+    _stateSize = getStateSize();
   }
 
   // Virtual functions
 
-  virtual bool loadROMFileImpl(const std::string &romFilePath) = 0;
-  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
   virtual uint8_t *getLowMem() const = 0;
   virtual uint8_t *getNametableMem() const = 0;
   virtual uint8_t *getHighMem() const = 0;
   virtual const uint8_t *getChrMem() const = 0;
   virtual size_t getChrMemSize() const = 0;
-  virtual void serializeFullState(uint8_t *state) const = 0;
-  virtual void deserializeFullState(const uint8_t *state) = 0;
-  virtual void serializeLiteState(uint8_t *state) const = 0;
-  virtual void deserializeLiteState(const uint8_t *state) = 0;
-  virtual size_t getFullStateSize() const = 0;
-  virtual size_t getLiteStateSize() const = 0;
-  virtual void enableLiteStateBlock(const std::string& block) = 0;
-  virtual void disableLiteStateBlock(const std::string& block) = 0;
-
+  virtual void serializeState(uint8_t *state) const = 0;
+  virtual void deserializeState(const uint8_t *state) = 0;
+  virtual size_t getStateSize() const = 0;
+  
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;
@@ -141,11 +149,13 @@ class EmuInstanceBase
 
   protected:
 
-  // Storage for the light state size
-  size_t _liteStateSize;
+  virtual void enableStateBlockImpl(const std::string& block) = 0;
+  virtual void disableStateBlockImpl(const std::string& block) = 0;
+  virtual bool loadROMFileImpl(const std::string &romFilePath) = 0;
+  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
 
-  // Storage for the full state size
-  size_t _fullStateSize;
+  // Storage for the light state size
+  size_t _stateSize;
 
   // Flag to determine whether to enable/disable rendering
   bool _doRendering = true;

@@ -45,17 +45,11 @@ class Emu
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
 // Save emulator state variants
-  size_t serializeFullState(uint8_t *buffer) const   { return emu.serializeFullState(buffer); }
-  size_t serializeLiteState(uint8_t *buffer) const   { return emu.serializeLiteState(buffer); }
-
-  size_t deserializeFullState(const uint8_t *buffer) { return emu.deserializeFullState(buffer); }
-  size_t deserializeLiteState(const uint8_t *buffer) { return emu.deserializeLiteState(buffer); }
-
-  size_t getLiteStateSize() const { return emu.serializeLiteState(nullptr); }
-  size_t getFullStateSize() const { return emu.serializeFullState(nullptr); }
-
-  void enableLiteStateBlock(const std::string& block) { emu.enableLiteStateBlock(block); };
-  void disableLiteStateBlock(const std::string& block) { emu.disableLiteStateBlock(block); };
+  size_t serializeState(uint8_t *buffer) const   { return emu.serializeState(buffer); }
+  size_t deserializeState(const uint8_t *buffer) { return emu.deserializeState(buffer); }
+  size_t getStateSize() const { return emu.serializeState(nullptr); }
+  void enableStateBlock(const std::string& block) { emu.enableStateBlock(block); };
+  void disableStateBlock(const std::string& block) { emu.disableStateBlock(block); };
 
   // Basic emulation
 
