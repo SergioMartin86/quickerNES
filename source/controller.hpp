@@ -137,6 +137,10 @@ public:
 
       // Pushing input code into the port
       port = code;
+
+      // Adding joypad signature
+      // Per https://www.nesdev.org/wiki/Standard_controller, the joypad reports 1s after the first 8 bits
+      port |= ~0xFF;
     }
 
     // If its fourscore, its like two joypads separated by a |
