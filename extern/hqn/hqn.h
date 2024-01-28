@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <stdio.h>
-#include <emuInstance.hpp>
+#include <nesInstance.hpp>
 
 #define BLIT_SIZE 65536
 

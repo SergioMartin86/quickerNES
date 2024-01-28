@@ -2,24 +2,19 @@
 
 #include <algorithm>
 #include <fstream>
-#include <metrohash128/metrohash128.h>
 #include <sstream>
 #include <stdarg.h>
 #include <stdexcept>
 #include <stdio.h>
 #include <unistd.h>
 #include <vector>
-
-// If we use NCurses, we need to use the appropriate printing function
-#ifdef NCURSES
-  #include <ncurses.h>
-  #define LOG printw
-#else
-  #define LOG printf
-#endif
+#include <metrohash128/metrohash128.h>
+#include "nesInstance.hpp"
 
 // If we use NCurses, define the following useful functions
 #ifdef NCURSES
+
+#include <ncurses.h>
 
 // Function to check for keypress taken from https://github.com/ajpaulson/learning-ncurses/blob/master/kbhit.c
 inline int kbhit()
@@ -84,16 +79,6 @@ inline void refreshTerminal()
 
 #endif // NCURSES
 
-typedef _uint128_t hash_t;
-inline hash_t calculateMetroHash(uint8_t *data, size_t size)
-{
-  MetroHash128 hash;
-  hash.Update(data, size);
-  hash_t result;
-  hash.Finalize(reinterpret_cast<uint8_t *>(&result));
-  return result;
-}
-
 // Function to split a string into a sub-strings delimited by a character
 // Taken from stack overflow answer to https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
 // By Evan Teran
@@ -124,26 +109,6 @@ inline std::string slurp(std::ifstream &in)
   std::ostringstream sstr;
   sstr << in.rdbuf();
   return sstr.str();
-}
-
-#define EXIT_WITH_ERROR(...) exitWithError(__FILE__, __LINE__, __VA_ARGS__)
-inline void exitWithError [[noreturn]] (const char *fileName, const int lineNumber, const char *format, ...)
-{
-  char *outstr = 0;
-  va_list ap;
-  va_start(ap, format);
-  int ret = vasprintf(&outstr, format, ap);
-  if (ret < 0) exit(-1);
-
-  std::string outString = outstr;
-  free(outstr);
-
-  char info[1024];
-
-  snprintf(info, sizeof(info) - 1, " + From %s:%d\n", fileName, lineNumber);
-  outString += info;
-
-  throw std::runtime_error(outString.c_str());
 }
 
 // Loads a string from a given file
@@ -191,70 +156,18 @@ inline std::vector<T> splitVector(const T size, const T n)
   return subSizes;
 }
 
-inline std::string simplifyMove(const std::string &move)
-{
-  std::string simpleMove;
+typedef _uint128_t hash_t;
 
-  bool isEmptyMove = true;
-  for (size_t i = 0; i < move.size(); i++)
-    if (move[i] != '.' && move[i] != '|')
-    {
-      simpleMove += move[i];
-      isEmptyMove = false;
-    }
-  if (isEmptyMove) return ".";
-  return simpleMove;
+inline hash_t calculateMetroHash(uint8_t *data, size_t size)
+{
+  MetroHash128 hash;
+  hash.Update(data, size);
+  hash_t result;
+  hash.Finalize(reinterpret_cast<uint8_t *>(&result));
+  return result;
 }
 
-inline bool getBitFlag(const uint8_t value, const uint8_t idx)
+inline hash_t calculateStateHash(const NESInstance* nes)
 {
-  if (((idx == 7) && (value & 0b10000000)) ||
-      ((idx == 6) && (value & 0b01000000)) ||
-      ((idx == 5) && (value & 0b00100000)) ||
-      ((idx == 4) && (value & 0b00010000)) ||
-      ((idx == 3) && (value & 0b00001000)) ||
-      ((idx == 2) && (value & 0b00000100)) ||
-      ((idx == 1) && (value & 0b00000010)) ||
-      ((idx == 0) && (value & 0b00000001))) return true;
-  return false;
+  return calculateMetroHash(nes->getLowMem(), _LOW_MEM_SIZE);
 }
-
-inline size_t countButtonsPressedString(const std::string &input)
-{
-  size_t count = 0;
-  for (size_t i = 0; i < input.size(); i++)
-    if (input[i] != '.') count++;
-  return count;
-};
-
-template <typename T>
-inline uint16_t countButtonsPressedNumber(const T &input)
-{
-  uint16_t count = 0;
-  if (input & 0b0000000000000001) count++;
-  if (input & 0b0000000000000010) count++;
-  if (input & 0b0000000000000100) count++;
-  if (input & 0b0000000000001000) count++;
-  if (input & 0b0000000000010000) count++;
-  if (input & 0b0000000000100000) count++;
-  if (input & 0b0000000001000000) count++;
-  if (input & 0b0000000010000000) count++;
-  if (input & 0b0000000100000000) count++;
-  if (input & 0b0000001000000000) count++;
-  if (input & 0b0000010000000000) count++;
-  if (input & 0b0000100000000000) count++;
-  if (input & 0b0001000000000000) count++;
-  if (input & 0b0010000000000000) count++;
-  if (input & 0b0100000000000000) count++;
-  if (input & 0b1000000000000000) count++;
-  return count;
-};
-
-static auto moveCountComparerString = [](const std::string &a, const std::string &b)
-{
-  return countButtonsPressedString(a) < countButtonsPressedString(b);
-};
-static auto moveCountComparerNumber = [](const uint8_t a, const uint8_t b)
-{
-  return countButtonsPressedNumber(a) < countButtonsPressedNumber(b);
-};

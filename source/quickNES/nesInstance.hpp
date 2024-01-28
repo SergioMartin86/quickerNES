@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Nes_Emu.h>
-#include <Nes_State.h>
-#include <emuInstanceBase.hpp>
+#include <quickNES/core/nes_emu/Nes_Emu.h>
+#include <quickNES/core/nes_emu/Nes_State.h>
+#include <nesInstanceBase.hpp>
 
 #define _DUMMY_SIZE 65536
 
@@ -12,10 +12,10 @@ extern void register_misc_mappers();
 extern void register_extra_mappers();
 extern void register_mapper_70();
 
-class EmuInstance : public EmuInstanceBase
+class NESInstance : public NESInstanceBase
 {
   public:
-  EmuInstance() : EmuInstanceBase()
+  NESInstance() : NESInstanceBase()
   {
     // Creating new emulator
     _nes = new Nes_Emu;
@@ -32,10 +32,10 @@ class EmuInstance : public EmuInstanceBase
     register_mapper_70();
   }
 
-  virtual bool loadROMFileImpl(const std::string &romData) override
+  virtual bool loadROMImpl(const uint8_t* romData, const size_t romSize) override
   {
     // Loading rom data
-    Mem_File_Reader romReader(romData.data(), (int)romData.size());
+    Mem_File_Reader romReader(romData, (int)romSize);
     Auto_File_Reader romFile(romReader);
     auto result = _nes->load_ines(romFile);
     return result == 0;
