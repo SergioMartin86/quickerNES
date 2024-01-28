@@ -39,6 +39,12 @@ class PlaybackInstance
   // Initializes the playback module instance
   PlaybackInstance(NESInstance *emu, const std::vector<std::string> &sequence, const std::string &overlayPath = "") : _emu(emu)
   {
+    // Allocating video buffer
+    _video_buffer = (uint8_t *)malloc(image_width * image_height);
+
+    // Setting video buffer
+    ((emulator_t*)_emu->getInternalEmulatorPointer())->set_pixels(_video_buffer, image_width + 8);
+
     // Enabling emulation rendering
     _emu->enableRendering();
 
@@ -224,6 +230,7 @@ class PlaybackInstance
   }
 
   private:
+
   // Internal sequence information
   std::vector<stepData_t> _stepSequence;
 
@@ -238,6 +245,9 @@ class PlaybackInstance
 
   // Flag to store whether to use the button overlay
   bool _useOverlay = false;
+
+  // Video buffer
+  uint8_t *_video_buffer;
 
   // Overlay info
   std::string _overlayPath;
