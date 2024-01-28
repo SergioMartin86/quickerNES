@@ -32,6 +32,6 @@ quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
 
  quickerNESDependency = declare_dependency(
   compile_args        : [ '-D_PAGE_SIZE="' + pageSize.to_string() + '"'],
-  include_directories : include_directories(['.', 'core']),
+  include_directories : include_directories(['.']),
   sources             : [ quickerNESSrc ]
  )

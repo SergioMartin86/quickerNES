@@ -4,7 +4,7 @@
 
 // Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 namespace quickerNES
 {

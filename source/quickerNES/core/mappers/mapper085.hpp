@@ -2,8 +2,8 @@
 
 // Emu 0.5.4. http://www.slack.net/~ant/
 
-#include "apu/vrc7/apu.hpp"
-#include "mappers/mapper.hpp"
+#include "../apu/vrc7/apu.hpp"
+#include "mapper.hpp"
 #include <cstring>
 
 /* Copyright (C) 2004-2005 Shay Green. This module is free software; you

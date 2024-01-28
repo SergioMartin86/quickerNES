@@ -17,7 +17,7 @@
  * 4-in-1 Multicart ( Reset-based )
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 // NROM-128 4-in-1 multicart
 

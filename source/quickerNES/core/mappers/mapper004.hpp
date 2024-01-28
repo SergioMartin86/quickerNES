@@ -2,9 +2,9 @@
 
 // Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
-#include "core.hpp"
+#include "../core.hpp"
 #include <cstring>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you

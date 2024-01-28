@@ -25,7 +25,7 @@
  * Nina-03 / Nina-06
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 namespace quickerNES
 {

@@ -23,7 +23,7 @@
  * VRC-3 Konami, Salamander
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 namespace quickerNES
 {

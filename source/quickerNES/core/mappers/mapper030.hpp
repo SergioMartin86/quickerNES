@@ -27,7 +27,7 @@
  * Tested only on Troll Burner and Mystic Origins demo.
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 // Unrom512
 

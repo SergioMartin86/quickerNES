@@ -25,7 +25,7 @@
  * Mapper 206
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 namespace quickerNES
 {

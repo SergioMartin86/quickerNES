@@ -115,6 +115,7 @@ int main(int argc, char *argv[])
     if (loadStringFromFile(stateFileData, initialStateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", initialStateFilePath.c_str());
     e.deserializeState((uint8_t*)stateFileData.data());
   }
+  
   // Disabling requested blocks from state serialization
   for (const auto& block : stateDisabledBlocks) e.disableStateBlock(block);
 
