@@ -95,11 +95,8 @@ class NESInstanceBase
 
   // Virtual functions
 
-  virtual uint8_t *getLowMem() const = 0;
-  virtual uint8_t *getNametableMem() const = 0;
-  virtual uint8_t *getHighMem() const = 0;
-  virtual const uint8_t *getChrMem() const = 0;
-  virtual size_t getChrMemSize() const = 0;
+  virtual uint8_t *getLowMem() = 0;
+
   virtual void serializeState(uint8_t *state) const = 0;
   virtual void deserializeState(const uint8_t *state) = 0;
   virtual size_t getStateSize() const = 0;
@@ -107,7 +104,7 @@ class NESInstanceBase
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;
-  virtual void *getInternalEmulatorPointer() const = 0;
+  virtual void *getInternalEmulatorPointer() = 0;
 
   protected:
 
