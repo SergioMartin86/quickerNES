@@ -42,7 +42,6 @@ HQNState::HQNState()
 // Destructor
 HQNState::~HQNState()
 {
-    delete m_emu;
 }
 
 error_t HQNState::setSampleRate(int rate)
