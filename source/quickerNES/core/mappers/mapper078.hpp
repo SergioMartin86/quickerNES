@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 // Holy Diver and Uchuusen - Cosmo Carrier.
 

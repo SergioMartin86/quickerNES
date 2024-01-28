@@ -24,7 +24,7 @@
  *
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 // Un1rom
 

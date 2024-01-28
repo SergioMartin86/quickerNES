@@ -4,8 +4,8 @@
 
 // Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "apu/namco/apu.hpp"
-#include "mappers/mapper.hpp"
+#include "../apu/namco/apu.hpp"
+#include "mapper.hpp"
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

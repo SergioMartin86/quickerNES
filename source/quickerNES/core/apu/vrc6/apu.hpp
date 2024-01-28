@@ -5,8 +5,8 @@
 // Snd_Emu 0.1.7
 
 #include <cstdint>
-#include "apu/blipBuffer.hpp"
-#include "apu/apu.hpp"
+#include "../blipBuffer.hpp"
+#include "../apu.hpp"
 
 namespace quickerNES
 {

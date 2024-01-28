@@ -1,6 +1,6 @@
 #pragma once
 
-#include "emuInstance.hpp"
+#include "nesInstance.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <hqn/hqn.h>
@@ -30,14 +30,14 @@ class PlaybackInstance
     step.input = input;
     step.stateData = (uint8_t *)malloc(_emu->getStateSize());
     _emu->serializeState(step.stateData);
-    step.hash = _emu->getStateHash();
+    step.hash = calculateStateHash(_emu);
 
     // Adding the step into the sequence
     _stepSequence.push_back(step);
   }
 
   // Initializes the playback module instance
-  PlaybackInstance(EmuInstance *emu, const std::vector<std::string> &sequence, const std::string &overlayPath = "") : _emu(emu)
+  PlaybackInstance(NESInstance *emu, const std::vector<std::string> &sequence, const std::string &overlayPath = "") : _emu(emu)
   {
     // Enabling emulation rendering
     _emu->enableRendering();
@@ -234,7 +234,7 @@ class PlaybackInstance
   hqn::GUIController *_hqnGUI;
 
   // Pointer to the contained emulator instance
-  EmuInstance *const _emu;
+  NESInstance *const _emu;
 
   // Flag to store whether to use the button overlay
   bool _useOverlay = false;

@@ -1,7 +1,7 @@
 
 // Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "apu/fme7/apu.hpp"
+#include "apu.hpp"
 #include <cstring>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you

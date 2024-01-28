@@ -23,7 +23,7 @@
  *
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 // https://www.nesdev.org/wiki/INES_Mapper244
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#include <core/emu.hpp>
-#include <emuInstanceBase.hpp>
+#include <quickerNES/core/emu.hpp>
+#include <nesInstanceBase.hpp>
 
 typedef quickerNES::Emu emulator_t;
 
-class EmuInstance : public EmuInstanceBase
+class NESInstance : public NESInstanceBase
 {
   public:
-  EmuInstance() : EmuInstanceBase()
+  NESInstance() : NESInstanceBase()
   {
     // Creating new emulator
     _nes = new emulator_t;
@@ -20,12 +20,12 @@ class EmuInstance : public EmuInstanceBase
     _nes->set_pixels(video_buffer, image_width + 8);
   }
 
-  ~EmuInstance() = default;
+  ~NESInstance() = default;
 
-  virtual bool loadROMFileImpl(const std::string &romData) override
+  virtual bool loadROMImpl(const uint8_t* romData, const size_t romSize) override
   {
     // Loading rom data
-    _nes->load_ines((uint8_t *)romData.data());
+    _nes->load_ines(romData);
     return true;
   }
 

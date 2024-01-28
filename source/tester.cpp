@@ -2,7 +2,7 @@
 #include "nlohmann/json.hpp"
 #include "sha1/sha1.hpp"
 #include "utils.hpp"
-#include "emuInstance.hpp"
+#include "nesInstance.hpp"
 #include <chrono>
 #include <sstream>
 #include <vector>
@@ -94,18 +94,28 @@ int main(int argc, char *argv[])
   std::string controller2Type = scriptJson["Controller 2 Type"].get<std::string>();
 
   // Creating emulator instance
-  EmuInstance e;
+  NESInstance e;
 
   // Setting controller types
   e.setController1Type(controller1Type);
   e.setController2Type(controller2Type);
 
   // Loading ROM File
-  e.loadROMFile(romFilePath);
+  std::string romFileData;
+  if (loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
+  e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
+
+  // Calculating ROM SHA1
+  auto romSHA1 = SHA1::GetHash((uint8_t *)romFileData.data(), romFileData.size());
 
   // If an initial state is provided, load it now
-  if (initialStateFilePath != "") e.loadStateFile(initialStateFilePath);
-
+  if (initialStateFilePath != "")
+  {
+    std::string stateFileData;
+    if (loadStringFromFile(stateFileData, initialStateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", initialStateFilePath.c_str());
+    e.deserializeState((uint8_t*)stateFileData.data());
+  }
+  
   // Disabling requested blocks from state serialization
   for (const auto& block : stateDisabledBlocks) e.disableStateBlock(block);
 
@@ -114,9 +124,6 @@ int main(int argc, char *argv[])
 
   // Getting state size
   const auto stateSize = e.getStateSize();
-
-  // Getting actual ROM SHA1
-  auto romSHA1 = e.getRomSHA1();
 
   // Checking with the expected SHA1 hash
   if (romSHA1 != expectedROMSHA1) EXIT_WITH_ERROR("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
@@ -174,11 +181,11 @@ int main(int argc, char *argv[])
   double elapsedTimeSeconds = (double)dt * 1.0e-9;
 
   // Calculating final state hash
-  const auto finalStateHash = e.getStateHash();
+  auto result = calculateStateHash(&e);
 
   // Creating hash string
   char hashStringBuffer[256];
-  sprintf(hashStringBuffer, "0x%lX%lX", finalStateHash.first, finalStateHash.second);
+  sprintf(hashStringBuffer, "0x%lX%lX", result.first, result.second);
 
   // Printing time information
   printf("[] Elapsed time:            %3.3fs\n", (double)dt * 1.0e-9);

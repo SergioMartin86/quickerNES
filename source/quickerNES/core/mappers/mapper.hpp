@@ -4,8 +4,8 @@
 // Emu 0.7.0
 
 #include <climits>
-#include "cart.hpp"
-#include "cpu.hpp"
+#include "../cart.hpp"
+#include "../cpu.hpp"
 
 namespace quickerNES
 {

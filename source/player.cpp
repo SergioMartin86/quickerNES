@@ -1,5 +1,5 @@
 #include "argparse/argparse.hpp"
-#include "emuInstance.hpp"
+#include "nesInstance.hpp"
 #include "playbackInstance.hpp"
 #include "utils.hpp"
 #include <cstdlib>
@@ -91,17 +91,24 @@ int main(int argc, char *argv[])
   refreshTerminal();
 
   // Creating emulator instance
-  EmuInstance e;
+  NESInstance e;
 
   // Setting controller types
   e.setController1Type(controller1Type);
   e.setController2Type(controller2Type);
   
   // Loading ROM File
-  e.loadROMFile(romFilePath);
+  std::string romFileData;
+  if (loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
+  e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
 
   // If an initial state is provided, load it now
-  if (stateFilePath != "") e.loadStateFile(stateFilePath);
+  if (stateFilePath != "")
+  {
+    std::string stateFileData;
+    if (loadStringFromFile(stateFileData, stateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", stateFilePath.c_str());
+    e.deserializeState((uint8_t*)stateFileData.data());
+  }
 
   // Creating playback instance
   auto p = PlaybackInstance(&e, sequence);

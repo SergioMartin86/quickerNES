@@ -1,7 +1,7 @@
 // Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "apu/buffer.hpp"
-#include "apu/apu.hpp"
+#include "buffer.hpp"
+#include "apu.hpp"
 
 /* Library Copyright (C) 2003-2006 Shay Green. This library is free software;
 you can redistribute it and/or modify it under the terms of the GNU Lesser

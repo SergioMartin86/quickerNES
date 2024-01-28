@@ -4,8 +4,8 @@
 
 // Emu 0.7.0. http://www.slack.net/~ant/libs/
 
-#include "apu/fme7/apu.hpp"
-#include "mappers/mapper.hpp"
+#include "../apu/fme7/apu.hpp"
+#include "mapper.hpp"
 
 /* Copyright (C) 2005 Chris Moeller */
 /* Copyright (C) 2005-2006 Shay Green. This module is free software; you

@@ -1,5 +1,5 @@
 #pragma once
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 #include <cstring>
 
 namespace quickerNES

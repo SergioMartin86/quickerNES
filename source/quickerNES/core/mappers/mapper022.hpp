@@ -26,8 +26,8 @@
  * VRC-2/VRC-4 Konami
  */
 
-#include "mappers/mapper.hpp"
-#include "mappers/mapper021.hpp"
+#include "mapper.hpp"
+#include "mapper021.hpp"
 
 namespace quickerNES
 {

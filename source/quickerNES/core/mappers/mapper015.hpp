@@ -17,7 +17,7 @@
  * 100-in-1 Contra Function 16
  */
 
-#include "mappers/mapper.hpp"
+#include "mapper.hpp"
 
 namespace quickerNES
 {

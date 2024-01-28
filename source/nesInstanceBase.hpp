@@ -1,8 +1,7 @@
 #pragma once
 
-#include "sha1/sha1.hpp"
-#include <utils.hpp>
-#include <controller.hpp>
+#include "logger.hpp"
+#include "controller.hpp"
 
 #define _LOW_MEM_SIZE 0x800
 #define _HIGH_MEM_SIZE 0x2000
@@ -12,12 +11,12 @@
 static const uint16_t image_width = 256;
 static const uint16_t image_height = 240;
 
-class EmuInstanceBase
+class NESInstanceBase
 {
   public:
 
-  EmuInstanceBase() = default;
-  virtual ~EmuInstanceBase() = default;
+  NESInstanceBase() = default;
+  virtual ~NESInstanceBase() = default;
 
   inline void advanceState(const std::string &move)
   {
@@ -61,56 +60,19 @@ class EmuInstanceBase
     if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
   }
 
-  inline std::string getRomSHA1() const { return _romSHA1String; }
-
-  inline hash_t getStateHash() const
-  {
-    MetroHash128 hash;
-
-    hash.Update(getLowMem(), _LOW_MEM_SIZE);
-    // hash.Update(getHighMem(), _HIGH_MEM_SIZE);
-    // hash.Update(getNametableMem(), _NAMETABLES_MEM_SIZE);
-    // hash.Update(getChrMem(), getChrMemSize());
-
-    hash_t result;
-    hash.Finalize(reinterpret_cast<uint8_t *>(&result));
-    return result;
-  }
-
   inline void enableRendering() { _doRendering = true; };
   inline void disableRendering() { _doRendering = false; };
 
-  inline void loadStateFile(const std::string &stateFilePath)
+  inline bool loadROM(const uint8_t* romData, const size_t romSize)
   {
-    std::string stateData;
-    bool status = loadStringFromFile(stateData, stateFilePath);
-    if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
-    deserializeState((uint8_t *)stateData.data());
-  }
-
-  inline void saveStateFile(const std::string &stateFilePath) const
-  {
-    std::string stateData;
-    stateData.resize(_stateSize);
-    serializeState((uint8_t *)stateData.data());
-    saveStringToFile(stateData, stateFilePath.c_str());
-  }
-
-  inline void loadROMFile(const std::string &romFilePath)
-  {
-    // Loading ROM data
-    bool status = loadStringFromFile(_romData, romFilePath);
-    if (status == false) EXIT_WITH_ERROR("Could not find/read ROM file: %s\n", romFilePath.c_str());
-
-    // Calculating ROM hash value
-    _romSHA1String = SHA1::GetHash((uint8_t *)_romData.data(), _romData.size());
-
     // Actually loading rom file
-    status = loadROMFileImpl(_romData);
-    if (status == false) EXIT_WITH_ERROR("Could not process ROM file: %s\n", romFilePath.c_str());
+    auto status = loadROMImpl(romData, romSize);
 
     // Detecting full state size
     _stateSize = getStateSize();
+
+    // Returning status
+    return status;
   }
 
   void enableStateBlock(const std::string& block)
@@ -151,7 +113,7 @@ class EmuInstanceBase
 
   virtual void enableStateBlockImpl(const std::string& block) = 0;
   virtual void disableStateBlockImpl(const std::string& block) = 0;
-  virtual bool loadROMFileImpl(const std::string &romFilePath) = 0;
+  virtual bool loadROMImpl(const uint8_t* romData, const size_t romSize) = 0;
   virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
 
   // Storage for the light state size
@@ -161,11 +123,6 @@ class EmuInstanceBase
   bool _doRendering = true;
 
   private:
-  // Storage for the ROM data
-  std::string _romData;
-
-  // SHA1 rom hash
-  std::string _romSHA1String;
 
   // Controller class for input parsing
   Controller _controller;
