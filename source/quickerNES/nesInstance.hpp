@@ -41,9 +41,6 @@ class NESInstance final : public NESInstanceBase
 
   private:
 
-  // Video buffer
-  uint8_t *video_buffer;
-
   // Emulator instance
   emulator_t _nes;
 };
