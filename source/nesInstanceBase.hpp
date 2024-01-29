@@ -3,10 +3,6 @@
 #include "logger.hpp"
 #include "controller.hpp"
 
-#define _LOW_MEM_SIZE 0x800
-#define _HIGH_MEM_SIZE 0x2000
-#define _NAMETABLES_MEM_SIZE 0x1000
-
 // Size of image generated in graphics buffer
 static const uint16_t image_width = 256;
 static const uint16_t image_height = 240;
@@ -95,7 +91,8 @@ class NESInstanceBase
 
   // Virtual functions
 
-  virtual uint8_t *getLowMem() = 0;
+  virtual uint8_t *getLowMem() const = 0;
+  virtual size_t getLowMemSize() const = 0;
 
   virtual void serializeState(uint8_t *state) const = 0;
   virtual void deserializeState(const uint8_t *state) = 0;

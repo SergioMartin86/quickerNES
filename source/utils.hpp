@@ -169,5 +169,5 @@ inline hash_t calculateMetroHash(uint8_t *data, size_t size)
 
 inline hash_t calculateStateHash(NESInstance* nes)
 {
-  return calculateMetroHash(nes->getLowMem(), _LOW_MEM_SIZE);
+  return calculateMetroHash(nes->getLowMem(), nes->getLowMemSize());
 }

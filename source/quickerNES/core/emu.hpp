@@ -204,7 +204,9 @@ class Emu
   {
     low_mem_size = 0x800
   };
-  uint8_t *low_mem() { return emu.low_mem; }
+  
+  uint8_t *get_low_mem() const { return (uint8_t*)emu.low_mem; }
+  size_t get_low_mem_size() const { return low_mem_size; }
 
   // Optional 8K memory
   enum

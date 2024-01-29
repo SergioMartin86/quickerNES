@@ -23,7 +23,8 @@ class NESInstance final : public NESInstanceBase
     register_mapper_70();
   }
 
-  uint8_t *getLowMem() override { return _nes.low_mem(); };
+  uint8_t *getLowMem() const override { return _nes.low_mem(); };
+  size_t getLowMemSize() const override { return 0x800; };
 
   void serializeState(uint8_t *state) const override
   {
