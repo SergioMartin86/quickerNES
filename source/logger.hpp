@@ -5,14 +5,19 @@
 #include <stdio.h>
 
 // If we use NCurses, we need to use the appropriate printing function
-#ifdef NCURSES
-  #include <ncurses.h>
-  #define LOG printw
-#else
-  #define LOG printf
+#ifndef LOG
+  #ifdef NCURSES
+    #include <ncurses.h>
+    #define LOG printw
+  #else
+    #define LOG printf
+  #endif
 #endif
 
-#define EXIT_WITH_ERROR(...) exitWithError(__FILE__, __LINE__, __VA_ARGS__)
+#ifndef EXIT_WITH_ERROR
+ #define EXIT_WITH_ERROR(...) exitWithError(__FILE__, __LINE__, __VA_ARGS__)
+#endif
+
 inline void exitWithError [[noreturn]] (const char *fileName, const int lineNumber, const char *format, ...)
 {
   char *outstr = 0;
