@@ -9,7 +9,8 @@ class NESInstance final : public NESInstanceBase
 {
   public:
 
-  uint8_t *getLowMem() override { return _nes.low_mem(); };
+  uint8_t *getLowMem() const override { return _nes.get_low_mem(); };
+  size_t getLowMemSize() const override { return _nes.get_low_mem_size(); };
 
   void serializeState(uint8_t *state) const override {  _nes.serializeState(state); }
   void deserializeState(const uint8_t *state) override { _nes.deserializeState(state); }
