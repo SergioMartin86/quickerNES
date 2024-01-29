@@ -1,8 +1,8 @@
 #pragma once
 
-#include <quickNES/core/nes_emu/Nes_Emu.h>
-#include <quickNES/core/nes_emu/Nes_State.h>
-#include <nesInstanceBase.hpp>
+#include "core/nes_emu/Nes_Emu.h"
+#include "core/nes_emu/Nes_State.h"
+#include "../nesInstanceBase.hpp"
 
 #define _DUMMY_SIZE 65536
 

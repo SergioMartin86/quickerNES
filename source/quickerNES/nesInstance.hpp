@@ -1,7 +1,7 @@
 #pragma once
 
-#include <quickerNES/core/emu.hpp>
-#include <nesInstanceBase.hpp>
+#include "core/emu.hpp"
+#include "../nesInstanceBase.hpp"
 
 typedef quickerNES::Emu emulator_t;
 
