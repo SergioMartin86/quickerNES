@@ -91,8 +91,8 @@ class Ppu_Impl : public ppu_state_t
 
   static const uint16_t scanline_len = 341;
 
-  uint8_t *getSpriteRAM() { return spr_ram; }
-  uint16_t getSpriteRAMSize() { return spr_ram_size; }
+  uint8_t *getSpriteRAM() const { return (uint8_t*)spr_ram; }
+  uint16_t getSpriteRAMSize() const { return spr_ram_size; }
   uint8_t spr_ram[spr_ram_size];
   void all_tiles_modified();
 

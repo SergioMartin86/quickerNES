@@ -191,12 +191,12 @@ class Emu
   // Access to emulated memory, for viewer/cheater/debugger
 
   // CHR
-  uint8_t const *chr_mem();
+  uint8_t *chr_mem() const;
   long chr_size() const;
   void write_chr(void const *, long count, long offset);
 
   // Nametable
-  uint8_t *nametable_mem() { return emu.ppu.impl->nt_ram; }
+  uint8_t *nametable_mem() const { return emu.ppu.impl->nt_ram; }
   long nametable_size() const { return 0x1000; }
 
   // Built-in 2K memory
@@ -213,11 +213,12 @@ class Emu
   {
     high_mem_size = 0x2000
   };
-  uint8_t *high_mem() { return emu.impl->sram; }
+  uint8_t *high_mem() const { return emu.impl->sram; }
+  size_t get_high_mem_size() const { return high_mem_size; }
 
   // Sprite memory
-  uint8_t *spr_mem() { return emu.ppu.getSpriteRAM(); }
-  uint16_t spr_mem_size() { return emu.ppu.getSpriteRAMSize(); }
+  uint8_t *spr_mem() const { return emu.ppu.getSpriteRAM(); }
+  uint16_t spr_mem_size() const { return emu.ppu.getSpriteRAMSize(); }
 
   // End of public interface
   public:
@@ -277,7 +278,7 @@ inline void Emu::set_pixels(void *p, long n)
   emu.ppu.host_row_bytes = n;
 }
 
-inline uint8_t const *Emu::chr_mem()
+inline uint8_t *Emu::chr_mem() const
 {
   return cart()->chr_size() ? (uint8_t *)cart()->chr() : emu.ppu.impl->chr_ram;
 }

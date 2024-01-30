@@ -12,6 +12,18 @@ class NESInstance final : public NESInstanceBase
   uint8_t *getLowMem() const override { return _nes.get_low_mem(); };
   size_t getLowMemSize() const override { return _nes.get_low_mem_size(); };
 
+  uint8_t *getWorkMem() const { return _nes.high_mem(); };
+  size_t getWorkMemSize() const { return _nes.get_high_mem_size(); };
+
+  uint8_t *getNametableMem() const { return _nes.nametable_mem(); };
+  size_t getNametableMemSize() const { return _nes.nametable_size(); };
+
+  uint8_t *getSpriteMem() const { return _nes.spr_mem(); };
+  size_t getSpriteMemSize() const { return _nes.spr_mem_size(); };
+
+  uint8_t *getCHRMem() const { return _nes.chr_mem(); };
+  size_t getCHRMemSize() const { return _nes.chr_size(); };
+
   void serializeState(uint8_t *state) const override {  _nes.serializeState(state); }
   void deserializeState(const uint8_t *state) override { _nes.deserializeState(state); }
   size_t getStateSize() const override { return _nes.getStateSize(); }
