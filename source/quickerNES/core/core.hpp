@@ -15,12 +15,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Emu 0.7.0
 
+#include <stdexcept>
 #include "cpu.hpp"
 #include "apu/apu.hpp"
 #include "mappers/mapper.hpp"
 #include "ppu/ppu.hpp"
 #include <cstdio>
 #include <string>
+#include <xdelta3/xdelta3.h>
 
 namespace quickerNES
 {
@@ -151,44 +153,174 @@ class Core : private Cpu
     reset(true, true);
   }
 
-  size_t serializeState(uint8_t *buffer) const
+  static inline void serializeContiguousData(const uint8_t* __restrict__ inputData, const size_t inputDataSize, uint8_t* __restrict__ outputData, size_t* outputDataPos, size_t* referenceDataPos)
   {
-    size_t pos = 0;
-    std::string headerCode;
-    const uint32_t headerSize = sizeof(char) * 4;
-    uint32_t blockSize = 0;
-    void *dataSource;
+    // Only perform memcpy if the input block is not null
+    if (outputData != nullptr) memcpy(&outputData[*outputDataPos], inputData, inputDataSize);
 
-    blockSize = 0xFFFFFFFF;
-    if (HEADBlockEnabled == true)
+    // Moving pointer positions
+    *outputDataPos += inputDataSize;
+    *referenceDataPos += inputDataSize;
+  }
+
+  static inline void deserializeContiguousData(uint8_t* __restrict__ outputData, const size_t outputDataSize, const uint8_t* __restrict__ inputData, size_t* inputDataPos, size_t* referenceDataPos)
+  {
+    // Only perform memcpy if the input block is not null
+    if (outputData != nullptr) memcpy(outputData, &inputData[*inputDataPos], outputDataSize);
+
+    // Moving pointer positions
+    *inputDataPos += outputDataSize;
+    *referenceDataPos += outputDataSize;
+  }
+
+  static inline void serializeBlockHead(uint8_t* __restrict__ outputData, size_t* outputDataPos, size_t* referenceDataPos, const char* blockTag, const uint32_t blockSize)
+  {
+    if (outputData != nullptr) memcpy(&outputData[*outputDataPos], blockTag, 4);
+    *outputDataPos += 4; *referenceDataPos += 4;
+
+    if (outputData != nullptr) memcpy(&outputData[*outputDataPos], &blockSize, 4);
+    *outputDataPos += 4; *referenceDataPos += 4;
+  }
+
+  static inline void deserializeBlockHead(size_t* inputDataPos, size_t* referenceDataPos)
+  {
+    *inputDataPos += 8;
+    *referenceDataPos += 8;
+  }
+
+  static inline void serializeDifferentialData(
+    const uint8_t* __restrict__ inputData,
+    const size_t inputDataSize,
+    uint8_t* __restrict__ outputData,
+    size_t* outputDataPos,
+    const uint8_t* __restrict__ referenceData = nullptr,
+    size_t* referenceDataPos = 0,
+    const size_t outputMaxSize = 0,
+    const bool useZlib = false
+    )
+  {
+    // Only perform compression if input is not null
+    if (outputData != nullptr)
     {
-      headerCode = "NESS"; // NESS Block
-      if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-      pos += headerSize;
-      if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-      pos += headerSize;
+      // Variable to store difference count 
+      auto diffCount = (usize_t*)&outputData[*outputDataPos];
+
+      // Advancing position pointer to store the difference counter
+      *outputDataPos += sizeof(usize_t);
+
+      // If we reached maximum output, stop here
+      if (*outputDataPos >= outputMaxSize) 
+      {
+        fprintf(stderr, "[Error] Maximum output data position reached before differential encode (%lu)\n", outputMaxSize);
+        std::runtime_error("Error while serializing");
+      }
+
+      // Encoding differential
+      int ret = xd3_encode_memory(
+        inputData,
+        inputDataSize,
+        &referenceData[*referenceDataPos],
+        inputDataSize,
+        &outputData[*outputDataPos],
+        diffCount,
+        outputMaxSize - *outputDataPos,
+        useZlib ? 0 : XD3_NOCOMPRESS
+      );
+
+      // If an error happened, print it here
+      if (ret != 0)
+      {
+         fprintf(stderr, "[Error] unexpected error while encoding differential compression. Diff count: %u\n", *diffCount);
+         std::runtime_error("Error while serializing");
+      } 
+
+      // Increasing output data position pointer
+      *outputDataPos += *diffCount;
+
+      // If exceeded size, report it
+      if ((usize_t)*outputDataPos > outputMaxSize) 
+      {
+        fprintf(stderr, "[Error] Differential compression size (%u) exceeded output maximum size (%lu).\n", *diffCount, outputMaxSize);
+        std::runtime_error("Error while serializing");
+      }
     }
 
+    // Finally, increasing reference data position pointer
+    *referenceDataPos += inputDataSize;
+  }
+
+  static inline void deserializeDifferentialData(
+    uint8_t* __restrict__ outputData,
+    const size_t outputDataSize,
+    const uint8_t* __restrict__ inputData,
+    size_t* inputDataPos,
+    const uint8_t* __restrict__ referenceData = nullptr,
+    size_t* referenceDataPos = 0,
+    const bool useZlib = false
+    )
+  {
+    // Reading differential count
+    usize_t diffCount;
+    memcpy(&diffCount, &inputData[*inputDataPos], sizeof(usize_t));
+
+    // Advancing position pointer to store the difference counter
+    *inputDataPos += sizeof(usize_t);
+
+    // Encoding differential
+    usize_t output_size;
+    int ret = xd3_decode_memory(
+      &inputData[*inputDataPos],
+      diffCount,
+      &referenceData[*referenceDataPos],
+      outputDataSize,
+      outputData,
+      &output_size,
+      outputDataSize,
+      useZlib ? 0 : XD3_NOCOMPRESS
+    );
+
+    // If an error happened, print it here
+    if (ret != 0) 
+    {
+      fprintf(stderr, "[Error] unexpected error while decoding differential compression. Diff count: %u\n", diffCount);
+      std::runtime_error("Error while deserializing");
+    }
+
+    // Increasing output data position pointer
+    *inputDataPos += diffCount;
+
+    // Finally, increasing reference data position pointer
+    *referenceDataPos += outputDataSize;
+  }
+
+
+  size_t serializeState(
+    uint8_t* __restrict__ outputData,
+    const bool useDifferentialCompression = false,
+    const uint8_t* __restrict__ referenceData = nullptr,
+    const size_t outputMaxSize = 0,
+    const bool useZlib = false) const
+  {
+    size_t outputDataPos = 0;
+    size_t referenceDataPos = 0;
+
+    // NESS Block
+    if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "NESS", 0xFFFFFFFF);
+
+    // TIME Block
     if (TIMEBlockEnabled == true)
     {
       nes_state_t state = nes;
       state.timestamp *= 5;
-      blockSize = sizeof(nes_state_t);
-      dataSource = (void *)&state;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "TIME"; // TIME Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
+      const auto inputDataSize = sizeof(nes_state_t);
+      const auto inputData = (uint8_t *)&state;
 
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "TIME", inputDataSize);
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
     }
 
+    // CPUR Block
     if (CPURBlockEnabled == true)
     {
       cpu_state_t s;
@@ -199,227 +331,149 @@ class Core : private Cpu
       s.x = r.x;
       s.y = r.y;
       s.p = r.status;
-      blockSize = sizeof(cpu_state_t);
-      dataSource = (void *)&s;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "CPUR"; // CPUR Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
+      const auto inputDataSize = sizeof(cpu_state_t);
+      const auto inputData = (uint8_t *)&s;
 
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "CPUR", inputDataSize);
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
     }
 
     if (PPURBlockEnabled == true)
     {
-      blockSize = sizeof(ppu_state_t);
-      dataSource = (void *)&ppu;
+      const auto inputDataSize = sizeof(ppu_state_t);
+      const auto inputData = (const uint8_t *)&ppu;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "PPUR"; // PPUR Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
-
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "PPUR", inputDataSize);
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
     }
 
+    // APUR Block
     if (APURBlockEnabled == true)
     {
       Apu::apu_state_t apuState;
       impl->apu.save_state(&apuState);
-      blockSize = sizeof(Apu::apu_state_t);
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "APUR"; // APUR Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
+      const auto inputDataSize = sizeof(Apu::apu_state_t);
+      const auto inputData = (uint8_t *)&apuState;
 
-      if (buffer != nullptr) memcpy(&buffer[pos], &apuState, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "APUR", inputDataSize);
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
     }
 
+    // CTRL Block
     if (CTRLBlockEnabled == true)
     {
-      blockSize = sizeof(joypad_state_t);
-      dataSource = (void *)&joypad;
+      const auto inputDataSize = sizeof(joypad_state_t);
+      const auto inputData = (uint8_t *)&joypad;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "CTRL"; // CTRL Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
-
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "CTRL", inputDataSize);
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
     }
 
+    // MAPR Block
     if (MAPRBlockEnabled == true)
     {
-      blockSize = mapper->state_size;
-      dataSource = (void *)mapper->state;
+      const auto inputDataSize = mapper->state_size;
+      const auto inputData = (uint8_t *)mapper->state;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "MAPR"; // MAPR Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
-
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "MAPR", inputDataSize);
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
     }
 
+    // LRAM Block
     if (LRAMBlockEnabled == true)
     {
-      blockSize = low_ram_size;
-      dataSource = (void *)low_mem;
+      const auto inputDataSize = low_ram_size;
+      const auto inputData = (uint8_t *)low_mem;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "LRAM"; // LRAM Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
-
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "LRAM", inputDataSize);
+      if (useDifferentialCompression == false) serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == true)  serializeDifferentialData(inputData, inputDataSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
     }
 
+    // SPRT Block
     if (SPRTBlockEnabled == true)
     {
-      blockSize = Ppu::spr_ram_size;
-      dataSource = (void *)ppu.spr_ram;
+      const auto inputDataSize = Ppu::spr_ram_size;
+      const auto inputData = (uint8_t *)ppu.spr_ram;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "SPRT"; // SPRT Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
-
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "SPRT", inputDataSize);
+      if (useDifferentialCompression == false) serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == true)  serializeDifferentialData(inputData, inputDataSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
     }
 
+    // NTAB Block
     if (NTABBlockEnabled == true)
     {
       size_t nametable_size = 0x800;
       if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
-      blockSize = nametable_size;
-      dataSource = (void *)ppu.impl->nt_ram;
 
-      if (HEADBlockEnabled == true)
-      {
-        headerCode = "NTAB"; // NTAB Block
-        if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-        pos += headerSize;
-        if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-        pos += headerSize;
-      }
+      const auto inputDataSize = nametable_size;
+      const auto inputData = (uint8_t *)ppu.impl->nt_ram;
 
-      if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-      pos += blockSize;
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "NTAB", inputDataSize);
+      if (useDifferentialCompression == false) serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == true)  serializeDifferentialData(inputData, inputDataSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
     }
 
+    // CHRR Block
     if (CHRRBlockEnabled == true)
     {
       if (ppu.chr_is_writable)
       {
-        blockSize = ppu.chr_size;
-        dataSource = (void *)ppu.impl->chr_ram;
+        const auto inputDataSize = ppu.chr_size;
+        const auto inputData = (uint8_t *)ppu.impl->chr_ram;
 
-        if (HEADBlockEnabled == true)
-        {
-          headerCode = "CHRR"; // CHRR Block
-          if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-          pos += headerSize;
-          if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-          pos += headerSize;
-        }
-
-        if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-        pos += blockSize;
+        if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "CHRR", inputDataSize);
+        if (useDifferentialCompression == false) serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
+        if (useDifferentialCompression == true)  serializeDifferentialData(inputData, inputDataSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
       }
     }
 
+    // SRAM Block
     if (SRAMBlockEnabled == true)
     {
       if (sram_present)
       {
-        blockSize = impl->sram_size;
-        dataSource = (void *)impl->sram;
+        const auto inputDataSize = impl->sram_size;
+        const auto inputData = (uint8_t *)impl->sram;
 
-        if (HEADBlockEnabled == true)
-        {
-          headerCode = "SRAM"; // SRAM Block
-          if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-          pos += headerSize;
-          if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-          pos += headerSize;
-        }
-
-        if (buffer != nullptr) memcpy(&buffer[pos], dataSource, blockSize);
-        pos += blockSize;
+        if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "SRAM", inputDataSize);
+        if (useDifferentialCompression == false) serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos, &referenceDataPos);
+        if (useDifferentialCompression == true)  serializeDifferentialData(inputData, inputDataSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
       }
     }
 
-    if (HEADBlockEnabled == true)
-    {
-      headerCode = "gend"; // gend Block
-      blockSize = 0;
-      if (buffer != nullptr) memcpy(&buffer[pos], headerCode.data(), headerSize);
-      pos += headerSize;
-      if (buffer != nullptr) memcpy(&buffer[pos], &blockSize, headerSize);
-      pos += headerSize;
-    }
+    // gend Block
+    if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "gend", 0);
 
-    return pos; // Bytes written
+    return outputDataPos; // Bytes written
   }
 
-  size_t deserializeState(const uint8_t *buffer)
+  size_t deserializeState(const uint8_t* __restrict__ inputData, const bool useDifferentialCompression = false, const uint8_t* __restrict__ referenceData = nullptr, const bool useZlib = false)
   {
     disable_rendering();
     error_count = 0;
     ppu.burst_phase = 0; // avoids shimmer when seeking to same time over and over
 
-    size_t pos = 0;
-    const uint32_t headerSize = sizeof(char) * 4;
-    uint32_t blockSize = 0;
+    size_t inputDataPos = 0;
+    size_t referenceDataPos = 0;
 
     // NESS Block
-    if (HEADBlockEnabled == true) pos += 2 * headerSize;
+    if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
 
     // TIME Block
     if (TIMEBlockEnabled == true)
     {
       nes_state_t nesState;
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      blockSize = sizeof(nes_state_t);
-      memcpy(&nesState, &buffer[pos], blockSize);
-      pos += blockSize;
+
+      const auto outputData = (uint8_t*) &nesState;
+      const auto inputDataSize = sizeof(nes_state_t);
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+      
       nes = nesState;
       nes.timestamp /= 5;
     }
@@ -428,10 +482,13 @@ class Core : private Cpu
     if (CPURBlockEnabled == true)
     {
       cpu_state_t s;
-      blockSize = sizeof(cpu_state_t);
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy((void *)&s, &buffer[pos], blockSize);
-      pos += blockSize;
+      
+      const auto outputData = (uint8_t*) &s;
+      const auto inputDataSize = sizeof(cpu_state_t);
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+
       r.pc = s.pc;
       r.sp = s.s;
       r.a = s.a;
@@ -443,20 +500,24 @@ class Core : private Cpu
     // PPUR Block
     if (PPURBlockEnabled == true)
     {
-      blockSize = sizeof(ppu_state_t);
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy((void *)&ppu, &buffer[pos], blockSize);
-      pos += blockSize;
+      const auto outputData = (uint8_t*) &ppu;
+      const auto inputDataSize = sizeof(ppu_state_t);
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
     }
 
     // APUR Block
     if (APURBlockEnabled == true)
     {
       Apu::apu_state_t apuState;
-      blockSize = sizeof(Apu::apu_state_t);
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy(&apuState, &buffer[pos], blockSize);
-      pos += blockSize;
+
+      const auto outputData = (uint8_t*) &apuState;
+      const auto inputDataSize = sizeof(Apu::apu_state_t);
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+
       impl->apu.load_state(apuState);
       impl->apu.end_frame(-(int)nes.timestamp / ppu_overclock);
     }
@@ -464,39 +525,47 @@ class Core : private Cpu
     // CTRL Block
     if (CTRLBlockEnabled == true)
     {
-      blockSize = sizeof(joypad_state_t);
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy((void *)&joypad, &buffer[pos], blockSize);
-      pos += blockSize;
+      const auto outputData = (uint8_t*) &joypad;
+      const auto inputDataSize = sizeof(joypad_state_t);
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
     }
 
     // MAPR Block
     if (MAPRBlockEnabled == true)
     {
       mapper->default_reset_state();
-      blockSize = mapper->state_size;
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy((void *)mapper->state, &buffer[pos], blockSize);
-      pos += blockSize;
+
+      const auto outputData = (uint8_t*) mapper->state;
+      const auto inputDataSize = mapper->state_size;
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+
       mapper->apply_mapping();
     }
 
     // LRAM Block
     if (LRAMBlockEnabled == true)
     {
-      blockSize = low_ram_size;
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy((void *)low_mem, &buffer[pos], blockSize);
-      pos += blockSize;
+      const auto outputData = (uint8_t*) low_mem;
+      const auto inputDataSize = low_ram_size;
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == false) deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, inputDataSize, inputData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
     }
 
     // SPRT Block
     if (SPRTBlockEnabled == true)
     {
-      blockSize = Ppu::spr_ram_size;
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy((void *)ppu.spr_ram, &buffer[pos], blockSize);
-      pos += blockSize;
+      const auto outputData = (uint8_t*) ppu.spr_ram;
+      const auto inputDataSize = Ppu::spr_ram_size;
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == false) deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, inputDataSize, inputData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
     }
 
     // NTAB Block
@@ -504,43 +573,51 @@ class Core : private Cpu
     {
       size_t nametable_size = 0x800;
       if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
-      blockSize = nametable_size;
-      if (HEADBlockEnabled == true) pos += 2 * headerSize;
-      memcpy((void *)ppu.impl->nt_ram, &buffer[pos], blockSize);
-      pos += blockSize;
+
+      const auto outputData = (uint8_t*) ppu.impl->nt_ram;
+      const auto inputDataSize = nametable_size;
+
+      if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == false) deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, inputDataSize, inputData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
     }
 
+    // CHRR Block
     if (CHRRBlockEnabled == true)
     {
       if (ppu.chr_is_writable)
       {
-        // CHRR Block
-        blockSize = ppu.chr_size;
-        if (HEADBlockEnabled == true) pos += 2 * headerSize;
-        memcpy((void *)ppu.impl->chr_ram, &buffer[pos], blockSize);
-        pos += blockSize;
+        const auto outputData = (uint8_t*) ppu.impl->chr_ram;
+        const auto inputDataSize = ppu.chr_size;
+
+        if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+        if (useDifferentialCompression == false) deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+        if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, inputDataSize, inputData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
+
         ppu.all_tiles_modified();
       }
     }
 
+    // SRAM Block
     if (SRAMBlockEnabled == true)
     {
       if (sram_present)
       {
-        // SRAM Block
-        blockSize = impl->sram_size;
-        if (HEADBlockEnabled == true) pos += 2 * headerSize;
-        memcpy((void *)impl->sram, &buffer[pos], blockSize);
-        pos += blockSize;
+        const auto outputData = (uint8_t*) impl->sram;
+        const auto inputDataSize = impl->sram_size;
+
+        if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
+        if (useDifferentialCompression == false) deserializeContiguousData(outputData, inputDataSize, inputData, &inputDataPos, &referenceDataPos);
+        if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, inputDataSize, inputData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
       }
     }
 
     if (sram_present) enable_sram(true);
 
-    // headerCode = "gend"; // gend Block
-    if (HEADBlockEnabled == true) pos += 2 * headerSize;
+    // gend Block
+    if (HEADBlockEnabled == true) deserializeBlockHead(&inputDataPos, &referenceDataPos);
 
-    return pos; // Bytes read
+    return inputDataPos; // Bytes read
   }
 
 void enableStateBlock(const std::string& block)

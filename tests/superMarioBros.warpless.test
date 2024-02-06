@@ -5,5 +5,11 @@
   "Sequence File": "superMarioBros.warpless.sol",
   "Disable State Blocks": [ "HEAD", "SRAM", "CHRR", "NTAB", "SPRT", "CTRL" ],
   "Controller 1 Type": "Joypad",
-  "Controller 2 Type": "None"
+  "Controller 2 Type": "None",
+  "Differential Compression":
+  {
+    "Enabled": false,
+    "Max Differences": 2200,
+    "Use Zlib": true
+  }
 }

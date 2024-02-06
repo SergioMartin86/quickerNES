@@ -98,6 +98,10 @@ class NESInstanceBase
   virtual void deserializeState(const uint8_t *state) = 0;
   virtual size_t getStateSize() const = 0;
   
+  virtual size_t serializeDifferentialState(uint8_t *differentialData, const uint8_t* referenceData, const size_t maxSize, const bool useZlib) const = 0;
+  virtual void deserializeDifferentialState(const uint8_t *differentialData, const uint8_t* referenceData, const bool useZlib) = 0;
+  virtual size_t getDifferentialStateSize() const = 0;
+
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;

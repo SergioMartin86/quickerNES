@@ -45,9 +45,14 @@ class Emu
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
 // Save emulator state variants
-  size_t serializeState(uint8_t *buffer) const   { return emu.serializeState(buffer); }
-  size_t deserializeState(const uint8_t *buffer) { return emu.deserializeState(buffer); }
-  size_t getStateSize() const { return emu.serializeState(nullptr); }
+  size_t serializeState(uint8_t *buffer) const   { return emu.serializeState(buffer, false); }
+  size_t deserializeState(const uint8_t *buffer) { return emu.deserializeState(buffer, false); }
+  size_t getStateSize() const { return emu.serializeState(nullptr, false); }
+
+  size_t serializeDifferentialState(uint8_t* __restrict__ outputData, const uint8_t* __restrict__ referenceData, const size_t outputMaxSize, const bool useZlib) const { return emu.serializeState(outputData, true, referenceData, outputMaxSize, useZlib); }
+  size_t deserializeDifferentialState(const uint8_t* __restrict__ inputStateData, const uint8_t* __restrict__ referenceData, const bool useZlib) {  return emu.deserializeState(inputStateData, true, referenceData, useZlib); }
+  size_t getDifferentialStateSize() const { return emu.serializeState(nullptr, true, nullptr, 0, false); }
+
   void enableStateBlock(const std::string& block) { emu.enableStateBlock(block); };
   void disableStateBlock(const std::string& block) { emu.disableStateBlock(block); };
 

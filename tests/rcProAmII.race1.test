@@ -5,5 +5,11 @@
   "Sequence File": "rcProAmII.race1.sol",
   "Disable State Blocks": [ "HEAD", "SRAM", "NTAB", "SPRT", "CTRL", "APUR" ],
   "Controller 1 Type": "FourScore1",
-  "Controller 2 Type": "FourScore2"
+  "Controller 2 Type": "FourScore2",
+  "Differential Compression":
+  {
+    "Enabled": false,
+    "Max Differences": 2200,
+    "Use Zlib": true
+  }
 }
