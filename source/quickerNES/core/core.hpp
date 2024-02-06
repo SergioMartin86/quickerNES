@@ -15,6 +15,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Emu 0.7.0
 
+#include <stdexcept>
 #include "cpu.hpp"
 #include "apu/apu.hpp"
 #include "mappers/mapper.hpp"
@@ -172,68 +173,55 @@ class Core : private Cpu
     const size_t inputDataSize,
     uint8_t* __restrict__ outputData,
     size_t* outputDataPos,
-    const bool useDifferentialCompression = false,
     const uint8_t* __restrict__ referenceData = nullptr,
     size_t* referenceDataPos = 0,
     const size_t outputMaxSize = 0,
     const bool useZlib = false
     )
   {
-    // If not using differential compression, process the entire input block
-    if (useDifferentialCompression == false)
+    // Only perform compression if input is not null
+    if (outputData != nullptr)
     {
-      // Only perform memcpy if the input block is not null
-      if (outputData != nullptr) memcpy(&outputData[*outputDataPos], inputData, inputDataSize);
-      *outputDataPos += inputDataSize;
-    }
+      // Variable to store difference count 
+      auto diffCount = (usize_t*)&outputData[*outputDataPos];
 
-    // If using differential compression
-    if (useDifferentialCompression == true)
-    {
-      // Only perform compression if input is not null
-      if (outputData != nullptr)
+      // Advancing position pointer to store the difference counter
+      *outputDataPos += sizeof(usize_t);
+
+      // If we reached maximum output, stop here
+      if (*outputDataPos >= outputMaxSize) 
       {
-        // Variable to store difference count 
-        auto diffCount = (usize_t*)&outputData[*outputDataPos];
+        fprintf(stderr, "[Error] Maximum output data position reached before differential encode (%lu)\n", outputMaxSize);
+        std::runtime_error("Error while serializing");
+      }
 
-        // Advancing position pointer to store the difference counter
-        *outputDataPos += sizeof(usize_t);
+      // Encoding differential
+      int ret = xd3_encode_memory(
+        inputData,
+        inputDataSize,
+        &referenceData[*referenceDataPos],
+        inputDataSize,
+        &outputData[*outputDataPos],
+        diffCount,
+        outputMaxSize - *outputDataPos,
+        useZlib ? 0 : XD3_NOCOMPRESS
+      );
 
-        // If we reached maximum output, stop here
-        if (*outputDataPos >= outputMaxSize) 
-        {
-          fprintf(stderr, "[Error] Maximum output data position reached before differential encode (%lu)\n", outputMaxSize);
-          exit(-1);
-        }
+      // If an error happened, print it here
+      if (ret != 0)
+      {
+         fprintf(stderr, "[Error] unexpected error while encoding differential compression. Diff count: %u\n", *diffCount);
+         std::runtime_error("Error while serializing");
+      } 
 
-        // Encoding differential
-        int ret = xd3_encode_memory(
-          inputData,
-          inputDataSize,
-          &referenceData[*referenceDataPos],
-          inputDataSize,
-          &outputData[*outputDataPos],
-          diffCount,
-          outputMaxSize - *outputDataPos,
-          useZlib ? 0 : XD3_NOCOMPRESS
-        );
+      // Increasing output data position pointer
+      *outputDataPos += *diffCount;
 
-        // If an error happened, print it here
-        if (ret != 0) 
-        {
-          fprintf(stderr, "[Error] unexpected error while encoding differential compression. Diff count: %u\n", *diffCount);
-          exit(-1);
-        }
-
-        // Increasing output data position pointer
-        *outputDataPos += *diffCount;
-
-        // If exceeded size, report it
-        if ((usize_t)*outputDataPos > outputMaxSize) 
-        {
-          fprintf(stderr, "[Error] Differential compression size (%u) exceeded output maximum size (%lu).\n", *diffCount, outputMaxSize);
-          exit(-1);
-        }
+      // If exceeded size, report it
+      if ((usize_t)*outputDataPos > outputMaxSize) 
+      {
+        fprintf(stderr, "[Error] Differential compression size (%u) exceeded output maximum size (%lu).\n", *diffCount, outputMaxSize);
+        std::runtime_error("Error while serializing");
       }
     }
 
@@ -246,53 +234,40 @@ class Core : private Cpu
     const size_t outputDataSize,
     const uint8_t* __restrict__ inputData,
     size_t* inputDataPos,
-    const bool useDifferentialCompression = false,
     const uint8_t* __restrict__ referenceData = nullptr,
     size_t* referenceDataPos = 0,
     const bool useZlib = false
     )
   {
-    // If not using differential compression, process the entire input block
-    if (useDifferentialCompression == false)
+    // Reading differential count
+    usize_t diffCount;
+    memcpy(&diffCount, &inputData[*inputDataPos], sizeof(usize_t));
+
+    // Advancing position pointer to store the difference counter
+    *inputDataPos += sizeof(usize_t);
+
+    // Encoding differential
+    usize_t output_size;
+    int ret = xd3_decode_memory(
+      &inputData[*inputDataPos],
+      diffCount,
+      &referenceData[*referenceDataPos],
+      outputDataSize,
+      outputData,
+      &output_size,
+      outputDataSize,
+      useZlib ? 0 : XD3_NOCOMPRESS
+    );
+
+    // If an error happened, print it here
+    if (ret != 0) 
     {
-      // Only perform memcpy if the input block is not null
-      if (outputData != nullptr) memcpy(outputData, &inputData[*inputDataPos], outputDataSize);
-      *inputDataPos += outputDataSize;
+      fprintf(stderr, "[Error] unexpected error while decoding differential compression. Diff count: %u\n", diffCount);
+      std::runtime_error("Error while deserializing");
     }
 
-    // If using differential compression
-    if (useDifferentialCompression == true)
-    {
-      // Reading differential count
-      usize_t diffCount;
-      memcpy(&diffCount, &inputData[*inputDataPos], sizeof(usize_t));
-
-      // Advancing position pointer to store the difference counter
-      *inputDataPos += sizeof(usize_t);
-
-      // Encoding differential
-      usize_t output_size;
-      int ret = xd3_decode_memory(
-        &inputData[*inputDataPos],
-        diffCount,
-        &referenceData[*referenceDataPos],
-        outputDataSize,
-        outputData,
-        &output_size,
-        outputDataSize,
-        useZlib ? 0 : XD3_NOCOMPRESS
-      );
-
-      // If an error happened, print it here
-      if (ret != 0) 
-      {
-        fprintf(stderr, "[Error] unexpected error while decoding differential compression. Diff count: %u\n", diffCount);
-        exit(-1);
-      }
-
-      // Increasing output data position pointer
-      *inputDataPos += diffCount;
-    }
+    // Increasing output data position pointer
+    *inputDataPos += diffCount;
 
     // Finally, increasing reference data position pointer
     *referenceDataPos += outputDataSize;
@@ -383,8 +358,8 @@ class Core : private Cpu
         outputDataPos += headerSize; referenceDataPos += headerSize;
       } 
 
-      if (useDifferentialCompression == true)  serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
-      if (useDifferentialCompression == false) serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, outputMaxSize, useZlib);
+      if (useDifferentialCompression == false) serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true)  serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
     }
 
     if (APURBlockEnabled == true)
@@ -456,8 +431,8 @@ class Core : private Cpu
         outputDataPos += headerSize; referenceDataPos += headerSize;
       }
 
-      if (useDifferentialCompression == true)  serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
-      if (useDifferentialCompression == false) serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, outputMaxSize, useZlib);
+      if (useDifferentialCompression == false) serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true)  serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
     }
 
     if (SPRTBlockEnabled == true)
@@ -474,14 +449,15 @@ class Core : private Cpu
         outputDataPos += headerSize; referenceDataPos += headerSize;
       }
 
-      if (useDifferentialCompression == true)  serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
-      if (useDifferentialCompression == false) serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, outputMaxSize, useZlib);
+      if (useDifferentialCompression == false) serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true)  serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
     }
 
     if (NTABBlockEnabled == true)
     {
       size_t nametable_size = 0x800;
       if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
+
       blockSize = nametable_size;
       dataSource = (void *)ppu.impl->nt_ram;
 
@@ -494,8 +470,8 @@ class Core : private Cpu
         outputDataPos += headerSize; referenceDataPos += headerSize;
       }
 
-      if (useDifferentialCompression == true)  serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
-      if (useDifferentialCompression == false) serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, outputMaxSize, useZlib);
+      if (useDifferentialCompression == false) serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true)  serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
     }
 
     if (CHRRBlockEnabled == true)
@@ -514,8 +490,8 @@ class Core : private Cpu
           outputDataPos += headerSize; referenceDataPos += headerSize;
         }
 
-        if (useDifferentialCompression == true)  serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
-        if (useDifferentialCompression == false) serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, outputMaxSize, useZlib);
+        if (useDifferentialCompression == false) serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
+        if (useDifferentialCompression == true)  serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
       }
     }
 
@@ -535,8 +511,8 @@ class Core : private Cpu
           outputDataPos += headerSize; referenceDataPos += headerSize;
         }
 
-        if (useDifferentialCompression == true)  serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
-        if (useDifferentialCompression == false) serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, outputMaxSize, useZlib);
+        if (useDifferentialCompression == false) serializeContiguousData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos);
+        if (useDifferentialCompression == true)  serializeDifferentialData((uint8_t*)dataSource, blockSize, outputData, &outputDataPos, referenceData, &referenceDataPos, outputMaxSize, useZlib);
       }
     }
 
@@ -604,7 +580,7 @@ class Core : private Cpu
       if (HEADBlockEnabled == true) { inputDataPos += 2 * headerSize; referenceDataPos += 2 * headerSize; }
 
       if (useDifferentialCompression == false) deserializeContiguousData(outputData, blockSize, inputStateData, &inputDataPos);
-      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, useZlib);
+      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
     }
 
     // APUR Block
@@ -634,11 +610,15 @@ class Core : private Cpu
     if (MAPRBlockEnabled == true)
     {
       mapper->default_reset_state();
+
       auto outputData = (uint8_t *)&mapper->state;
       blockSize = mapper->state_size;
+
       if (HEADBlockEnabled == true) { inputDataPos += 2 * headerSize; referenceDataPos += 2 * headerSize; }
+
       memcpy(outputData, &inputStateData[inputDataPos], blockSize);
       inputDataPos += blockSize;
+
       mapper->apply_mapping();
     }
 
@@ -650,7 +630,7 @@ class Core : private Cpu
       if (HEADBlockEnabled == true) { inputDataPos += 2 * headerSize; referenceDataPos += 2 * headerSize; }
       
       if (useDifferentialCompression == false) deserializeContiguousData(outputData, blockSize, inputStateData, &inputDataPos);
-      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, useZlib);
+      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
     }
 
     // SPRT Block
@@ -661,7 +641,7 @@ class Core : private Cpu
       if (HEADBlockEnabled == true) { inputDataPos += 2 * headerSize; referenceDataPos += 2 * headerSize; }
 
       if (useDifferentialCompression == false) deserializeContiguousData(outputData, blockSize, inputStateData, &inputDataPos);
-      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, useZlib);
+      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
     }
 
     // NTAB Block
@@ -674,7 +654,7 @@ class Core : private Cpu
       if (HEADBlockEnabled == true) { inputDataPos += 2 * headerSize; referenceDataPos += 2 * headerSize; }
 
       if (useDifferentialCompression == false) deserializeContiguousData(outputData, blockSize, inputStateData, &inputDataPos);
-      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, useZlib);
+      if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
     }
 
     // CHRR Block
@@ -687,7 +667,7 @@ class Core : private Cpu
         if (HEADBlockEnabled == true) { inputDataPos += 2 * headerSize; referenceDataPos += 2 * headerSize; }
 
         if (useDifferentialCompression == false) deserializeContiguousData(outputData, blockSize, inputStateData, &inputDataPos);
-        if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, useZlib);
+        if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
 
         ppu.all_tiles_modified();
       }
@@ -703,7 +683,7 @@ class Core : private Cpu
         if (HEADBlockEnabled == true) { inputDataPos += 2 * headerSize; referenceDataPos += 2 * headerSize; }
 
         if (useDifferentialCompression == false) deserializeContiguousData(outputData, blockSize, inputStateData, &inputDataPos);
-        if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, useDifferentialCompression, referenceData, &referenceDataPos, useZlib);
+        if (useDifferentialCompression == true)  deserializeDifferentialData(outputData, blockSize, inputStateData, &inputDataPos, referenceData, &referenceDataPos, useZlib);
       }
     }
 
