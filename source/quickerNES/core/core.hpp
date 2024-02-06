@@ -232,6 +232,12 @@ class Core : private Cpu
     *outputDataPos += 4; *referenceDataPos += 4;
   }
 
+  static inline void deserializeBlockHead(size_t* inputDataPos, size_t* referenceDataPos)
+  {
+    *inputDataPos += 4; *referenceDataPos += 4;
+    *inputDataPos += 4; *referenceDataPos += 4;
+  }
+
   static inline void serializeDifferentialData(
     const uint8_t* __restrict__ inputData,
     const size_t inputDataSize,
@@ -362,8 +368,8 @@ class Core : private Cpu
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "TIME", inputDataSize);
 
-      if (outputData != nullptr) memcpy(&outputData[outputDataPos], inputData, inputDataSize);
-      outputDataPos += inputDataSize; referenceDataPos += inputDataSize;
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true) referenceDataPos += inputDataSize;
     }
 
     // CPUR Block
@@ -383,8 +389,8 @@ class Core : private Cpu
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "CPUR", inputDataSize);
 
-      if (outputData != nullptr) memcpy(&outputData[outputDataPos], inputData, inputDataSize);
-      outputDataPos += inputDataSize; referenceDataPos += inputDataSize;
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true) referenceDataPos += inputDataSize;
     }
 
     if (PPURBlockEnabled == true)
@@ -394,8 +400,8 @@ class Core : private Cpu
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "PPUR", inputDataSize);
 
-      if (outputData != nullptr) memcpy(&outputData[outputDataPos], inputData, inputDataSize);
-      outputDataPos += inputDataSize; referenceDataPos += inputDataSize;
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true) referenceDataPos += inputDataSize;
     }
 
     // APUR Block
@@ -409,8 +415,8 @@ class Core : private Cpu
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "APUR", inputDataSize);
 
-      if (outputData != nullptr) memcpy(&outputData[outputDataPos], inputData, inputDataSize);
-      outputDataPos += inputDataSize; referenceDataPos += inputDataSize;
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true) referenceDataPos += inputDataSize;
     }
 
     // CTRL Block
@@ -421,8 +427,8 @@ class Core : private Cpu
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "CTRL", inputDataSize);
 
-      if (outputData != nullptr) memcpy(&outputData[outputDataPos], inputData, inputDataSize);
-      outputDataPos += inputDataSize; referenceDataPos += inputDataSize;
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true) referenceDataPos += inputDataSize;
     }
 
     // MAPR Block
@@ -433,8 +439,8 @@ class Core : private Cpu
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, &outputDataPos, &referenceDataPos, "MAPR", inputDataSize);
 
-      if (outputData != nullptr) memcpy(&outputData[outputDataPos], inputData, inputDataSize);
-      outputDataPos += inputDataSize; referenceDataPos += inputDataSize;
+      serializeContiguousData(inputData, inputDataSize, outputData, &outputDataPos);
+      if (useDifferentialCompression == true) referenceDataPos += inputDataSize;
     }
 
     // LRAM Block
