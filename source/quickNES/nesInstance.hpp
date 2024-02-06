@@ -50,6 +50,15 @@ class NESInstance final : public NESInstanceBase
     return w.size();
   }
 
+  size_t serializeDifferentialState(uint8_t *differentialData, const uint8_t* referenceData, const size_t maxSize, const bool useZlib) const override
+  {  serializeState(differentialData); return 0; }
+
+  void deserializeDifferentialState(const uint8_t *differentialData, const uint8_t* referenceData, const bool useZlib) override 
+  {  deserializeState(differentialData); }
+
+  size_t getDifferentialStateSize() const override
+  { return getStateSize(); }
+
   std::string getCoreName() const override { return "QuickNES"; }
   void doSoftReset() override { _nes.reset(false); }
   void doHardReset() override { _nes.reset(true); }
