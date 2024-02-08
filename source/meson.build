@@ -1,5 +1,8 @@
 # Getting core configurations
+if get_option('buildQuickNES') == true
 subdir('quickNES')
+endif
+
 subdir('quickerNES')
 
 # Tool Configuration
