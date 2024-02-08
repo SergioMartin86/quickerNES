@@ -1,7 +1,8 @@
-#include "argparse/argparse.hpp"
-#include "nlohmann/json.hpp"
-#include "sha1/sha1.hpp"
-#include "utils.hpp"
+#include <jaffarCommon/extern/argparse/argparse.hpp>
+#include <jaffarCommon/include/json.hpp>
+#include <jaffarCommon/include/hash.hpp>
+#include <jaffarCommon/include/string.hpp>
+#include <jaffarCommon/include/file.hpp>
 #include "nesInstance.hpp"
 #include <chrono>
 #include <sstream>
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
 
   // Loading script file
   std::string scriptJsonRaw;
-  if (loadStringFromFile(scriptJsonRaw, scriptFilePath) == false) EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
+  if (jaffarCommon::loadStringFromFile(scriptJsonRaw, scriptFilePath) == false) EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
 
   // Parsing script
   const auto scriptJson = nlohmann::json::parse(scriptJsonRaw);
@@ -119,7 +120,7 @@ int main(int argc, char *argv[])
 
   // Loading ROM File
   std::string romFileData;
-  if (loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
+  if (jaffarCommon::loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
   e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
 
   // Calculating ROM SHA1
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
   if (initialStateFilePath != "")
   {
     std::string stateFileData;
-    if (loadStringFromFile(stateFileData, initialStateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", initialStateFilePath.c_str());
+    if (jaffarCommon::loadStringFromFile(stateFileData, initialStateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", initialStateFilePath.c_str());
     e.deserializeState((uint8_t*)stateFileData.data());
   }
   
@@ -151,10 +152,10 @@ int main(int argc, char *argv[])
 
   // Loading sequence file
   std::string sequenceRaw;
-  if (loadStringFromFile(sequenceRaw, sequenceFilePath) == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
+  if (jaffarCommon::loadStringFromFile(sequenceRaw, sequenceFilePath) == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = split(sequenceRaw, ' ');
+  const auto sequence = jaffarCommon::split(sequenceRaw, ' ');
 
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
@@ -172,7 +173,7 @@ int main(int argc, char *argv[])
   printf("[] ROM Hash:                               'SHA1: %s'\n", romSHA1.c_str());
   printf("[] Sequence File:                          '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:                        %lu\n", sequenceLength);
-  printf("[] State Size:                             %lu bytes - Disabled Blocks:  [ %s ]\n", e.getStateSize(), stateDisabledBlocksOutput.c_str());
+  printf("[] State Size:                             %lu bytes - Disabled Blocks:  [ %s ]\n", stateSize, stateDisabledBlocksOutput.c_str());
   printf("[] Use Differential Compression:           %s\n", differentialCompressionEnabled ? "true" : "false");
   if (differentialCompressionEnabled == true) 
   { 
@@ -197,7 +198,7 @@ int main(int argc, char *argv[])
     differentialStateData = (uint8_t *)malloc(fullDifferentialStateSize);
     size_t differentialDataPos = 0;
     size_t referenceDataPos = 0;
-    e.serializeDifferentialState(differentialStateData, &differentialDataPos, currentState, &referenceDataPos, fullDifferentialStateSize, differentialCompressionUseZlib);
+    e.serializeDifferentialState(differentialStateData, &differentialDataPos, fullDifferentialStateSize, currentState, &referenceDataPos, stateSize, differentialCompressionUseZlib);
     differentialStateMaxSizeDetected = differentialDataPos;
   }
 
@@ -218,7 +219,7 @@ int main(int argc, char *argv[])
       {
        size_t differentialDataPos = 0;
        size_t referenceDataPos = 0;
-       e.deserializeDifferentialState(differentialStateData, &differentialDataPos, currentState, &referenceDataPos, differentialCompressionUseZlib);
+       e.deserializeDifferentialState(differentialStateData, &differentialDataPos, fullDifferentialStateSize, currentState, &referenceDataPos, stateSize, differentialCompressionUseZlib);
       }
 
       if (differentialCompressionEnabled == false) e.deserializeState(currentState);
@@ -232,7 +233,7 @@ int main(int argc, char *argv[])
       {
        size_t differentialDataPos = 0;
        size_t referenceDataPos = 0;
-       e.serializeDifferentialState(differentialStateData, &differentialDataPos, currentState, &referenceDataPos, fullDifferentialStateSize, differentialCompressionUseZlib);
+       e.serializeDifferentialState(differentialStateData, &differentialDataPos, fullDifferentialStateSize, currentState, &referenceDataPos, stateSize, differentialCompressionUseZlib);
        differentialStateMaxSizeDetected = std::max(differentialStateMaxSizeDetected, differentialDataPos);
       }  
 
@@ -246,7 +247,7 @@ int main(int argc, char *argv[])
   double elapsedTimeSeconds = (double)dt * 1.0e-9;
 
   // Calculating final state hash
-  auto result = calculateStateHash(&e);
+  auto result = jaffarCommon::calculateMetroHash(e.getLowMem(), e.getLowMemSize());
 
   // Creating hash string
   char hashStringBuffer[256];
@@ -261,7 +262,7 @@ int main(int argc, char *argv[])
   printf("[] Differential State Max Size Detected:   %lu\n", differentialStateMaxSizeDetected);    
   }
   // If saving hash, do it now
-  if (hashOutputFile != "") saveStringToFile(std::string(hashStringBuffer), hashOutputFile.c_str());
+  if (hashOutputFile != "") jaffarCommon::saveStringToFile(std::string(hashStringBuffer), hashOutputFile.c_str());
 
   // If reached this point, everything ran ok
   return 0;

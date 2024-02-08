@@ -7,7 +7,7 @@ subdir('quickerNES')
  toolDependency = declare_dependency(
   include_directories : include_directories(['.', '../extern']),
   sources             : [ 
-   '../extern/metrohash128/metrohash128.cpp',
-   '../extern/xdelta3/xdelta3.c',
+   '../extern/jaffarCommon/extern/metrohash128/metrohash128.cpp',
+   '../extern/jaffarCommon/extern/xdelta3/xdelta3.c',
    ]
  )

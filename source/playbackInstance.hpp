@@ -1,13 +1,13 @@
 #pragma once
 
-#include "nesInstance.hpp"
+#include <string>
+#include <unistd.h>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <hqn/hqn.h>
 #include <hqn/hqn_gui_controller.h>
-#include <string>
-#include <unistd.h>
-#include <utils.hpp>
+#include <jaffarCommon/include/hash.hpp>
+#include "nesInstance.hpp"
 
 #define _INVERSE_FRAME_RATE 16667
 
@@ -15,7 +15,7 @@ struct stepData_t
 {
   std::string input;
   uint8_t *stateData;
-  hash_t hash;
+  jaffarCommon::hash_t hash;
 };
 
 class PlaybackInstance
@@ -30,7 +30,7 @@ class PlaybackInstance
     step.input = input;
     step.stateData = (uint8_t *)malloc(_emu->getStateSize());
     _emu->serializeState(step.stateData);
-    step.hash = calculateStateHash(_emu);
+    step.hash = jaffarCommon::calculateMetroHash(_emu->getLowMem(), _emu->getLowMemSize());
 
     // Adding the step into the sequence
     _stepSequence.push_back(step);
@@ -205,7 +205,7 @@ class PlaybackInstance
     return step.stateData;
   }
 
-  const hash_t getStateHash(const size_t stepId) const
+  const jaffarCommon::hash_t getStateHash(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
     if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
