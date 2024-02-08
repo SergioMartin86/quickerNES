@@ -13,6 +13,15 @@ subdir('source')
 # Common application flags
 commonCompileArgs = [ '-Wfatal-errors', '-Wall']
 
+# Common includes
+commonIncludes = include_directories(['extern'])
+
+# Common sources
+commonSources = [ 
+   'extern/jaffarCommon/extern/metrohash128/metrohash128.cpp',
+   'extern/jaffarCommon/extern/xdelta3/xdelta3.c',
+   ]
+
 # Building playback tool
 
 quickerNESPlayerSrc = [
@@ -30,7 +39,8 @@ if meson.is_subproject() == false
       cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
       dependencies        : [ quickerNESDependency, toolDependency, dependency('sdl2'), dependency('SDL2_image') ],
       link_args           : [ '-lncurses' ],
-      sources             : quickerNESPlayerSrc
+      sources             : [ commonSources, quickerNESPlayerSrc ],
+      include_directories : [ commonIncludes ]
     )
   endif
 
@@ -40,6 +50,8 @@ if meson.is_subproject() == false
     'source/tester.cpp',
     cpp_args            : [ commonCompileArgs, '-Werror' ],
     dependencies        : [ quickerNESDependency, toolDependency ],
+    sources             : [ commonSources ],
+    include_directories : [ commonIncludes ]
   )
 
   # Building tester tool for the original QuickNES
@@ -48,6 +60,8 @@ if meson.is_subproject() == false
     'source/tester.cpp',
     cpp_args            : [ commonCompileArgs, '-w', '-DDISABLE_AUTO_FILE', '-D__LIBRETRO__', '-DNDEBUG', '-DBLARGG_NONPORTABLE'  ],
     dependencies        : [ quickNESDependency, toolDependency ],
+    sources             : [ commonSources ],
+    include_directories : [ commonIncludes ]
   )
 
   # Building tests
