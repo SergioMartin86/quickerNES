@@ -50,10 +50,10 @@ class NESInstance final : public NESInstanceBase
     return w.size();
   }
 
-  size_t serializeDifferentialState(uint8_t *differentialData, const uint8_t* referenceData, const size_t maxSize, const bool useZlib) const override
-  {  serializeState(differentialData); return 0; }
+  void serializeDifferentialState(uint8_t *differentialData, size_t* differentialDataPos, const uint8_t* referenceData, size_t* referenceDataPos, const size_t maxSize, const bool useZlib) const override
+  {  serializeState(differentialData); }
 
-  void deserializeDifferentialState(const uint8_t *differentialData, const uint8_t* referenceData, const bool useZlib) override 
+  void deserializeDifferentialState(const uint8_t *differentialData, size_t* differentialDataPos, const uint8_t* referenceData, size_t* referenceDataPos, const bool useZlib) override 
   {  deserializeState(differentialData); }
 
   size_t getDifferentialStateSize() const override

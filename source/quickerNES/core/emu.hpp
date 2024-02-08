@@ -45,13 +45,27 @@ class Emu
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
 // Save emulator state variants
-  size_t serializeState(uint8_t *buffer) const   { return emu.serializeState(buffer, false); }
-  size_t deserializeState(const uint8_t *buffer) { return emu.deserializeState(buffer, false); }
-  size_t getStateSize() const { return emu.serializeState(nullptr, false); }
+  void serializeState(uint8_t *buffer) const   { emu.serializeState(buffer); }
+  void deserializeState(const uint8_t *buffer) { emu.deserializeState(buffer); }
+  size_t getStateSize() const { size_t outputDataPos = 0; emu.serializeState(nullptr, &outputDataPos); return outputDataPos; }
 
-  size_t serializeDifferentialState(uint8_t* __restrict__ outputData, const uint8_t* __restrict__ referenceData, const size_t outputMaxSize, const bool useZlib) const { return emu.serializeState(outputData, true, referenceData, outputMaxSize, useZlib); }
-  size_t deserializeDifferentialState(const uint8_t* __restrict__ inputStateData, const uint8_t* __restrict__ referenceData, const bool useZlib) {  return emu.deserializeState(inputStateData, true, referenceData, useZlib); }
-  size_t getDifferentialStateSize() const { return emu.serializeState(nullptr, true, nullptr, 0, false); }
+  void serializeDifferentialState(uint8_t* __restrict__ outputData, size_t* outputDataPos, const uint8_t* __restrict__ referenceData, size_t* referenceDataPos, const size_t outputMaxSize, const bool useZlib) const
+   {
+     emu.serializeState(outputData, outputDataPos, referenceData, referenceDataPos, outputMaxSize, useZlib);
+   }
+
+  void deserializeDifferentialState(const uint8_t* __restrict__ inputData, size_t* inputDataPos, const uint8_t* __restrict__ referenceData, size_t* referenceDataPos, const bool useZlib)
+  {
+    emu.deserializeState(inputData, inputDataPos, referenceData, referenceDataPos, useZlib);
+  }
+
+  size_t getDifferentialStateSize() const 
+  {
+    size_t outputDataPos = 0;
+    size_t referenceDataPos = 0;
+    emu.serializeState(nullptr, &outputDataPos, nullptr, &referenceDataPos, 0, false);
+    return outputDataPos;
+  }
 
   void enableStateBlock(const std::string& block) { emu.enableStateBlock(block); };
   void disableStateBlock(const std::string& block) { emu.disableStateBlock(block); };
