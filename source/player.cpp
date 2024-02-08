@@ -1,8 +1,10 @@
-#include "argparse/argparse.hpp"
+#include <cstdlib>
+#include "jaffarCommon/extern/argparse/argparse.hpp"
+#include "jaffarCommon/include/file.hpp"
+#include "jaffarCommon/include/logger.hpp"
+#include "jaffarCommon/include/string.hpp"
 #include "nesInstance.hpp"
 #include "playbackInstance.hpp"
-#include "utils.hpp"
-#include <cstdlib>
 
 int main(int argc, char *argv[])
 {
@@ -72,14 +74,14 @@ int main(int argc, char *argv[])
 
   // Loading sequence file
   std::string inputSequence;
-  auto status = loadStringFromFile(inputSequence, sequenceFilePath.c_str());
+  auto status = jaffarCommon::loadStringFromFile(inputSequence, sequenceFilePath.c_str());
   if (status == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = split(inputSequence, ' ');
+  const auto sequence = jaffarCommon::split(inputSequence, ' ');
 
   // Initializing terminal
-  initializeTerminal();
+  jaffarCommon::initializeTerminal();
 
   // Printing provided parameters
   printw("[] Rom File Path:      '%s'\n", romFilePath.c_str());
@@ -88,7 +90,7 @@ int main(int argc, char *argv[])
   printw("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
   printw("[] Generating Sequence...\n");
 
-  refreshTerminal();
+  jaffarCommon::refreshTerminal();
 
   // Creating emulator instance
   NESInstance e;
@@ -99,14 +101,14 @@ int main(int argc, char *argv[])
   
   // Loading ROM File
   std::string romFileData;
-  if (loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
+  if (jaffarCommon::loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
   e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
 
   // If an initial state is provided, load it now
   if (stateFilePath != "")
   {
     std::string stateFileData;
-    if (loadStringFromFile(stateFileData, stateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", stateFilePath.c_str());
+    if (jaffarCommon::loadStringFromFile(stateFileData, stateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", stateFilePath.c_str());
     e.deserializeState((uint8_t*)stateFileData.data());
   }
 
@@ -144,7 +146,7 @@ int main(int argc, char *argv[])
     // Printing data and commands
     if (showFrameInfo)
     {
-      clearTerminal();
+      jaffarCommon::clearTerminal();
 
       printw("[] ----------------------------------------------------------------\n");
       printw("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
@@ -154,14 +156,14 @@ int main(int argc, char *argv[])
       // Only print commands if not in reproduce mode
       if (isReproduce == false) printw("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
 
-      refreshTerminal();
+      jaffarCommon::refreshTerminal();
     }
 
     // Resetting show frame info flag
     showFrameInfo = true;
 
     // Get command
-    auto command = getKeyPress();
+    auto command = jaffarCommon::getKeyPress();
 
     // Advance/Rewind commands
     if (command == 'n') currentStep = currentStep - 1;
@@ -186,7 +188,7 @@ int main(int argc, char *argv[])
       std::string saveData;
       saveData.resize(stateSize);
       memcpy(saveData.data(), stateData, stateSize);
-      if (saveStringToFile(saveData, saveFileName.c_str()) == false) EXIT_WITH_ERROR("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
+      if (jaffarCommon::saveStringToFile(saveData, saveFileName.c_str()) == false) EXIT_WITH_ERROR("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
       printw("[] Saved state to %s\n", saveFileName.c_str());
 
       // Do no show frame info again after this action
@@ -201,5 +203,5 @@ int main(int argc, char *argv[])
   }
 
   // Ending ncurses window
-  finalizeTerminal();
+  jaffarCommon::finalizeTerminal();
 }

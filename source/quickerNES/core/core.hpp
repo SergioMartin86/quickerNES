@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include "ppu/ppu.hpp"
 #include <cstdio>
 #include <string>
-#include <xdelta3/xdelta3.h>
+#include <jaffarCommon/include/diff.hpp>
 
 namespace quickerNES
 {
@@ -153,26 +153,6 @@ class Core : private Cpu
     reset(true, true);
   }
 
-  static inline void serializeContiguousData(const uint8_t* __restrict__ inputData, const size_t inputDataSize, uint8_t* __restrict__ outputData, size_t* outputDataPos, size_t* referenceDataPos)
-  {
-    // Only perform memcpy if the input block is not null
-    if (outputData != nullptr) memcpy(&outputData[*outputDataPos], inputData, inputDataSize);
-
-    // Moving pointer positions
-    *outputDataPos += inputDataSize;
-    if (referenceDataPos != nullptr) *referenceDataPos += inputDataSize;
-  }
-
-  static inline void deserializeContiguousData(uint8_t* __restrict__ outputData, const size_t outputDataSize, const uint8_t* __restrict__ inputData, size_t* inputDataPos, size_t* referenceDataPos)
-  {
-    // Only perform memcpy if the input block is not null
-    if (outputData != nullptr) memcpy(outputData, &inputData[*inputDataPos], outputDataSize);
-
-    // Moving pointer positions
-    *inputDataPos += outputDataSize;
-    if (referenceDataPos != nullptr) *referenceDataPos += outputDataSize;
-  }
-
   static inline void serializeBlockHead(
     uint8_t* __restrict__ outputData,
     size_t* outputDataPos,
@@ -197,125 +177,21 @@ class Core : private Cpu
     if (referenceDataPos != nullptr) *referenceDataPos += 8;
   }
 
-  static inline void serializeDifferentialData(
-    const uint8_t* __restrict__ inputData,
-    const size_t inputDataSize,
-    uint8_t* __restrict__ outputData,
-    size_t* outputDataPos,
-    const uint8_t* __restrict__ referenceData = nullptr,
-    size_t* referenceDataPos = 0,
-    const size_t outputMaxSize = 0,
-    const bool useZlib = false
-    )
-  {
-    // Only perform compression if input is not null
-    if (outputData != nullptr)
-    {
-      // Variable to store difference count 
-      auto diffCount = (usize_t*)&outputData[*outputDataPos];
-
-      // Advancing position pointer to store the difference counter
-      *outputDataPos += sizeof(usize_t);
-
-      // If we reached maximum output, stop here
-      if (*outputDataPos >= outputMaxSize) 
-      {
-        fprintf(stderr, "[Error] Maximum output data position reached before differential encode (%lu)\n", outputMaxSize);
-        std::runtime_error("Error while serializing");
-      }
-
-      // Encoding differential
-      int ret = xd3_encode_memory(
-        inputData,
-        inputDataSize,
-        &referenceData[*referenceDataPos],
-        inputDataSize,
-        &outputData[*outputDataPos],
-        diffCount,
-        outputMaxSize - *outputDataPos,
-        useZlib ? 0 : XD3_NOCOMPRESS
-      );
-
-      // If an error happened, print it here
-      if (ret != 0)
-      {
-         fprintf(stderr, "[Error] unexpected error while encoding differential compression. Diff count: %u\n", *diffCount);
-         std::runtime_error("Error while serializing");
-      } 
-
-      // Increasing output data position pointer
-      *outputDataPos += *diffCount;
-
-      // If exceeded size, report it
-      if ((usize_t)*outputDataPos > outputMaxSize) 
-      {
-        fprintf(stderr, "[Error] Differential compression size (%u) exceeded output maximum size (%lu).\n", *diffCount, outputMaxSize);
-        std::runtime_error("Error while serializing");
-      }
-    }
-
-    // Finally, increasing reference data position pointer
-    *referenceDataPos += inputDataSize;
-  }
-
-  static inline void deserializeDifferentialData(
-    uint8_t* __restrict__ outputData,
-    const size_t outputDataSize,
-    const uint8_t* __restrict__ inputData,
-    size_t* inputDataPos,
-    const uint8_t* __restrict__ referenceData = nullptr,
-    size_t* referenceDataPos = 0,
-    const bool useZlib = false
-    )
-  {
-    // Reading differential count
-    usize_t diffCount;
-    memcpy(&diffCount, &inputData[*inputDataPos], sizeof(usize_t));
-
-    // Advancing position pointer to store the difference counter
-    *inputDataPos += sizeof(usize_t);
-
-    // Encoding differential
-    usize_t output_size;
-    int ret = xd3_decode_memory(
-      &inputData[*inputDataPos],
-      diffCount,
-      &referenceData[*referenceDataPos],
-      outputDataSize,
-      outputData,
-      &output_size,
-      outputDataSize,
-      useZlib ? 0 : XD3_NOCOMPRESS
-    );
-
-    // If an error happened, print it here
-    if (ret != 0) 
-    {
-      fprintf(stderr, "[Error] unexpected error while decoding differential compression. Diff count: %u\n", diffCount);
-      std::runtime_error("Error while deserializing");
-    }
-
-    // Increasing output data position pointer
-    *inputDataPos += diffCount;
-
-    // Finally, increasing reference data position pointer
-    *referenceDataPos += outputDataSize;
-  }
-
 
   inline void serializeState(
     uint8_t* __restrict__ outputData,
-    size_t* outputDataPos = nullptr,
+    size_t* outputDataPos,
+    const size_t outputDataMaxSize,
     const uint8_t* __restrict__ referenceData = nullptr,
     size_t* referenceDataPos = nullptr,
-    const size_t outputMaxSize = 0,
+    const size_t referenceDataMaxSize = 0,
     const bool useZlib = false) const
   {
     size_t tmpIOutputDataPos = 0;
     if (outputDataPos == nullptr) outputDataPos = &tmpIOutputDataPos;
 
     // NESS Block
-    if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "NESS", 0xFFFFFFFF, referenceDataPos);
+    if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "NESS", 0xFFFFFFFF, referenceDataPos);
 
     // TIME Block
     if (TIMEBlockEnabled == true)
@@ -326,8 +202,8 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(nes_state_t);
       const auto inputData = (uint8_t *)&state;
 
-      if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "TIME", inputDataSize, referenceDataPos);
-      serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
+      if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "TIME", inputDataSize, referenceDataPos);
+      jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     // CPUR Block
@@ -346,7 +222,7 @@ class Core : private Cpu
       const auto inputData = (uint8_t *)&s;
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "CPUR", inputDataSize, referenceDataPos);
-      serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
+      jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     if (PPURBlockEnabled == true)
@@ -355,7 +231,7 @@ class Core : private Cpu
       const auto inputData = (const uint8_t *)&ppu;
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "PPUR", inputDataSize, referenceDataPos);
-      serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
+      jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     // APUR Block
@@ -368,7 +244,7 @@ class Core : private Cpu
       const auto inputData = (uint8_t *)&apuState;
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "APUR", inputDataSize, referenceDataPos);
-      serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
+      jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     // CTRL Block
@@ -378,7 +254,7 @@ class Core : private Cpu
       const auto inputData = (uint8_t *)&joypad;
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "CTRL", inputDataSize, referenceDataPos);
-      serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
+      jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     // MAPR Block
@@ -388,7 +264,7 @@ class Core : private Cpu
       const auto inputData = (uint8_t *)mapper->state;
 
       if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "MAPR", inputDataSize, referenceDataPos);
-      serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
+      jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     // LRAM Block
@@ -398,8 +274,8 @@ class Core : private Cpu
       const auto inputData = (uint8_t *)low_mem;
 
       if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "LRAM", inputDataSize, referenceDataPos);
-      if (referenceDataPos == nullptr) serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
-      if (referenceDataPos != nullptr) serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, referenceData, referenceDataPos, outputMaxSize, useZlib);
+      if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+      if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
     }
 
     // SPRT Block
@@ -409,8 +285,8 @@ class Core : private Cpu
       const auto inputData = (uint8_t *)ppu.spr_ram;
 
       if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "SPRT", inputDataSize, referenceDataPos);
-      if (referenceDataPos == nullptr) serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
-      if (referenceDataPos != nullptr) serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, referenceData, referenceDataPos, outputMaxSize, useZlib);
+      if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+      if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
     }
 
     // NTAB Block
@@ -423,8 +299,8 @@ class Core : private Cpu
       const auto inputData = (uint8_t *)ppu.impl->nt_ram;
 
       if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "NTAB", inputDataSize, referenceDataPos);
-      if (referenceDataPos == nullptr) serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
-      if (referenceDataPos != nullptr) serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, referenceData, referenceDataPos, outputMaxSize, useZlib);
+      if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+      if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
     }
 
     // CHRR Block
@@ -436,8 +312,8 @@ class Core : private Cpu
         const auto inputData = (uint8_t *)ppu.impl->chr_ram;
 
         if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "CHRR", inputDataSize, referenceDataPos);
-        if (referenceDataPos == nullptr) serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
-        if (referenceDataPos != nullptr) serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, referenceData, referenceDataPos, outputMaxSize, useZlib);
+        if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+        if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
       }
     }
 
@@ -450,8 +326,8 @@ class Core : private Cpu
         const auto inputData = (uint8_t *)impl->sram;
 
         if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "SRAM", inputDataSize, referenceDataPos);
-        if (referenceDataPos == nullptr) serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, referenceDataPos);
-        if (referenceDataPos != nullptr) serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, referenceData, referenceDataPos, outputMaxSize, useZlib);
+        if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+        if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
       }
     }
 
@@ -461,9 +337,11 @@ class Core : private Cpu
 
   inline void deserializeState(
     const uint8_t* __restrict__ inputData,
-    size_t* inputDataPos = nullptr,
+    size_t* inputDataPos,
+    const size_t inputDataMaxSize,
     const uint8_t* __restrict__ referenceData = nullptr,
     size_t* referenceDataPos = nullptr,
+    const size_t referenceDataMaxSize = 0,
     const bool useZlib = false)
   {
     disable_rendering();
@@ -485,7 +363,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(nes_state_t);
 
       if (HEADBlockEnabled == true) deserializeBlockHead(inputDataPos, referenceDataPos);
-      deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
+      jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       
       nes = nesState;
       nes.timestamp /= 5;
@@ -500,7 +378,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(cpu_state_t);
 
       if (HEADBlockEnabled == true) deserializeBlockHead(inputDataPos, referenceDataPos);
-      deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
+      jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
 
       r.pc = s.pc;
       r.sp = s.s;
@@ -517,7 +395,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(ppu_state_t);
 
       if (HEADBlockEnabled == true) deserializeBlockHead(inputDataPos, referenceDataPos);
-      deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
+      jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     // APUR Block
@@ -529,7 +407,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(Apu::apu_state_t);
 
       if (HEADBlockEnabled == true) deserializeBlockHead(inputDataPos, referenceDataPos);
-      deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
+      jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
 
       impl->apu.load_state(apuState);
       impl->apu.end_frame(-(int)nes.timestamp / ppu_overclock);
@@ -542,7 +420,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(joypad_state_t);
 
       if (HEADBlockEnabled == true) deserializeBlockHead(inputDataPos, referenceDataPos);
-      deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
+      jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
     // MAPR Block
@@ -554,7 +432,7 @@ class Core : private Cpu
       const auto inputDataSize = mapper->state_size;
 
       if (HEADBlockEnabled == true) deserializeBlockHead(inputDataPos, referenceDataPos);
-      deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
+      jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
 
       mapper->apply_mapping();
     }
@@ -566,8 +444,8 @@ class Core : private Cpu
       const auto inputDataSize = low_ram_size;
 
       if (HEADBlockEnabled == true)    deserializeBlockHead(inputDataPos, referenceDataPos);
-      if (referenceDataPos == nullptr) deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
-      if (referenceDataPos != nullptr) deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, referenceData, referenceDataPos, useZlib);
+      if (referenceDataPos == nullptr) jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+      if (referenceDataPos != nullptr) jaffarCommon::deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib);
     }
 
     // SPRT Block
@@ -577,8 +455,8 @@ class Core : private Cpu
       const auto inputDataSize = Ppu::spr_ram_size;
 
       if (HEADBlockEnabled == true)    deserializeBlockHead(inputDataPos, referenceDataPos);
-      if (referenceDataPos == nullptr) deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
-      if (referenceDataPos != nullptr) deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, referenceData, referenceDataPos, useZlib);
+      if (referenceDataPos == nullptr) jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+      if (referenceDataPos != nullptr) jaffarCommon::deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib);
     }
 
     // NTAB Block
@@ -591,8 +469,8 @@ class Core : private Cpu
       const auto inputDataSize = nametable_size;
 
       if (HEADBlockEnabled == true)    deserializeBlockHead(inputDataPos, referenceDataPos);
-      if (referenceDataPos == nullptr) deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
-      if (referenceDataPos != nullptr) deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, referenceData, referenceDataPos, useZlib);
+      if (referenceDataPos == nullptr) jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+      if (referenceDataPos != nullptr) jaffarCommon::deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib);
     }
 
     // CHRR Block
@@ -604,8 +482,8 @@ class Core : private Cpu
         const auto inputDataSize = ppu.chr_size;
 
         if (HEADBlockEnabled == true)    deserializeBlockHead(inputDataPos, referenceDataPos);
-        if (referenceDataPos == nullptr) deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
-        if (referenceDataPos != nullptr) deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, referenceData, referenceDataPos, useZlib);
+        if (referenceDataPos == nullptr) jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+        if (referenceDataPos != nullptr) jaffarCommon::deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib);
 
         ppu.all_tiles_modified();
       }
@@ -620,8 +498,8 @@ class Core : private Cpu
         const auto inputDataSize = impl->sram_size;
 
         if (HEADBlockEnabled == true)    deserializeBlockHead(inputDataPos, referenceDataPos);
-        if (referenceDataPos == nullptr) deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, referenceDataPos);
-        if (referenceDataPos != nullptr) deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, referenceData, referenceDataPos, useZlib);
+        if (referenceDataPos == nullptr) jaffarCommon::deserializeContiguousData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+        if (referenceDataPos != nullptr) jaffarCommon::deserializeDifferentialData(outputData, inputDataSize, inputData, inputDataPos, inputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib);
       }
     }
 

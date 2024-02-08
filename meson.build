@@ -29,7 +29,6 @@ if meson.is_subproject() == false
       'source/player.cpp',
       cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
       dependencies        : [ quickerNESDependency, toolDependency, dependency('sdl2'), dependency('SDL2_image') ],
-      include_directories : include_directories(['source']),
       link_args           : [ '-lncurses' ],
       sources             : quickerNESPlayerSrc
     )
@@ -41,7 +40,6 @@ if meson.is_subproject() == false
     'source/tester.cpp',
     cpp_args            : [ commonCompileArgs, '-Werror' ],
     dependencies        : [ quickerNESDependency, toolDependency ],
-    include_directories : include_directories(['../extern/json'])
   )
 
   # Building tester tool for the original QuickNES
@@ -50,7 +48,6 @@ if meson.is_subproject() == false
     'source/tester.cpp',
     cpp_args            : [ commonCompileArgs, '-w', '-DDISABLE_AUTO_FILE', '-D__LIBRETRO__', '-DNDEBUG', '-DBLARGG_NONPORTABLE'  ],
     dependencies        : [ quickNESDependency, toolDependency ],
-    include_directories : include_directories(['../extern/json'])
   )
 
   # Building tests
