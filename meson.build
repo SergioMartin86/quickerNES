@@ -56,6 +56,7 @@ if meson.is_subproject() == false
 
   # Building tester tool for the original QuickNES
 
+  if get_option('buildQuickNES') == true
   quickNESTester = executable('quickNESTester',
     'source/tester.cpp',
     cpp_args            : [ commonCompileArgs, '-w', '-DDISABLE_AUTO_FILE', '-D__LIBRETRO__', '-DNDEBUG', '-DBLARGG_NONPORTABLE'  ],
@@ -63,8 +64,11 @@ if meson.is_subproject() == false
     sources             : [ commonSources ],
     include_directories : [ commonIncludes ]
   )
+  endif
 
   # Building tests
+  if get_option('buildQuickNES') == true
   subdir('tests')
-
+  endif
+  
 endif # If not subproject
