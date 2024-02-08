@@ -195,7 +195,10 @@ int main(int argc, char *argv[])
   if (differentialCompressionEnabled == true) 
   {
     differentialStateData = (uint8_t *)malloc(fullDifferentialStateSize);
-    differentialStateMaxSizeDetected = e.serializeDifferentialState(differentialStateData, currentState, fullDifferentialStateSize, differentialCompressionUseZlib);
+    size_t differentialDataPos = 0;
+    size_t referenceDataPos = 0;
+    e.serializeDifferentialState(differentialStateData, &differentialDataPos, currentState, &referenceDataPos, fullDifferentialStateSize, differentialCompressionUseZlib);
+    differentialStateMaxSizeDetected = differentialDataPos;
   }
 
   // Check whether to perform each action
@@ -211,7 +214,13 @@ int main(int argc, char *argv[])
     
     if (doDeserialize == true)
     {
-      if (differentialCompressionEnabled == true)  e.deserializeDifferentialState(differentialStateData, currentState, differentialCompressionUseZlib);
+      if (differentialCompressionEnabled == true) 
+      {
+       size_t differentialDataPos = 0;
+       size_t referenceDataPos = 0;
+       e.deserializeDifferentialState(differentialStateData, &differentialDataPos, currentState, &referenceDataPos, differentialCompressionUseZlib);
+      }
+
       if (differentialCompressionEnabled == false) e.deserializeState(currentState);
     } 
     
@@ -219,7 +228,14 @@ int main(int argc, char *argv[])
 
     if (doSerialize == true)
     {
-      if (differentialCompressionEnabled == true)  differentialStateMaxSizeDetected = std::max(differentialStateMaxSizeDetected, e.serializeDifferentialState(differentialStateData, currentState, fullDifferentialStateSize, differentialCompressionUseZlib));
+      if (differentialCompressionEnabled == true)
+      {
+       size_t differentialDataPos = 0;
+       size_t referenceDataPos = 0;
+       e.serializeDifferentialState(differentialStateData, &differentialDataPos, currentState, &referenceDataPos, fullDifferentialStateSize, differentialCompressionUseZlib);
+       differentialStateMaxSizeDetected = std::max(differentialStateMaxSizeDetected, differentialDataPos);
+      }  
+
       if (differentialCompressionEnabled == false) e.serializeState(currentState);
     } 
   }
