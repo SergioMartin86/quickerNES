@@ -154,19 +154,16 @@ class Core : private Cpu
   }
 
   static inline void serializeBlockHead(
-    uint8_t* __restrict__ outputData,
-    size_t* outputDataPos,
     const char* blockTag,
     const uint32_t blockSize,
-    size_t* referenceDataPos = nullptr)
+    uint8_t* __restrict__ outputData,
+    size_t* outputDataPos,
+    const size_t outputDataMaxSize,
+    size_t* referenceDataPos,
+    const size_t referenceDataMaxSize)
   {
-    if (outputData != nullptr) memcpy(&outputData[*outputDataPos], blockTag, 4);
-    *outputDataPos += 4;
-    if (referenceDataPos != nullptr) *referenceDataPos += 4;
-
-    if (outputData != nullptr) memcpy(&outputData[*outputDataPos], &blockSize, 4);
-    *outputDataPos += 4; 
-    if (referenceDataPos != nullptr) *referenceDataPos += 4;
+    jaffarCommon::serializeContiguousData(blockTag,   4, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
+    jaffarCommon::serializeContiguousData(&blockSize, 4, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
   }
 
   static inline void deserializeBlockHead(
@@ -191,7 +188,7 @@ class Core : private Cpu
     if (outputDataPos == nullptr) outputDataPos = &tmpIOutputDataPos;
 
     // NESS Block
-    if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "NESS", 0xFFFFFFFF, referenceDataPos);
+    if (HEADBlockEnabled == true) serializeBlockHead("NESS", 0xFFFFFFFF, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
 
     // TIME Block
     if (TIMEBlockEnabled == true)
@@ -202,7 +199,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(nes_state_t);
       const auto inputData = (uint8_t *)&state;
 
-      if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "TIME", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true) serializeBlockHead("TIME", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
@@ -221,7 +218,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(cpu_state_t);
       const auto inputData = (uint8_t *)&s;
 
-      if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "CPUR", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true) serializeBlockHead("CPUR", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
@@ -230,7 +227,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(ppu_state_t);
       const auto inputData = (const uint8_t *)&ppu;
 
-      if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "PPUR", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true) serializeBlockHead("PPUR", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
@@ -243,7 +240,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(Apu::apu_state_t);
       const auto inputData = (uint8_t *)&apuState;
 
-      if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "APUR", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true) serializeBlockHead("APUR", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
@@ -253,7 +250,7 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(joypad_state_t);
       const auto inputData = (uint8_t *)&joypad;
 
-      if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "CTRL", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true) serializeBlockHead("CTRL", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
@@ -263,7 +260,7 @@ class Core : private Cpu
       const auto inputDataSize = mapper->state_size;
       const auto inputData = (uint8_t *)mapper->state;
 
-      if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "MAPR", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true) serializeBlockHead("MAPR", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
     }
 
@@ -273,7 +270,7 @@ class Core : private Cpu
       const auto inputDataSize = low_ram_size;
       const auto inputData = (uint8_t *)low_mem;
 
-      if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "LRAM", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true)    serializeBlockHead("LRAM", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
     }
@@ -284,7 +281,7 @@ class Core : private Cpu
       const auto inputDataSize = Ppu::spr_ram_size;
       const auto inputData = (uint8_t *)ppu.spr_ram;
 
-      if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "SPRT", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true)    serializeBlockHead("SPRT", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
     }
@@ -298,7 +295,7 @@ class Core : private Cpu
       const auto inputDataSize = nametable_size;
       const auto inputData = (uint8_t *)ppu.impl->nt_ram;
 
-      if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "NTAB", inputDataSize, referenceDataPos);
+      if (HEADBlockEnabled == true)    serializeBlockHead("NTAB", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
       if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
     }
@@ -311,7 +308,7 @@ class Core : private Cpu
         const auto inputDataSize = ppu.chr_size;
         const auto inputData = (uint8_t *)ppu.impl->chr_ram;
 
-        if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "CHRR", inputDataSize, referenceDataPos);
+        if (HEADBlockEnabled == true)    serializeBlockHead("CHRR", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
         if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
         if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
       }
@@ -325,14 +322,14 @@ class Core : private Cpu
         const auto inputDataSize = impl->sram_size;
         const auto inputData = (uint8_t *)impl->sram;
 
-        if (HEADBlockEnabled == true)    serializeBlockHead(outputData, outputDataPos, "SRAM", inputDataSize, referenceDataPos);
+        if (HEADBlockEnabled == true)    serializeBlockHead("SRAM", inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
         if (referenceDataPos == nullptr) jaffarCommon::serializeContiguousData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
         if (referenceDataPos != nullptr) jaffarCommon::serializeDifferentialData(inputData, inputDataSize, outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize,useZlib);
       }
     }
 
     // gend Block
-    if (HEADBlockEnabled == true) serializeBlockHead(outputData, outputDataPos, "gend", 0, referenceDataPos);
+    if (HEADBlockEnabled == true) serializeBlockHead("gend", 0, outputData, outputDataPos, outputDataMaxSize, referenceDataPos, referenceDataMaxSize);
   }
 
   inline void deserializeState(
