@@ -1,5 +1,7 @@
 #pragma once
 
+#include "jaffarCommon/include/serializers/base.hpp"
+#include "jaffarCommon/include/deserializers/base.hpp"
 #include "core/nes_emu/Nes_Emu.h"
 #include "core/nes_emu/Nes_State.h"
 #include "../nesInstanceBase.hpp"
@@ -26,21 +28,21 @@ class NESInstance final : public NESInstanceBase
   uint8_t *getLowMem() const override { return _nes.low_mem(); };
   size_t getLowMemSize() const override { return 0x800; };
 
-  void serializeState(uint8_t *state) const override
+  void serializeState(jaffarCommon::serializer::Base& serializer) const override
   {
-    Mem_Writer w(state, _stateSize, 0);
+    Mem_Writer w(serializer.getOutputDataBuffer(), _stateSize, 0);
     Auto_File_Writer a(w);
     _nes.save_state(a);
   }
 
-  void deserializeState(const uint8_t *state) override
+  void deserializeState(jaffarCommon::deserializer::Base& deserializer) override
   {
-    Mem_File_Reader r(state, _stateSize);
+    Mem_File_Reader r(deserializer.getInputDataBuffer(), _stateSize);
     Auto_File_Reader a(r);
     _nes.load_state(a);
   }
 
-  inline size_t getStateSize() const override
+  inline size_t getFullStateSize() const override
   {
     uint8_t *data = (uint8_t *)malloc(_DUMMY_SIZE);
     Mem_Writer w(data, _DUMMY_SIZE);
@@ -50,28 +52,7 @@ class NESInstance final : public NESInstanceBase
     return w.size();
   }
 
-  void serializeDifferentialState(
-    uint8_t *outputData,
-    size_t* outputDataPos,
-    const size_t outputDataMaxSize,
-    const uint8_t* referenceData,
-    size_t* referenceDataPos,
-    const size_t maxSize,
-    const bool useZlib) const override
-  {  serializeState(outputData); }
-
-  void deserializeDifferentialState(
-    const uint8_t *inputData,
-    size_t* inputDataPos,
-    const size_t inputDataMaxSize,
-    const uint8_t* referenceData,
-    size_t* referenceDataPos,
-    const size_t referenceDataMaxSize,
-    const bool useZlib) override 
-  {  deserializeState(inputData); }
-
-  size_t getDifferentialStateSize() const override
-  { return getStateSize(); }
+  inline size_t getDifferentialStateSize() const override { return getFullStateSize(); }
 
   std::string getCoreName() const override { return "QuickNES"; }
   void doSoftReset() override { _nes.reset(false); }

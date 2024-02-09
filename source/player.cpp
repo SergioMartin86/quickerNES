@@ -1,5 +1,7 @@
 #include <cstdlib>
 #include "jaffarCommon/extern/argparse/argparse.hpp"
+#include "jaffarCommon/include/serializers/contiguous.hpp"
+#include "jaffarCommon/include/deserializers/contiguous.hpp"
 #include "jaffarCommon/include/file.hpp"
 #include "jaffarCommon/include/logger.hpp"
 #include "jaffarCommon/include/string.hpp"
@@ -109,14 +111,15 @@ int main(int argc, char *argv[])
   {
     std::string stateFileData;
     if (jaffarCommon::loadStringFromFile(stateFileData, stateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", stateFilePath.c_str());
-    e.deserializeState((uint8_t*)stateFileData.data());
+    jaffarCommon::deserializer::Contiguous deserializer(stateFileData.data());
+    e.deserializeState(deserializer);
   }
 
   // Creating playback instance
   auto p = PlaybackInstance(&e, sequence);
 
   // Getting state size
-  auto stateSize = e.getStateSize();
+  auto stateSize = e.getFullStateSize();
 
   // Flag to continue running playback
   bool continueRunning = true;

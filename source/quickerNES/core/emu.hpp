@@ -4,7 +4,6 @@
 
 // Emu 0.7.0
 
-#include <limits>
 #include "cart.hpp"
 #include "core.hpp"
 #include "apu/multiBuffer.hpp"
@@ -46,47 +45,8 @@ class Emu
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
 // Save emulator state variants
-  void serializeState(uint8_t *buffer) const   { emu.serializeState(buffer, nullptr, std::numeric_limits<uint32_t>::max()); }
-  void deserializeState(const uint8_t *buffer) { emu.deserializeState(buffer, nullptr, std::numeric_limits<uint32_t>::max()); }
-  size_t getStateSize() const { size_t outputDataPos = 0; emu.serializeState(nullptr, &outputDataPos, std::numeric_limits<uint32_t>::max()); return outputDataPos; }
-
-  void serializeDifferentialState(
-    uint8_t* __restrict__ outputData,
-    size_t* outputDataPos,
-    const size_t outputDataMaxSize,
-    const uint8_t* __restrict__ referenceData,
-    size_t* referenceDataPos,
-    const size_t referenceDataMaxSize,
-    const bool useZlib) const
-   {
-     emu.serializeState(outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib);
-   }
-
-  void deserializeDifferentialState(
-    const uint8_t* __restrict__ inputData,
-    size_t* inputDataPos,
-    const size_t inputDataMaxSize,
-    const uint8_t* __restrict__ referenceData,
-    size_t* referenceDataPos,
-    const size_t referenceDataMaxSize,
-    const bool useZlib)
-  {
-    emu.deserializeState(inputData, inputDataPos, inputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib);
-  }
-
-  size_t getDifferentialStateSize() const 
-  {
-    uint8_t* outputDataPtr = nullptr;
-    size_t outputDataPos = 0;
-    uint8_t* referenceDataPtr = nullptr;
-    size_t referenceDataPos = 0;
-    uint32_t outputDataMaxSize = std::numeric_limits<uint32_t>::max();
-    uint32_t referenceDataMaxSize = std::numeric_limits<uint32_t>::max();
-
-    emu.serializeState(outputDataPtr, &outputDataPos, outputDataMaxSize, referenceDataPtr, &referenceDataPos, referenceDataMaxSize, false);
-    return outputDataPos;
-  }
-
+  void serializeState(jaffarCommon::serializer::Base& serializer) const { emu.serializeState(serializer); }
+  void deserializeState(jaffarCommon::deserializer::Base& deserializer) { emu.deserializeState(deserializer); }
   void enableStateBlock(const std::string& block) { emu.enableStateBlock(block); };
   void disableStateBlock(const std::string& block) { emu.disableStateBlock(block); };
 

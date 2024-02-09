@@ -6,6 +6,8 @@
 #include <SDL_image.h>
 #include <hqn/hqn.h>
 #include <hqn/hqn_gui_controller.h>
+#include <jaffarCommon/include/serializers/contiguous.hpp>
+#include <jaffarCommon/include/deserializers/contiguous.hpp>
 #include <jaffarCommon/include/hash.hpp>
 #include "nesInstance.hpp"
 
@@ -28,8 +30,10 @@ class PlaybackInstance
   {
     stepData_t step;
     step.input = input;
-    step.stateData = (uint8_t *)malloc(_emu->getStateSize());
-    _emu->serializeState(step.stateData);
+    step.stateData = (uint8_t *)malloc(_emu->getFullStateSize());
+
+    jaffarCommon::serializer::Contiguous serializer(step.stateData);
+    _emu->serializeState(serializer);
     step.hash = jaffarCommon::calculateMetroHash(_emu->getLowMem(), _emu->getLowMemSize());
 
     // Adding the step into the sequence
@@ -166,7 +170,8 @@ class PlaybackInstance
     if (stepId > 0)
     {
       const auto stateData = getStateData(stepId - 1);
-      _emu->deserializeState(stateData);
+      jaffarCommon::deserializer::Contiguous deserializer(stateData);
+      _emu->deserializeState(deserializer);
       _emu->advanceState(getStateInput(stepId - 1));
     }
 

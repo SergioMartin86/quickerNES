@@ -24,33 +24,8 @@ class NESInstance final : public NESInstanceBase
   uint8_t *getCHRMem() const { return _nes.chr_mem(); };
   size_t getCHRMemSize() const { return _nes.chr_size(); };
 
-  void serializeState(uint8_t *state) const override {  _nes.serializeState(state); }
-  void deserializeState(const uint8_t *state) override { _nes.deserializeState(state); }
-  size_t getStateSize() const override { return _nes.getStateSize(); }
-
-  void serializeDifferentialState(
-    uint8_t *outputData,
-    size_t* outputDataPos,
-    const size_t outputDataMaxSize,
-    const uint8_t* referenceData,
-    size_t* referenceDataPos,
-    const size_t referenceDataMaxSize,
-    const bool useZlib) const override
-  {  _nes.serializeDifferentialState(outputData, outputDataPos, outputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib); }
-
-  void deserializeDifferentialState(
-    const uint8_t *inputData,
-    size_t* inputDataPos,
-    const size_t inputDataMaxSize,
-    const uint8_t* referenceData,
-    size_t* referenceDataPos,
-    const size_t referenceDataMaxSize,
-    const bool useZlib
-   ) override 
-  {  _nes.deserializeDifferentialState(inputData, inputDataPos, inputDataMaxSize, referenceData, referenceDataPos, referenceDataMaxSize, useZlib); }
-
-  size_t getDifferentialStateSize() const override
-  { return _nes.getDifferentialStateSize(); }
+  void serializeState(jaffarCommon::serializer::Base& serializer) const override { _nes.serializeState(serializer); }
+  void deserializeState(jaffarCommon::deserializer::Base& deserializer) override { _nes.deserializeState(deserializer); }
 
   std::string getCoreName() const override { return "QuickerNES"; }
   
@@ -59,6 +34,20 @@ class NESInstance final : public NESInstanceBase
   
   void *getInternalEmulatorPointer() override { return &_nes; }
   
+  inline size_t getFullStateSize() const override
+  {
+    jaffarCommon::serializer::Contiguous serializer;
+    serializeState(serializer);
+    return serializer.getOutputSize();
+  }
+
+  inline size_t getDifferentialStateSize() const override
+  {
+    jaffarCommon::serializer::Differential serializer;
+    serializeState(serializer);
+    return serializer.getOutputSize();
+  }
+
   protected:
 
   bool loadROMImpl(const uint8_t* romData, const size_t romSize) override

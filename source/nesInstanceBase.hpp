@@ -1,5 +1,7 @@
 #pragma once
 
+#include "jaffarCommon/include/serializers/contiguous.hpp"
+#include "jaffarCommon/include/serializers/differential.hpp"
 #include "jaffarCommon/include/logger.hpp"
 #include "controller.hpp"
 
@@ -65,7 +67,7 @@ class NESInstanceBase
     auto status = loadROMImpl(romData, romSize);
 
     // Detecting full state size
-    _stateSize = getStateSize();
+    _stateSize = getFullStateSize();
 
     // Returning status
     return status;
@@ -77,7 +79,7 @@ class NESInstanceBase
     enableStateBlockImpl(block);
 
     // Recalculating State size
-    _stateSize = getStateSize();
+    _stateSize = getFullStateSize();
   }
 
   void disableStateBlock(const std::string& block)
@@ -86,37 +88,19 @@ class NESInstanceBase
     disableStateBlockImpl(block);
 
     // Recalculating State Size
-    _stateSize = getStateSize();
+    _stateSize = getFullStateSize();
   }
+
+  virtual size_t getFullStateSize() const = 0;
+  virtual size_t getDifferentialStateSize() const = 0;
 
   // Virtual functions
 
   virtual uint8_t *getLowMem() const = 0;
   virtual size_t getLowMemSize() const = 0;
 
-  virtual void serializeState(uint8_t *state) const = 0;
-  virtual void deserializeState(const uint8_t *state) = 0;
-  virtual size_t getStateSize() const = 0;
-  
-  virtual void serializeDifferentialState(
-    uint8_t *outputData,
-    size_t* outputDataPos,
-    const size_t outputDataMaxSize,
-    const uint8_t* referenceData,
-    size_t* referenceDataPos,
-    const size_t referenceDataMaxSize,
-    const bool useZlib) const = 0;
-
-  virtual void deserializeDifferentialState(
-    const uint8_t *inputData,
-    size_t* inputDataPos,
-    const size_t inputDataMaxSize,
-    const uint8_t* referenceData,
-    size_t* referenceDataPos,
-    const size_t referenceDataMaxSize,
-    const bool useZlib) = 0;
-
-  virtual size_t getDifferentialStateSize() const = 0;
+  virtual void serializeState(jaffarCommon::serializer::Base& serializer) const = 0;
+  virtual void deserializeState(jaffarCommon::deserializer::Base& deserializer) = 0;
 
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
