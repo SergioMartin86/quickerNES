@@ -8,7 +8,7 @@
   "Controller 2 Type": "None",
   "Differential Compression":
   {
-    "Enabled": true,
+    "Enabled": true, 
     "Max Differences": 3100,
     "Use Zlib": true
   }

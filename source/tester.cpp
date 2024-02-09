@@ -1,5 +1,9 @@
 #include <jaffarCommon/extern/argparse/argparse.hpp>
 #include <jaffarCommon/include/json.hpp>
+#include <jaffarCommon/include/serializers/contiguous.hpp>
+#include <jaffarCommon/include/serializers/differential.hpp>
+#include <jaffarCommon/include/deserializers/contiguous.hpp>
+#include <jaffarCommon/include/deserializers/differential.hpp>
 #include <jaffarCommon/include/hash.hpp>
 #include <jaffarCommon/include/string.hpp>
 #include <jaffarCommon/include/file.hpp>
@@ -131,7 +135,8 @@ int main(int argc, char *argv[])
   {
     std::string stateFileData;
     if (jaffarCommon::loadStringFromFile(stateFileData, initialStateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", initialStateFilePath.c_str());
-    e.deserializeState((uint8_t*)stateFileData.data());
+    jaffarCommon::deserializer::Contiguous d(stateFileData.data());
+    e.deserializeState(d);
   }
   
   // Disabling requested blocks from state serialization
@@ -140,8 +145,8 @@ int main(int argc, char *argv[])
   // Disable rendering
   e.disableRendering();
 
-  // Getting state size
-  const auto stateSize = e.getStateSize();
+  // Getting full state size
+  const auto stateSize = e.getFullStateSize();
 
   // Getting differential state size
   const auto fixedDiferentialStateSize = e.getDifferentialStateSize();
@@ -187,19 +192,23 @@ int main(int argc, char *argv[])
   fflush(stdout);
 
   // Serializing initial state
-  uint8_t *currentState = (uint8_t *)malloc(stateSize);
-  e.serializeState(currentState);
+  auto currentState = (uint8_t *)malloc(stateSize);
+  {
+    jaffarCommon::serializer::Contiguous cs(currentState);
+    e.serializeState(cs);
+  }
 
   // Serializing differential state data (in case it's used)
   uint8_t *differentialStateData = nullptr;
   size_t differentialStateMaxSizeDetected = 0;
+
+  // Allocating memory for differential data and performing the first serialization
   if (differentialCompressionEnabled == true) 
   {
     differentialStateData = (uint8_t *)malloc(fullDifferentialStateSize);
-    size_t differentialDataPos = 0;
-    size_t referenceDataPos = 0;
-    e.serializeDifferentialState(differentialStateData, &differentialDataPos, fullDifferentialStateSize, currentState, &referenceDataPos, stateSize, differentialCompressionUseZlib);
-    differentialStateMaxSizeDetected = differentialDataPos;
+    auto s = jaffarCommon::serializer::Differential(differentialStateData, fullDifferentialStateSize, currentState, stateSize, differentialCompressionUseZlib);
+    e.serializeState(s);
+    differentialStateMaxSizeDetected = s.getOutputSize();
   }
 
   // Check whether to perform each action
@@ -217,12 +226,15 @@ int main(int argc, char *argv[])
     {
       if (differentialCompressionEnabled == true) 
       {
-       size_t differentialDataPos = 0;
-       size_t referenceDataPos = 0;
-       e.deserializeDifferentialState(differentialStateData, &differentialDataPos, fullDifferentialStateSize, currentState, &referenceDataPos, stateSize, differentialCompressionUseZlib);
+       jaffarCommon::deserializer::Differential d(differentialStateData, fullDifferentialStateSize, currentState, stateSize, differentialCompressionUseZlib);
+       e.deserializeState(d);
       }
 
-      if (differentialCompressionEnabled == false) e.deserializeState(currentState);
+      if (differentialCompressionEnabled == false)
+      {
+        jaffarCommon::deserializer::Contiguous d(currentState, stateSize);
+        e.deserializeState(d);
+      } 
     } 
     
     e.advanceState(input);
@@ -231,13 +243,16 @@ int main(int argc, char *argv[])
     {
       if (differentialCompressionEnabled == true)
       {
-       size_t differentialDataPos = 0;
-       size_t referenceDataPos = 0;
-       e.serializeDifferentialState(differentialStateData, &differentialDataPos, fullDifferentialStateSize, currentState, &referenceDataPos, stateSize, differentialCompressionUseZlib);
-       differentialStateMaxSizeDetected = std::max(differentialStateMaxSizeDetected, differentialDataPos);
+        auto s = jaffarCommon::serializer::Differential(differentialStateData, fullDifferentialStateSize, currentState, stateSize, differentialCompressionUseZlib);
+        e.serializeState(s);
+        differentialStateMaxSizeDetected = std::max(differentialStateMaxSizeDetected, s.getOutputSize());
       }  
 
-      if (differentialCompressionEnabled == false) e.serializeState(currentState);
+      if (differentialCompressionEnabled == false) 
+      {
+        auto s = jaffarCommon::serializer::Contiguous(currentState, stateSize);
+        e.serializeState(s);
+      }
     } 
   }
   auto tf = std::chrono::high_resolution_clock::now();
