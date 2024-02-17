@@ -223,7 +223,7 @@ uint8_t clock_table [256] = {
 };
 
 
-__attribute__((optimize("align-functions=" _PAGE_SIZE)))
+__attribute__((optimize("align-functions=" _QUICKERNES_CPU_FUNCTION_ALIGNMENT)))
  Cpu::result_t Cpu::run ( nes_time_t end ) 
 {
  set_end_time_( end );
