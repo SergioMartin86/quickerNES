@@ -152,4 +152,4 @@ inline void Fme7_Apu::load_state(fme7_apu_state_t const &in)
   run_until(last_time);
 }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -255,4 +255,4 @@ class Mapper004 : public Mapper, mmc3_state_t
   int counter_just_clocked; // used only for debugging
 };
 
-} // namespace quickNES
+} // namespace quickerNES

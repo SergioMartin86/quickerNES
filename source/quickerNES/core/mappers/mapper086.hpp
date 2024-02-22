@@ -26,4 +26,4 @@ namespace quickerNES
 
 typedef Mapper_74x161x162x32<86> Mapper086;
 
-} // namespace quickNES
+} // namespace quickerNES

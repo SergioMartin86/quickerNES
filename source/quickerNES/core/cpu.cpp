@@ -1169,4 +1169,4 @@ end:
 }
 
 
-} // namespace quickNES
+} // namespace quickerNES

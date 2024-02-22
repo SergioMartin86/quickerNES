@@ -53,4 +53,4 @@ class Mapper060 : public Mapper
   uint8_t game_sel, last_game;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

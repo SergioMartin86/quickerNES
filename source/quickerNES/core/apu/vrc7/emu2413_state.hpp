@@ -38,4 +38,4 @@ extern "C"
 }
 #endif
 
-} // namespace quickNES
+} // namespace quickerNES

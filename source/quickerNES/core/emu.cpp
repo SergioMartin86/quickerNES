@@ -445,4 +445,4 @@ void Emu::RestoreAudioBufferState()
 	sound_buf->RestoreAudioBufferState();
 }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -169,4 +169,4 @@ struct Dmc : Osc
   nes_time_t next_read_time() const;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

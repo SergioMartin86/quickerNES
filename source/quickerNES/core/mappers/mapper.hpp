@@ -209,4 +209,4 @@ inline bool Mapper::write_intercepted(nes_time_t, nes_addr_t, int) { return fals
 
 inline int Mapper::read(nes_time_t, nes_addr_t) { return -1; } // signal to caller
 
-} // namespace quickNES
+} // namespace quickerNES

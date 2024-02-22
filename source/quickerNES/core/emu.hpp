@@ -219,6 +219,26 @@ class Emu
   uint8_t *spr_mem() const { return emu.ppu.getSpriteRAM(); }
   uint16_t spr_mem_size() const { return emu.ppu.getSpriteRAMSize(); }
 
+  // Palette memory
+  uint8_t *pal_mem() const { return emu.ppu.getPaletteRAM(); }
+  uint16_t pal_mem_size() const { return emu.ppu.getPaletteRAMSize(); }
+
+	uint8_t peek_prg(nes_addr_t addr) const { return *emu.get_code(addr); }
+	void poke_prg(nes_addr_t addr, uint8_t value) { *emu.get_code(addr) = value; }
+	uint8_t peek_ppu(int addr) { return emu.ppu.peekaddr(addr); }
+
+	uint8_t get_ppu2000() const { return emu.ppu.w2000; }
+
+  void get_regs(unsigned int *dest) const
+  {
+    dest[0] = emu.r.a;
+    dest[1] = emu.r.x;
+    dest[2] = emu.r.y;
+    dest[3] = emu.r.sp;
+    dest[4] = emu.r.pc;
+    dest[5] = emu.r.status;
+  }
+
   // End of public interface
   public:
   const char *set_sample_rate(long rate, class Buffer *);
@@ -287,4 +307,4 @@ inline long Emu::chr_size() const
   return cart()->chr_size() ? cart()->chr_size() : emu.ppu.chr_addr_size;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -1070,4 +1070,4 @@ inline void Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
       static_cast<Core &>(*cpu).cpu_write(addr, data, time); \
   }
 
-} // namespace quickNES
+} // namespace quickerNES

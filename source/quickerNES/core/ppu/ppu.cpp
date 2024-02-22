@@ -656,4 +656,4 @@ nes_time_t Ppu::earliest_open_bus_decay()
   return (decay_low < decay_high) ? decay_low : decay_high;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

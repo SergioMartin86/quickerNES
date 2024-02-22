@@ -112,4 +112,4 @@ inline void Namco_Apu::write_data(nes_time_t time, int data)
   access() = data;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

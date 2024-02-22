@@ -1152,4 +1152,4 @@ void OPLL_writeIO(OPLL *opll, e_uint32 adr, e_uint32 val)
     opll->adr = val;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

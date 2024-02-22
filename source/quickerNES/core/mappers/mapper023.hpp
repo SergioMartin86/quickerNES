@@ -33,4 +33,4 @@ namespace quickerNES
 
 typedef Mapper_VRC2_4<false, false> Mapper023;
 
-} // namespace quickNES
+} // namespace quickerNES

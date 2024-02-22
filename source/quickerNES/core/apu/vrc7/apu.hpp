@@ -76,4 +76,4 @@ inline void Vrc7::osc_output(int i, Blip_Buffer *buf)
   oscs[i].output = buf;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

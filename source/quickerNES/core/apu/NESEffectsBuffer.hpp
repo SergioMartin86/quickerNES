@@ -38,4 +38,4 @@ class Nes_Effects_Buffer : public Effects_Buffer
   friend Multi_Buffer *set_apu(Nes_Effects_Buffer *, Apu *);
 };
 
-} // namespace quickNES
+} // namespace quickerNES

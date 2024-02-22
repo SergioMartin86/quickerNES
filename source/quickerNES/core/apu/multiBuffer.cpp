@@ -284,4 +284,4 @@ void Stereo_Buffer::RestoreAudioBufferState()
   right()->RestoreAudioBufferState();
 }
 
-} // namespace quickNES
+} // namespace quickerNES

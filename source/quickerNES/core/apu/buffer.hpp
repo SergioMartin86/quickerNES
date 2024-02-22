@@ -79,4 +79,4 @@ class Buffer : public Multi_Buffer
   virtual void RestoreAudioBufferState();
 };
 
-} // namespace quickNES
+} // namespace quickerNES

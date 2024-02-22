@@ -134,4 +134,4 @@ class Mapper073 : public Mapper, vrc3_state_t
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

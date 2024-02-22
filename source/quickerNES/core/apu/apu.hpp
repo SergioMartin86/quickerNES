@@ -360,4 +360,4 @@ inline void Apu::load_state(apu_state_t const &state)
   dmc.run(last_time, last_time);
 }
 
-} // namespace quickNES
+} // namespace quickerNES

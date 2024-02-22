@@ -419,4 +419,4 @@ void Blip_Buffer::RestoreAudioBufferState()
   memcpy(buffer_, extra_buffer, sizeof(extra_buffer));
 }
 
-} // namespace quickNES
+} // namespace quickerNES

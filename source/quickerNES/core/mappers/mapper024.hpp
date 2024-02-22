@@ -233,4 +233,4 @@ class Mapper_Vrc6 : public Mapper, vrc6_state_t
 
 typedef Mapper_Vrc6<0> Mapper024;
 
-} // namespace quickNES
+} // namespace quickerNES

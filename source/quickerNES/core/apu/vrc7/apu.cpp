@@ -208,4 +208,4 @@ void Vrc7::update_last_amp()
   }
 }
 
-} // namespace quickNES
+} // namespace quickerNES

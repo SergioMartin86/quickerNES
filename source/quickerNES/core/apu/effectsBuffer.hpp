@@ -101,4 +101,4 @@ inline Effects_Buffer::channel_t Effects_Buffer::channel(int i)
   return channels[i % chan_count];
 }
 
-} // namespace quickNES
+} // namespace quickerNES

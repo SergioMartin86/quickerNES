@@ -143,4 +143,4 @@ inline void Ppu::update_open_bus(nes_time_t time)
   if (time >= decay_high) open_bus &= ~0xE0;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

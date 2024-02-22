@@ -109,4 +109,4 @@ inline void Vrc6_Apu::treble_eq(blip_eq_t const &eq)
   square_synth.treble_eq(eq);
 }
 
-} // namespace quickNES
+} // namespace quickerNES

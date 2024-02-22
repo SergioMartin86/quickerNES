@@ -138,6 +138,12 @@ class Cpu
   {
     return (uint8_t *)code_map[addr >> page_bits] + addr;
   }
+
+  inline const uint8_t *get_code(nes_addr_t addr) const
+  {
+    return (const uint8_t *)code_map[addr >> page_bits] + addr;
+  }
+  
 };
 
-} // namespace quickNES
+} // namespace quickerNES

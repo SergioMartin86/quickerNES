@@ -190,4 +190,4 @@ class Mapper069 : public Mapper, fme7_state_t
   Fme7_Apu sound;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

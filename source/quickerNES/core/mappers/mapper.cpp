@@ -291,4 +291,4 @@ Mapper *Mapper::getMapperFromCode(const int mapperCode)
   return mapper;
 }
 
-} // namespace quickNES
+} // namespace quickerNES
