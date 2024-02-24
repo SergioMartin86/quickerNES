@@ -89,10 +89,27 @@ class Ppu_Impl : public ppu_state_t
   };
   impl_t *impl;
 
+  long map_chr_addr_peek( unsigned a ) const
+	{
+		return chr_pages[a / chr_page_size] + a;
+	}
+  
+  int peekaddr(int addr)
+  {
+    if (addr < 0x2000)
+      return chr_data[map_chr_addr_peek(addr)];
+    else
+      return get_nametable(addr)[addr & 0x3ff];
+  }
+
   static const uint16_t scanline_len = 341;
 
   uint8_t *getSpriteRAM() const { return (uint8_t*)spr_ram; }
   uint16_t getSpriteRAMSize() const { return spr_ram_size; }
+    
+  uint8_t *getPaletteRAM() const { return (uint8_t*)palette; }
+  uint16_t getPaletteRAMSize() const { return sizeof(palette); }
+
   uint8_t spr_ram[spr_ram_size];
   void all_tiles_modified();
 

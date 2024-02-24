@@ -225,6 +225,17 @@ class Emu
   const char *set_sample_rate(long rate, class Nes_Effects_Buffer *);
   void irq_changed() { emu.irq_changed(); }
 
+  // Palette memory
+  uint8_t *pal_mem() const { return emu.ppu.getPaletteRAM(); }
+  uint16_t pal_mem_size() const { return emu.ppu.getPaletteRAMSize(); }
+
+	uint8_t peek_prg(nes_addr_t addr) const { return *emu.get_code(addr); }
+	void poke_prg(nes_addr_t addr, uint8_t value) { *emu.get_code(addr) = value; }
+	uint8_t peek_ppu(int addr) { return emu.ppu.peekaddr(addr); }
+
+	uint8_t get_ppu2000() const { return emu.ppu.w2000; }
+
+
   private:
   frame_t *frame_;
   int buffer_height_;
