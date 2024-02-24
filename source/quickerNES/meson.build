@@ -28,13 +28,10 @@ quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
  'core/cpu.cpp'
 ]
 
-# Getting page alignment option
-CPUFunctionAlignment = get_option('CPUFunctionAlignment')
-
 # quickerNES Core Configuration
 
  quickerNESDependency = declare_dependency(
-  compile_args        : [ '-D_QUICKERNES_CPU_FUNCTION_ALIGNMENT="' + CPUFunctionAlignment.to_string() + '"'],
+  compile_args        : [ ],
   include_directories : include_directories(['.']),
   sources             : [ quickerNESSrc ]
  )
