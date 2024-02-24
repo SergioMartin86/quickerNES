@@ -96,7 +96,6 @@ class Core : private Cpu
   bool NTABBlockEnabled = true;
   bool CHRRBlockEnabled = true;
   bool SRAMBlockEnabled = true;
-  bool HEADBlockEnabled = true;
 
   Core() : ppu(this)
   {
@@ -154,28 +153,8 @@ class Core : private Cpu
     reset(true, true);
   }
 
-  static inline void serializeBlockHead(
-    const char* blockTag,
-    const uint32_t blockSize,
-    jaffarCommon::serializer::Base& serializer)
-  {
-    serializer.pushContiguous(blockTag,   4);
-    serializer.pushContiguous(&blockSize, 4);
-  }
-
-  static inline void deserializeBlockHead(jaffarCommon::deserializer::Base& deserializer)
-  {
-    uint32_t nullValue = 0;
-    deserializer.popContiguous(&nullValue, 4);
-    deserializer.popContiguous(&nullValue, 4);
-  }
-
-
   inline void serializeState(jaffarCommon::serializer::Base& serializer) const
   {
-    // NESS Block
-    if (HEADBlockEnabled == true) serializeBlockHead("NESS", 0xFFFFFFFF, serializer);
-
     // TIME Block
     if (TIMEBlockEnabled == true)
     {
@@ -184,8 +163,6 @@ class Core : private Cpu
 
       const auto inputDataSize = sizeof(nes_state_t);
       const auto inputData = (uint8_t *)&state;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("TIME", inputDataSize, serializer);
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -204,7 +181,6 @@ class Core : private Cpu
       const auto inputDataSize = sizeof(cpu_state_t);
       const auto inputData = (uint8_t *)&s;
 
-      if (HEADBlockEnabled == true) serializeBlockHead("CPUR", inputDataSize, serializer);
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -212,8 +188,6 @@ class Core : private Cpu
     {
       const auto inputDataSize = sizeof(ppu_state_t);
       const auto inputData = (const uint8_t *)&ppu;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("PPUR", inputDataSize, serializer);
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -225,8 +199,6 @@ class Core : private Cpu
 
       const auto inputDataSize = sizeof(Apu::apu_state_t);
       const auto inputData = (uint8_t *)&apuState;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("APUR", inputDataSize, serializer);
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -235,8 +207,6 @@ class Core : private Cpu
     {
       const auto inputDataSize = sizeof(joypad_state_t);
       const auto inputData = (uint8_t *)&joypad;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("CTRL", inputDataSize, serializer);
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -245,8 +215,6 @@ class Core : private Cpu
     {
       const auto inputDataSize = mapper->state_size;
       const auto inputData = (uint8_t *)mapper->state;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("MAPR", inputDataSize, serializer);
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -255,8 +223,6 @@ class Core : private Cpu
     {
       const auto inputDataSize = low_ram_size;
       const auto inputData = (uint8_t *)low_mem;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("LRAM", inputDataSize, serializer);
       serializer.push(inputData, inputDataSize);
     }
 
@@ -265,8 +231,6 @@ class Core : private Cpu
     {
       const auto inputDataSize = Ppu::spr_ram_size;
       const auto inputData = (uint8_t *)ppu.spr_ram;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("SPRT", inputDataSize, serializer);
       serializer.push(inputData, inputDataSize);
     }
 
@@ -277,8 +241,6 @@ class Core : private Cpu
 
       const auto inputDataSize = nametable_size;
       const auto inputData = (uint8_t *)ppu.impl->nt_ram;
-
-      if (HEADBlockEnabled == true) serializeBlockHead("NTAB", inputDataSize, serializer);
       serializer.push(inputData, inputDataSize);
     }
 
@@ -289,8 +251,6 @@ class Core : private Cpu
       {
         const auto inputDataSize = ppu.chr_size;
         const auto inputData = (uint8_t *)ppu.impl->chr_ram;
-
-        if (HEADBlockEnabled == true) serializeBlockHead("CHRR", inputDataSize, serializer);
         serializer.push(inputData, inputDataSize);
       }
     }
@@ -302,14 +262,9 @@ class Core : private Cpu
       {
         const auto inputDataSize = impl->sram_size;
         const auto inputData = (uint8_t *)impl->sram;
-
-        if (HEADBlockEnabled == true) serializeBlockHead("SRAM", inputDataSize, serializer);
         serializer.push(inputData, inputDataSize);
       }
     }
-
-    // gend Block
-    if (HEADBlockEnabled == true) serializeBlockHead("gend", 0, serializer);
   }
 
   inline void deserializeState(jaffarCommon::deserializer::Base& deserializer)
@@ -318,9 +273,6 @@ class Core : private Cpu
     error_count = 0;
     ppu.burst_phase = 0; // avoids shimmer when seeking to same time over and over
 
-    // NESS Block
-    if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
-
     // TIME Block
     if (TIMEBlockEnabled == true)
     {
@@ -328,8 +280,6 @@ class Core : private Cpu
 
       const auto outputData = (uint8_t*) &nesState;
       const auto inputDataSize = sizeof(nes_state_t);
-
-      if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
       deserializer.popContiguous(outputData, inputDataSize);
       
       nes = nesState;
@@ -343,8 +293,6 @@ class Core : private Cpu
       
       const auto outputData = (uint8_t*) &s;
       const auto inputDataSize = sizeof(cpu_state_t);
-
-      if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
       deserializer.popContiguous(outputData, inputDataSize);
 
       r.pc = s.pc;
@@ -360,8 +308,6 @@ class Core : private Cpu
     {
       const auto outputData = (uint8_t*) &ppu;
       const auto inputDataSize = sizeof(ppu_state_t);
-
-      if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
       deserializer.popContiguous(outputData, inputDataSize);
     }
 
@@ -372,8 +318,6 @@ class Core : private Cpu
 
       const auto outputData = (uint8_t*) &apuState;
       const auto inputDataSize = sizeof(Apu::apu_state_t);
-
-      if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
       deserializer.popContiguous(outputData, inputDataSize);
 
       impl->apu.load_state(apuState);
@@ -385,8 +329,6 @@ class Core : private Cpu
     {
       const auto outputData = (uint8_t*) &joypad;
       const auto inputDataSize = sizeof(joypad_state_t);
-
-      if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
       deserializer.popContiguous(outputData, inputDataSize);
     }
 
@@ -397,8 +339,6 @@ class Core : private Cpu
 
       const auto outputData = (uint8_t*) mapper->state;
       const auto inputDataSize = mapper->state_size;
-
-      if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
       deserializer.popContiguous(outputData, inputDataSize);
 
       mapper->apply_mapping();
@@ -409,8 +349,6 @@ class Core : private Cpu
     {
       const auto outputData = (uint8_t*) low_mem;
       const auto inputDataSize = low_ram_size;
-
-      if (HEADBlockEnabled == true)    deserializeBlockHead(deserializer);
       deserializer.pop(outputData, inputDataSize);
     }
 
@@ -419,8 +357,6 @@ class Core : private Cpu
     {
       const auto outputData = (uint8_t*) ppu.spr_ram;
       const auto inputDataSize = Ppu::spr_ram_size;
-
-      if (HEADBlockEnabled == true)    deserializeBlockHead(deserializer);
       deserializer.pop(outputData, inputDataSize);
     }
 
@@ -431,8 +367,6 @@ class Core : private Cpu
 
       const auto outputData = (uint8_t*) ppu.impl->nt_ram;
       const auto inputDataSize = nametable_size;
-
-      if (HEADBlockEnabled == true)    deserializeBlockHead(deserializer);
       deserializer.pop(outputData, inputDataSize);
     }
 
@@ -443,8 +377,6 @@ class Core : private Cpu
       {
         const auto outputData = (uint8_t*) ppu.impl->chr_ram;
         const auto inputDataSize = ppu.chr_size;
-
-        if (HEADBlockEnabled == true)    deserializeBlockHead(deserializer);
         deserializer.pop(outputData, inputDataSize);
 
         ppu.all_tiles_modified();
@@ -458,16 +390,11 @@ class Core : private Cpu
       {
         const auto outputData = (uint8_t*) impl->sram;
         const auto inputDataSize = impl->sram_size;
-
-        if (HEADBlockEnabled == true)    deserializeBlockHead(deserializer);
         deserializer.pop(outputData, inputDataSize);
       }
     }
 
     if (sram_present) enable_sram(true);
-
-    // gend Block
-    if (HEADBlockEnabled == true) deserializeBlockHead(deserializer);
   }
 
 void enableStateBlock(const std::string& block)
@@ -485,7 +412,6 @@ void enableStateBlock(const std::string& block)
    if (block == "NTAB") { NTABBlockEnabled = true; recognizedBlock = true; }
    if (block == "CHRR") { CHRRBlockEnabled = true; recognizedBlock = true; }
    if (block == "SRAM") { SRAMBlockEnabled = true; recognizedBlock = true; }
-   if (block == "HEAD") { HEADBlockEnabled = true; recognizedBlock = true; }
 
    if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
 };
@@ -506,7 +432,6 @@ void disableStateBlock(const std::string& block)
    if (block == "NTAB") { NTABBlockEnabled = false; recognizedBlock = true; }
    if (block == "CHRR") { CHRRBlockEnabled = false; recognizedBlock = true; }
    if (block == "SRAM") { SRAMBlockEnabled = false; recognizedBlock = true; }
-   if (block == "HEAD") { HEADBlockEnabled = false; recognizedBlock = true; }
 
    if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
 };

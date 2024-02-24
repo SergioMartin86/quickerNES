@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
     showFrameInfo = true;
 
     // Get command
-    auto command = jaffarCommon::getKeyPress();
+    auto command = jaffarCommon::waitForKeyPress();
 
     // Advance/Rewind commands
     if (command == 'n') currentStep = currentStep - 1;
