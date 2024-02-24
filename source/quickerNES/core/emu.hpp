@@ -253,6 +253,7 @@ class Emu
   void clear_sound_buf();
   void fade_samples(blip_sample_t *, int size, int step);
 
+  void* pixels_base_ptr;
   char *host_pixels;
   int host_palette_size;
   frame_t single_frame;
@@ -269,10 +270,18 @@ class Emu
   public:
   void SaveAudioBufferState();
   void RestoreAudioBufferState();
+
+  
+  inline void* get_pixels_base_ptr()
+  {
+    return pixels_base_ptr;
+  }
 };
+
 
 inline void Emu::set_pixels(void *p, long n)
 {
+  pixels_base_ptr = p; 
   host_pixels = (char *)p + n;
   emu.ppu.host_row_bytes = n;
 }
