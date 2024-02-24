@@ -1,5 +1,5 @@
 #include <cstring>
-#include "apu.hpp"
+#include "apu_vrc7.hpp"
 #include "emu2413.hpp"
 
 namespace quickerNES

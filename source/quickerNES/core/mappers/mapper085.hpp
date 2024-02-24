@@ -2,7 +2,7 @@
 
 // Emu 0.5.4. http://www.slack.net/~ant/
 
-#include "../apu/vrc7/apu.hpp"
+#include "../apu/vrc7/apu_vrc7.hpp"
 #include "mapper.hpp"
 #include <cstring>
 

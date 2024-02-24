@@ -8,12 +8,12 @@ quickerNESAPUSrc = [
  'core/apu/NESEffectsBuffer.cpp', 
  'core/apu/effectsBuffer.cpp', 
  'core/apu/multiBuffer.cpp',
- 'core/apu/namco/apu.cpp', 
- 'core/apu/vrc6/apu.cpp', 
+ 'core/apu/namco/apu_namco.cpp', 
+ 'core/apu/vrc6/apu_vrc6.cpp', 
  'core/apu/vrc7/emu2413.cpp', 
  'core/apu/vrc7/emu2413_state.cpp', 
- 'core/apu/vrc7/apu.cpp',
- 'core/apu/fme7/apu.cpp', 
+ 'core/apu/vrc7/apu_vrc7.cpp',
+ 'core/apu/fme7/apu_fme7.cpp', 
 ]
 
 quickerNESPPUSrc = [

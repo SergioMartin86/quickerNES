@@ -3,7 +3,7 @@
 // Konami VRC6 mapper
 // Emu 0.7.0. http://www.slack.net/~ant/
 
-#include "../apu/vrc6/apu.hpp"
+#include "../apu/vrc6/apu_vrc6.hpp"
 #include "mapper.hpp"
 #include <cstring>
 
