@@ -23,12 +23,6 @@ Buffer::Buffer() : Multi_Buffer(1) {}
 
 Buffer::~Buffer() {}
 
-Multi_Buffer *set_apu(Buffer *buf, Apu *apu)
-{
-  buf->set_apu(apu);
-  return buf;
-}
-
 void Buffer::enable_nonlinearity(bool b)
 {
   if (b)
