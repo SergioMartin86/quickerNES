@@ -70,7 +70,7 @@ if get_option('onlyOpenSource') == false
        suite : [ testSuite ])
 endif
 
-# Special test case for from-save-state start, since it doesn't work with quickNES
+# Special test cases for from-save-state start, since it doesn't work with quickNES
 if get_option('onlyOpenSource') == false
   testFile = 'saiyuukiWorld.lastHalf.test'
   testSuite = testFile.split('.')[0]
@@ -81,4 +81,14 @@ if get_option('onlyOpenSource') == false
        timeout: testTimeout,
        args : [ testFile, '--cycleType', 'Full'],
        suite : [ testSuite ])
+
+  testFile = 'microMachines.race20.test'
+  testSuite = testFile.split('.')[0]
+  testName = testFile.split('.')[1]
+  test(testName,
+       quickerNESTester,
+       workdir : meson.current_source_dir(),
+       timeout: testTimeout,
+       args : [ testFile, '--cycleType', 'Full'],
+       suite : [ testSuite ])       
 endif
