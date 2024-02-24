@@ -235,6 +235,15 @@ class Emu
 
 	uint8_t get_ppu2000() const { return emu.ppu.w2000; }
 
+  void get_regs(unsigned int *dest) const
+  {
+    dest[0] = emu.r.a;
+    dest[1] = emu.r.x;
+    dest[2] = emu.r.y;
+    dest[3] = emu.r.sp;
+    dest[4] = emu.r.pc;
+    dest[5] = emu.r.status;
+  }
 
   private:
   frame_t *frame_;
