@@ -10,6 +10,6 @@
   {
     "Enabled": true,
     "Max Differences": 7000,
-    "Use Zlib": false
+    "Use Zlib": true
   }
 }

@@ -24,7 +24,6 @@ protectedTestSet = [
   'saintSeiyaKanketsuHen.anyPercent.test',
   'saintSeiyaOugonDensetsu.anyPercent.test',
   'saiyuukiWorld.anyPercent.test',
-  'saiyuukiWorld.lastHalf.test',
   'solarJetman.anyPercent.test',
   'sprilo.anyPercent.test',
   'superMarioBros.warpless.test',
@@ -58,3 +57,28 @@ foreach testFile : testSet
        suite : [ testSuite ])
 endforeach
 
+# Special test case for castlevania 3, since it doesn't work with quickNES
+if get_option('onlyOpenSource') == false
+  testFile = 'castlevania3.playaround.test'
+  testSuite = testFile.split('.')[0]
+  testName = testFile.split('.')[1]
+  test(testName,
+       quickerNESTester,
+       workdir : meson.current_source_dir(),
+       timeout: testTimeout,
+       args : [ testFile, '--cycleType', 'Full'],
+       suite : [ testSuite ])
+endif
+
+# Special test case for from-save-state start, since it doesn't work with quickNES
+if get_option('onlyOpenSource') == false
+  testFile = 'saiyuukiWorld.lastHalf.test'
+  testSuite = testFile.split('.')[0]
+  testName = testFile.split('.')[1]
+  test(testName,
+       quickerNESTester,
+       workdir : meson.current_source_dir(),
+       timeout: testTimeout,
+       args : [ testFile, '--cycleType', 'Full'],
+       suite : [ testSuite ])
+endif

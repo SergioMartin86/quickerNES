@@ -273,8 +273,7 @@ class Core : private Cpu
     // NTAB Block
     if (NTABBlockEnabled == true)
     {
-      size_t nametable_size = 0x800;
-      if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
+      size_t nametable_size = 0x1000;
 
       const auto inputDataSize = nametable_size;
       const auto inputData = (uint8_t *)ppu.impl->nt_ram;
@@ -428,8 +427,7 @@ class Core : private Cpu
     // NTAB Block
     if (NTABBlockEnabled == true)
     {
-      size_t nametable_size = 0x800;
-      if (ppu.nt_banks[3] >= &ppu.impl->nt_ram[0xC00]) nametable_size = 0x1000;
+      size_t nametable_size = 0x1000;
 
       const auto outputData = (uint8_t*) ppu.impl->nt_ram;
       const auto inputDataSize = nametable_size;
