@@ -14,6 +14,14 @@ typedef unsigned nes_addr_t; // 16-bit address
 class Cpu
 {
   public:
+
+  void set_tracecb(void (*cb)(unsigned int *data))
+  {
+    tracecb = cb;
+  }
+
+  void (*tracecb)(unsigned int *dest);
+
   // NES 6502 registers. *Not* kept updated during a call to run().
   struct registers_t
   {

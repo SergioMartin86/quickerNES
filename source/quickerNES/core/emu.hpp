@@ -45,7 +45,8 @@ class Emu
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
   int get_joypad_read_count() const { return emu.joypad_read_count; }
-
+  void set_tracecb(void (*cb)(unsigned int *dest)) { emu.set_tracecb(cb); }
+  
 // Save emulator state variants
   void serializeState(jaffarCommon::serializer::Base& serializer) const { emu.serializeState(serializer); }
   void deserializeState(jaffarCommon::deserializer::Base& deserializer) { emu.deserializeState(deserializer); }

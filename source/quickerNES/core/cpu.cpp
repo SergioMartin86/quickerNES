@@ -262,6 +262,22 @@ loop:
  
  if ( clock_count >= clock_limit ) [[unlikely]] goto stop;
 
+  // If traceback support is enabled, trigger it here
+  #ifdef _QUICKERNES_ENABLE_TRACEBACK_SUPPORT
+  if (tracecb)
+	{
+		unsigned int scratch[7];
+		scratch[0] = a;
+		scratch[1] = x;
+		scratch[2] = y;
+		scratch[3] = sp;
+		scratch[4] = pc - 1;
+		scratch[5] = status;
+		scratch[6] = opcode;
+		tracecb(scratch);
+	}
+  #endif
+
  clock_count += clock_table [opcode];
 
  switch ( opcode )
