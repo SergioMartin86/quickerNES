@@ -44,6 +44,8 @@ class Emu
 
   const uint8_t *getHostPixels() const { return emu.ppu.host_pixels; }
 
+  int get_joypad_read_count() const { return emu.joypad_read_count; }
+
 // Save emulator state variants
   void serializeState(jaffarCommon::serializer::Base& serializer) const { emu.serializeState(serializer); }
   void deserializeState(jaffarCommon::deserializer::Base& deserializer) { emu.deserializeState(deserializer); }
@@ -68,7 +70,6 @@ class Emu
   {
     static const uint8_t left = 8;
 
-    int joypad_read_count; // number of times joypads were strobed (read)
     int burst_phase;       // NTSC burst phase for frame (0, 1, or 2)
 
     int sample_count; // number of samples (always a multiple of chan_count)
