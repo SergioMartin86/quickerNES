@@ -484,6 +484,10 @@ void disableStateBlock(const std::string& block)
 
   nes_time_t emulate_frame(uint32_t joypad1, uint32_t joypad2)
   {
+    #ifdef _QUICKERNES_DETECT_JOYPAD_READS
+    joypad_read_count = 0;
+    #endif
+
     current_joypad[0] = joypad1;
     current_joypad[1] = joypad2;
 
@@ -559,6 +563,7 @@ void disableStateBlock(const std::string& block)
   Mapper *mapper;
   nes_state_t nes;
   Ppu ppu;
+  int joypad_read_count = 0;
 
   private:
   // noncopyable
@@ -609,6 +614,11 @@ void disableStateBlock(const std::string& block)
   {
     if ((addr & 0xFFFE) == 0x4016)
     {
+      // For performance's sake, this counter is only kept on demand
+      #ifdef _QUICKERNES_DETECT_JOYPAD_READS
+      joypad_read_count++;
+      #endif
+
       // to do: to aid with recording, doesn't emulate transparent latch,
       // so a game that held strobe at 1 and read $4016 or $4017 would not get
       // the current A status as occurs on a NES
