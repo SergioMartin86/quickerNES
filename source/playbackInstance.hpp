@@ -4,11 +4,11 @@
 #include <unistd.h>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <hqn/hqn.h>
-#include <hqn/hqn_gui_controller.h>
-#include <jaffarCommon/include/serializers/contiguous.hpp>
-#include <jaffarCommon/include/deserializers/contiguous.hpp>
-#include <jaffarCommon/include/hash.hpp>
+#include <extern/hqn/hqn.h>
+#include <extern/hqn/hqn_gui_controller.h>
+#include <jaffarCommon/serializers/contiguous.hpp>
+#include <jaffarCommon/deserializers/contiguous.hpp>
+#include <jaffarCommon/hash.hpp>
 #include "nesInstance.hpp"
 
 #define _INVERSE_FRAME_RATE 16667
@@ -17,7 +17,7 @@ struct stepData_t
 {
   std::string input;
   uint8_t *stateData;
-  jaffarCommon::hash_t hash;
+  jaffarCommon::hash::hash_t hash;
 };
 
 class PlaybackInstance
@@ -34,7 +34,7 @@ class PlaybackInstance
 
     jaffarCommon::serializer::Contiguous serializer(step.stateData);
     _emu->serializeState(serializer);
-    step.hash = jaffarCommon::calculateMetroHash(_emu->getLowMem(), _emu->getLowMemSize());
+    step.hash = jaffarCommon::hash::calculateMetroHash(_emu->getLowMem(), _emu->getLowMemSize());
 
     // Adding the step into the sequence
     _stepSequence.push_back(step);
@@ -81,39 +81,39 @@ class PlaybackInstance
 
       imagePath = _overlayPath + std::string("/base.png");
       _overlayBaseSurface = IMG_Load(imagePath.c_str());
-      if (_overlayBaseSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayBaseSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_a.png");
       _overlayButtonASurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonASurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonASurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_b.png");
       _overlayButtonBSurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonBSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonBSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_select.png");
       _overlayButtonSelectSurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonSelectSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonSelectSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_start.png");
       _overlayButtonStartSurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonStartSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonStartSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_left.png");
       _overlayButtonLeftSurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonLeftSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonLeftSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_right.png");
       _overlayButtonRightSurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonRightSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonRightSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_up.png");
       _overlayButtonUpSurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonUpSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonUpSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
 
       imagePath = _overlayPath + std::string("/button_down.png");
       _overlayButtonDownSurface = IMG_Load(imagePath.c_str());
-      if (_overlayButtonDownSurface == NULL) EXIT_WITH_ERROR("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
+      if (_overlayButtonDownSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
     }
 
     // Opening rendering window
@@ -122,7 +122,7 @@ class PlaybackInstance
     // We can only call SDL_InitSubSystem once
     if (!SDL_WasInit(SDL_INIT_VIDEO))
       if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0)
-        EXIT_WITH_ERROR("Failed to initialize video: %s", SDL_GetError());
+        JAFFAR_THROW_LOGIC("Failed to initialize video: %s", SDL_GetError());
 
     // Creating HQN GUI
     _hqnGUI = hqn::GUIController::create(_hqnState);
@@ -133,7 +133,7 @@ class PlaybackInstance
   void renderFrame(const size_t stepId)
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -189,7 +189,7 @@ class PlaybackInstance
   const std::string getInput(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -201,7 +201,7 @@ class PlaybackInstance
   const uint8_t *getStateData(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -210,10 +210,10 @@ class PlaybackInstance
     return step.stateData;
   }
 
-  const jaffarCommon::hash_t getStateHash(const size_t stepId) const
+  const jaffarCommon::hash::hash_t getStateHash(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -225,7 +225,7 @@ class PlaybackInstance
   const std::string getStateInput(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "jaffarCommon/include/serializers/base.hpp"
-#include "jaffarCommon/include/deserializers/base.hpp"
+#include "jaffarCommon/serializers/base.hpp"
+#include "jaffarCommon/deserializers/base.hpp"
 #include "core/nes_emu/Nes_Emu.h"
 #include "core/nes_emu/Nes_State.h"
 #include "../nesInstanceBase.hpp"

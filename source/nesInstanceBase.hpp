@@ -1,8 +1,8 @@
 #pragma once
 
-#include "jaffarCommon/include/serializers/contiguous.hpp"
-#include "jaffarCommon/include/serializers/differential.hpp"
-#include "jaffarCommon/include/logger.hpp"
+#include "jaffarCommon/serializers/contiguous.hpp"
+#include "jaffarCommon/serializers/differential.hpp"
+#include "jaffarCommon/logger.hpp"
 #include "controller.hpp"
 
 // Size of image generated in graphics buffer
@@ -19,10 +19,10 @@ class NESInstanceBase
   inline void advanceState(const std::string &move)
   {
     bool isInputValid = _controller.parseInputString(move);
-    if (isInputValid == false) EXIT_WITH_ERROR("Move provided cannot be parsed: '%s'\n", move.c_str());
+    if (isInputValid == false) JAFFAR_THROW_LOGIC("Move provided cannot be parsed: '%s'\n", move.c_str());
 
     // Parsing power
-    if (_controller.getPowerButtonState() == true) EXIT_WITH_ERROR("Power button pressed, but not supported: '%s'\n", move.c_str());
+    if (_controller.getPowerButtonState() == true) JAFFAR_THROW_LOGIC("Power button pressed, but not supported: '%s'\n", move.c_str());
 
     // Parsing reset
     if (_controller.getResetButtonState() == true) doSoftReset();
@@ -43,7 +43,7 @@ class NESInstanceBase
     if (type == "FourScore1") { _controller.setController1Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
     if (type == "FourScore2") { _controller.setController1Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
 
-    if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
+    if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Input type not recognized: '%s'\n", type.c_str());
   }
 
   inline void setController2Type(const std::string& type)
@@ -55,7 +55,7 @@ class NESInstanceBase
     if (type == "FourScore1") { _controller.setController2Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
     if (type == "FourScore2") { _controller.setController2Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
     
-    if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
+    if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Input type not recognized: '%s'\n", type.c_str());
   }
 
   inline void enableRendering() { _doRendering = true; };

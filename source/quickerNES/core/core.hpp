@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include "ppu/ppu.hpp"
 #include <cstdio>
 #include <string>
-#include <jaffarCommon/include/serializers/base.hpp>
-#include <jaffarCommon/include/deserializers/base.hpp>
+#include <jaffarCommon/serializers/base.hpp>
+#include <jaffarCommon/deserializers/base.hpp>
 
 namespace quickerNES
 {

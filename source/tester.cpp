@@ -1,12 +1,12 @@
-#include <jaffarCommon/extern/argparse/argparse.hpp>
-#include <jaffarCommon/include/json.hpp>
-#include <jaffarCommon/include/serializers/contiguous.hpp>
-#include <jaffarCommon/include/serializers/differential.hpp>
-#include <jaffarCommon/include/deserializers/contiguous.hpp>
-#include <jaffarCommon/include/deserializers/differential.hpp>
-#include <jaffarCommon/include/hash.hpp>
-#include <jaffarCommon/include/string.hpp>
-#include <jaffarCommon/include/file.hpp>
+#include <argparse/argparse.hpp>
+#include <jaffarCommon/json.hpp>
+#include <jaffarCommon/serializers/contiguous.hpp>
+#include <jaffarCommon/serializers/differential.hpp>
+#include <jaffarCommon/deserializers/contiguous.hpp>
+#include <jaffarCommon/deserializers/differential.hpp>
+#include <jaffarCommon/hash.hpp>
+#include <jaffarCommon/string.hpp>
+#include <jaffarCommon/file.hpp>
 #include "nesInstance.hpp"
 #include <chrono>
 #include <sstream>
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
   }
   catch (const std::runtime_error &err)
   {
-    EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str());
+    JAFFAR_THROW_LOGIC("%s\n%s", err.what(), program.help().str().c_str());
   }
 
   // Getting test script file path
@@ -51,68 +51,68 @@ int main(int argc, char *argv[])
 
   // Loading script file
   std::string scriptJsonRaw;
-  if (jaffarCommon::loadStringFromFile(scriptJsonRaw, scriptFilePath) == false) EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
+  if (jaffarCommon::file::loadStringFromFile(scriptJsonRaw, scriptFilePath) == false) JAFFAR_THROW_LOGIC("Could not find/read script file: %s\n", scriptFilePath.c_str());
 
   // Parsing script
   const auto scriptJson = nlohmann::json::parse(scriptJsonRaw);
 
   // Getting rom file path
-  if (scriptJson.contains("Rom File") == false) EXIT_WITH_ERROR("Script file missing 'Rom File' entry\n");
-  if (scriptJson["Rom File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Rom File' entry is not a string\n");
+  if (scriptJson.contains("Rom File") == false) JAFFAR_THROW_LOGIC("Script file missing 'Rom File' entry\n");
+  if (scriptJson["Rom File"].is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Rom File' entry is not a string\n");
   std::string romFilePath = scriptJson["Rom File"].get<std::string>();
 
   // Getting initial state file path
-  if (scriptJson.contains("Initial State File") == false) EXIT_WITH_ERROR("Script file missing 'Initial State File' entry\n");
-  if (scriptJson["Initial State File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Initial State File' entry is not a string\n");
+  if (scriptJson.contains("Initial State File") == false) JAFFAR_THROW_LOGIC("Script file missing 'Initial State File' entry\n");
+  if (scriptJson["Initial State File"].is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Initial State File' entry is not a string\n");
   std::string initialStateFilePath = scriptJson["Initial State File"].get<std::string>();
 
   // Getting sequence file path
-  if (scriptJson.contains("Sequence File") == false) EXIT_WITH_ERROR("Script file missing 'Sequence File' entry\n");
-  if (scriptJson["Sequence File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Sequence File' entry is not a string\n");
+  if (scriptJson.contains("Sequence File") == false) JAFFAR_THROW_LOGIC("Script file missing 'Sequence File' entry\n");
+  if (scriptJson["Sequence File"].is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Sequence File' entry is not a string\n");
   std::string sequenceFilePath = scriptJson["Sequence File"].get<std::string>();
 
   // Getting expected ROM SHA1 hash
-  if (scriptJson.contains("Expected ROM SHA1") == false) EXIT_WITH_ERROR("Script file missing 'Expected ROM SHA1' entry\n");
-  if (scriptJson["Expected ROM SHA1"].is_string() == false) EXIT_WITH_ERROR("Script file 'Expected ROM SHA1' entry is not a string\n");
+  if (scriptJson.contains("Expected ROM SHA1") == false) JAFFAR_THROW_LOGIC("Script file missing 'Expected ROM SHA1' entry\n");
+  if (scriptJson["Expected ROM SHA1"].is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Expected ROM SHA1' entry is not a string\n");
   std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
 
   // Parsing disabled blocks in lite state serialization
   std::vector<std::string> stateDisabledBlocks;
   std::string stateDisabledBlocksOutput;
-  if (scriptJson.contains("Disable State Blocks") == false) EXIT_WITH_ERROR("Script file missing 'Disable State Blocks' entry\n");
-  if (scriptJson["Disable State Blocks"].is_array() == false) EXIT_WITH_ERROR("Script file 'Disable State Blocks' is not an array\n");
+  if (scriptJson.contains("Disable State Blocks") == false) JAFFAR_THROW_LOGIC("Script file missing 'Disable State Blocks' entry\n");
+  if (scriptJson["Disable State Blocks"].is_array() == false) JAFFAR_THROW_LOGIC("Script file 'Disable State Blocks' is not an array\n");
   for (const auto& entry : scriptJson["Disable State Blocks"])
   {
-    if (entry.is_string() == false) EXIT_WITH_ERROR("Script file 'Disable State Blocks' entry is not a string\n");
+    if (entry.is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Disable State Blocks' entry is not a string\n");
     stateDisabledBlocks.push_back(entry.get<std::string>());
     stateDisabledBlocksOutput += entry.get<std::string>() + std::string(" ");
   } 
   
   // Getting Controller 1 type
-  if (scriptJson.contains("Controller 1 Type") == false) EXIT_WITH_ERROR("Script file missing 'Controller 1 Type' entry\n");
-  if (scriptJson["Controller 1 Type"].is_string() == false) EXIT_WITH_ERROR("Script file 'Controller 1 Type' entry is not a string\n");
+  if (scriptJson.contains("Controller 1 Type") == false) JAFFAR_THROW_LOGIC("Script file missing 'Controller 1 Type' entry\n");
+  if (scriptJson["Controller 1 Type"].is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Controller 1 Type' entry is not a string\n");
   std::string controller1Type = scriptJson["Controller 1 Type"].get<std::string>();
 
   // Getting Controller 2 type
-  if (scriptJson.contains("Controller 2 Type") == false) EXIT_WITH_ERROR("Script file missing 'Controller 2 Type' entry\n");
-  if (scriptJson["Controller 2 Type"].is_string() == false) EXIT_WITH_ERROR("Script file 'Controller 2 Type' entry is not a string\n");
+  if (scriptJson.contains("Controller 2 Type") == false) JAFFAR_THROW_LOGIC("Script file missing 'Controller 2 Type' entry\n");
+  if (scriptJson["Controller 2 Type"].is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Controller 2 Type' entry is not a string\n");
   std::string controller2Type = scriptJson["Controller 2 Type"].get<std::string>();
 
   // Getting differential compression configuration
-  if (scriptJson.contains("Differential Compression") == false) EXIT_WITH_ERROR("Script file missing 'Differential Compression' entry\n");
-  if (scriptJson["Differential Compression"].is_object() == false) EXIT_WITH_ERROR("Script file 'Differential Compression' entry is not a key/value object\n");
+  if (scriptJson.contains("Differential Compression") == false) JAFFAR_THROW_LOGIC("Script file missing 'Differential Compression' entry\n");
+  if (scriptJson["Differential Compression"].is_object() == false) JAFFAR_THROW_LOGIC("Script file 'Differential Compression' entry is not a key/value object\n");
   const auto& differentialCompressionJs = scriptJson["Differential Compression"];
 
-  if (differentialCompressionJs.contains("Enabled") == false) EXIT_WITH_ERROR("Script file missing 'Differential Compression / Enabled' entry\n");
-  if (differentialCompressionJs["Enabled"].is_boolean() == false) EXIT_WITH_ERROR("Script file 'Differential Compression / Enabled' entry is not a boolean\n");
+  if (differentialCompressionJs.contains("Enabled") == false) JAFFAR_THROW_LOGIC("Script file missing 'Differential Compression / Enabled' entry\n");
+  if (differentialCompressionJs["Enabled"].is_boolean() == false) JAFFAR_THROW_LOGIC("Script file 'Differential Compression / Enabled' entry is not a boolean\n");
   const auto differentialCompressionEnabled = differentialCompressionJs["Enabled"].get<bool>();
 
-  if (differentialCompressionJs.contains("Max Differences") == false) EXIT_WITH_ERROR("Script file missing 'Differential Compression / Max Differences' entry\n");
-  if (differentialCompressionJs["Max Differences"].is_number() == false) EXIT_WITH_ERROR("Script file 'Differential Compression / Max Differences' entry is not a number\n");
+  if (differentialCompressionJs.contains("Max Differences") == false) JAFFAR_THROW_LOGIC("Script file missing 'Differential Compression / Max Differences' entry\n");
+  if (differentialCompressionJs["Max Differences"].is_number() == false) JAFFAR_THROW_LOGIC("Script file 'Differential Compression / Max Differences' entry is not a number\n");
   const auto differentialCompressionMaxDifferences = differentialCompressionJs["Max Differences"].get<size_t>();
 
-  if (differentialCompressionJs.contains("Use Zlib") == false) EXIT_WITH_ERROR("Script file missing 'Differential Compression / Use Zlib' entry\n");
-  if (differentialCompressionJs["Use Zlib"].is_boolean() == false) EXIT_WITH_ERROR("Script file 'Differential Compression / Use Zlib' entry is not a boolean\n");
+  if (differentialCompressionJs.contains("Use Zlib") == false) JAFFAR_THROW_LOGIC("Script file missing 'Differential Compression / Use Zlib' entry\n");
+  if (differentialCompressionJs["Use Zlib"].is_boolean() == false) JAFFAR_THROW_LOGIC("Script file 'Differential Compression / Use Zlib' entry is not a boolean\n");
   const auto differentialCompressionUseZlib = differentialCompressionJs["Use Zlib"].get<bool>();
 
   // Creating emulator instance
@@ -124,17 +124,17 @@ int main(int argc, char *argv[])
 
   // Loading ROM File
   std::string romFileData;
-  if (jaffarCommon::loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
+  if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
   e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
 
   // Calculating ROM SHA1
-  auto romSHA1 = SHA1::GetHash((uint8_t *)romFileData.data(), romFileData.size());
+  auto romSHA1 = jaffarCommon::hash::getSHA1String(romFileData);
 
   // If an initial state is provided, load it now
   if (initialStateFilePath != "")
   {
     std::string stateFileData;
-    if (jaffarCommon::loadStringFromFile(stateFileData, initialStateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", initialStateFilePath.c_str());
+    if (jaffarCommon::file::loadStringFromFile(stateFileData, initialStateFilePath) == false) JAFFAR_THROW_LOGIC("Could not initial state file: %s\n", initialStateFilePath.c_str());
     jaffarCommon::deserializer::Contiguous d(stateFileData.data());
     e.deserializeState(d);
   }
@@ -153,14 +153,14 @@ int main(int argc, char *argv[])
   const auto fullDifferentialStateSize = fixedDiferentialStateSize + differentialCompressionMaxDifferences;
 
   // Checking with the expected SHA1 hash
-  if (romSHA1 != expectedROMSHA1) EXIT_WITH_ERROR("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
+  if (romSHA1 != expectedROMSHA1) JAFFAR_THROW_LOGIC("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
 
   // Loading sequence file
   std::string sequenceRaw;
-  if (jaffarCommon::loadStringFromFile(sequenceRaw, sequenceFilePath) == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
+  if (jaffarCommon::file::loadStringFromFile(sequenceRaw, sequenceFilePath) == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = jaffarCommon::split(sequenceRaw, ' ');
+  const auto sequence = jaffarCommon::string::split(sequenceRaw, ' ');
 
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
   double elapsedTimeSeconds = (double)dt * 1.0e-9;
 
   // Calculating final state hash
-  auto result = jaffarCommon::calculateMetroHash(e.getLowMem(), e.getLowMemSize());
+  auto result = jaffarCommon::hash::calculateMetroHash(e.getLowMem(), e.getLowMemSize());
 
   // Creating hash string
   char hashStringBuffer[256];
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
   printf("[] Differential State Max Size Detected:   %lu\n", differentialStateMaxSizeDetected);    
   }
   // If saving hash, do it now
-  if (hashOutputFile != "") jaffarCommon::saveStringToFile(std::string(hashStringBuffer), hashOutputFile.c_str());
+  if (hashOutputFile != "") jaffarCommon::file::saveStringToFile(std::string(hashStringBuffer), hashOutputFile.c_str());
 
   // If reached this point, everything ran ok
   return 0;

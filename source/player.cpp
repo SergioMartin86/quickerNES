@@ -1,10 +1,10 @@
 #include <cstdlib>
-#include "jaffarCommon/extern/argparse/argparse.hpp"
-#include "jaffarCommon/include/serializers/contiguous.hpp"
-#include "jaffarCommon/include/deserializers/contiguous.hpp"
-#include "jaffarCommon/include/file.hpp"
-#include "jaffarCommon/include/logger.hpp"
-#include "jaffarCommon/include/string.hpp"
+#include "argparse/argparse.hpp"
+#include "jaffarCommon/serializers/contiguous.hpp"
+#include "jaffarCommon/deserializers/contiguous.hpp"
+#include "jaffarCommon/file.hpp"
+#include "jaffarCommon/logger.hpp"
+#include "jaffarCommon/string.hpp"
 #include "nesInstance.hpp"
 #include "playbackInstance.hpp"
 
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   }
   catch (const std::runtime_error &err)
   {
-    EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str());
+    JAFFAR_THROW_LOGIC("%s\n%s", err.what(), program.help().str().c_str());
   }
 
   // Getting ROM file path
@@ -76,14 +76,14 @@ int main(int argc, char *argv[])
 
   // Loading sequence file
   std::string inputSequence;
-  auto status = jaffarCommon::loadStringFromFile(inputSequence, sequenceFilePath.c_str());
-  if (status == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
+  auto status = jaffarCommon::file::loadStringFromFile(inputSequence, sequenceFilePath.c_str());
+  if (status == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = jaffarCommon::split(inputSequence, ' ');
+  const auto sequence = jaffarCommon::string::split(inputSequence, ' ');
 
   // Initializing terminal
-  jaffarCommon::initializeTerminal();
+  jaffarCommon::logger::initializeTerminal();
 
   // Printing provided parameters
   printw("[] Rom File Path:      '%s'\n", romFilePath.c_str());
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
   printw("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
   printw("[] Generating Sequence...\n");
 
-  jaffarCommon::refreshTerminal();
+  jaffarCommon::logger::refreshTerminal();
 
   // Creating emulator instance
   NESInstance e;
@@ -103,14 +103,14 @@ int main(int argc, char *argv[])
   
   // Loading ROM File
   std::string romFileData;
-  if (jaffarCommon::loadStringFromFile(romFileData, romFilePath) == false) EXIT_WITH_ERROR("Could not rom file: %s\n", romFilePath.c_str());
+  if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
   e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
 
   // If an initial state is provided, load it now
   if (stateFilePath != "")
   {
     std::string stateFileData;
-    if (jaffarCommon::loadStringFromFile(stateFileData, stateFilePath) == false) EXIT_WITH_ERROR("Could not initial state file: %s\n", stateFilePath.c_str());
+    if (jaffarCommon::file::loadStringFromFile(stateFileData, stateFilePath) == false) JAFFAR_THROW_LOGIC("Could not initial state file: %s\n", stateFilePath.c_str());
     jaffarCommon::deserializer::Contiguous deserializer(stateFileData.data());
     e.deserializeState(deserializer);
   }
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     // Printing data and commands
     if (showFrameInfo)
     {
-      jaffarCommon::clearTerminal();
+      jaffarCommon::logger::clearTerminal();
 
       printw("[] ----------------------------------------------------------------\n");
       printw("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
@@ -159,14 +159,14 @@ int main(int argc, char *argv[])
       // Only print commands if not in reproduce mode
       if (isReproduce == false) printw("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
 
-      jaffarCommon::refreshTerminal();
+      jaffarCommon::logger::refreshTerminal();
     }
 
     // Resetting show frame info flag
     showFrameInfo = true;
 
     // Get command
-    auto command = jaffarCommon::waitForKeyPress();
+    auto command = jaffarCommon::logger::waitForKeyPress();
 
     // Advance/Rewind commands
     if (command == 'n') currentStep = currentStep - 1;
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
       std::string saveData;
       saveData.resize(stateSize);
       memcpy(saveData.data(), stateData, stateSize);
-      if (jaffarCommon::saveStringToFile(saveData, saveFileName.c_str()) == false) EXIT_WITH_ERROR("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
+      if (jaffarCommon::file::saveStringToFile(saveData, saveFileName.c_str()) == false) JAFFAR_THROW_LOGIC("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
       printw("[] Saved state to %s\n", saveFileName.c_str());
 
       // Do no show frame info again after this action
@@ -206,5 +206,5 @@ int main(int argc, char *argv[])
   }
 
   // Ending ncurses window
-  jaffarCommon::finalizeTerminal();
+  jaffarCommon::logger::finalizeTerminal();
 }
