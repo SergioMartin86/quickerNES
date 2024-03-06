@@ -8,6 +8,9 @@ project('quickerNES','c','cpp',
 # Loading dependencies
 subdir('source')
 
+# Do not build any targets if this is a subproject
+if meson.is_subproject() == false
+
 # Common application flags
 commonCompileArgs = [ '-Wfatal-errors', '-Wall']
 
@@ -22,10 +25,6 @@ hqnSubproject = subproject('hqn')
 hqnDependency = hqnSubproject.get_variable('hqnDependency')
 
 # Building playback tool
-
-# Do not build any targets if this is a subproject
-if meson.is_subproject() == false
-
   if get_option('buildPlayer') == true
     executable('player',
       'source/player.cpp',
