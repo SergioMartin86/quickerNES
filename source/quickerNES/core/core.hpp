@@ -276,13 +276,10 @@ class Core : private Cpu
     // TIME Block
     if (TIMEBlockEnabled == true)
     {
-      nes_state_t nesState;
-
-      const auto outputData = (uint8_t*) &nesState;
+      const auto outputData = (uint8_t*) &nes;
       const auto inputDataSize = sizeof(nes_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
       
-      nes = nesState;
       nes.timestamp /= 5;
     }
 
