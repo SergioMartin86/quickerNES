@@ -74,7 +74,7 @@ class NESInstance final : public NESInstanceBase
   void enableStateBlockImpl(const std::string& block) override {};
   void disableStateBlockImpl(const std::string& block) override {};
 
-  void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) override
+  void advanceStateImpl(const quickNES::Controller::port_t controller1, const quickNES::Controller::port_t controller2) override
   {
     if (_doRendering == true) _nes.emulate_frame(controller1, controller2);
     if (_doRendering == false) _nes.emulate_skip_frame(controller1, controller2);

@@ -38,10 +38,10 @@ class NESInstanceBase
   {
     bool isTypeRecognized = false;
 
-    if (type == "None") { _controller.setController1Type(Controller::controller_t::none); isTypeRecognized = true; }
-    if (type == "Joypad") { _controller.setController1Type(Controller::controller_t::joypad); isTypeRecognized = true; }
-    if (type == "FourScore1") { _controller.setController1Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
-    if (type == "FourScore2") { _controller.setController1Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
+    if (type == "None") { _controller.setController1Type(quickNES::Controller::controller_t::none); isTypeRecognized = true; }
+    if (type == "Joypad") { _controller.setController1Type(quickNES::Controller::controller_t::joypad); isTypeRecognized = true; }
+    if (type == "FourScore1") { _controller.setController1Type(quickNES::Controller::controller_t::fourscore1); isTypeRecognized = true; }
+    if (type == "FourScore2") { _controller.setController1Type(quickNES::Controller::controller_t::fourscore2); isTypeRecognized = true; }
 
     if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Input type not recognized: '%s'\n", type.c_str());
   }
@@ -50,10 +50,10 @@ class NESInstanceBase
   {
     bool isTypeRecognized = false;
 
-    if (type == "None") { _controller.setController2Type(Controller::controller_t::none); isTypeRecognized = true; }
-    if (type == "Joypad") { _controller.setController2Type(Controller::controller_t::joypad); isTypeRecognized = true; }
-    if (type == "FourScore1") { _controller.setController2Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
-    if (type == "FourScore2") { _controller.setController2Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
+    if (type == "None") { _controller.setController2Type(quickNES::Controller::controller_t::none); isTypeRecognized = true; }
+    if (type == "Joypad") { _controller.setController2Type(quickNES::Controller::controller_t::joypad); isTypeRecognized = true; }
+    if (type == "FourScore1") { _controller.setController2Type(quickNES::Controller::controller_t::fourscore1); isTypeRecognized = true; }
+    if (type == "FourScore2") { _controller.setController2Type(quickNES::Controller::controller_t::fourscore2); isTypeRecognized = true; }
     
     if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Input type not recognized: '%s'\n", type.c_str());
   }
@@ -112,7 +112,7 @@ class NESInstanceBase
   virtual void enableStateBlockImpl(const std::string& block) = 0;
   virtual void disableStateBlockImpl(const std::string& block) = 0;
   virtual bool loadROMImpl(const uint8_t* romData, const size_t romSize) = 0;
-  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
+  virtual void advanceStateImpl(const quickNES::Controller::port_t controller1, const quickNES::Controller::port_t controller2) = 0;
 
   // Storage for the light state size
   size_t _stateSize;
@@ -123,5 +123,5 @@ class NESInstanceBase
   private:
 
   // Controller class for input parsing
-  Controller _controller;
+  quickNES::Controller _controller;
 };

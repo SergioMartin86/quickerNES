@@ -7,6 +7,9 @@
 #include <string>
 #include <sstream>
 
+namespace quickNES
+{
+
 class Controller
 {
 public:
@@ -204,4 +207,7 @@ public:
   input_t _input;
   controller_t _controller1Type;
   controller_t _controller2Type;
-};
+  
+}; // class Controller
+
+} // namespace quickNES
