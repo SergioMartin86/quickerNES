@@ -33,7 +33,7 @@ public:
      * Create a new GUI controller. Returns a GUI Controller or nullptr
      * if an error occured during initialization.
      */
-    static GUIController *create(HQNState &state);
+    static GUIController *create(HQNState &state, SDL_Window* window);
 
     /**
      * Set the window title.
@@ -112,7 +112,7 @@ protected:
     /**
      * Called in create(). If this fails the GUI cannot be created.
      */
-    bool init();
+    bool init(SDL_Window* window);
 
 private:
     /**

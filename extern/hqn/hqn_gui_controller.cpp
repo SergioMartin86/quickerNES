@@ -68,10 +68,10 @@ GUIController::~GUIController()
     m_state.setListener(nullptr);
 }
 
-GUIController *GUIController::create(HQNState &state)
+GUIController *GUIController::create(HQNState &state, SDL_Window* window)
 {
     GUIController *self = new GUIController(state);
-    if (!self->init())
+    if (!self->init(window))
     {
         delete self;
         return nullptr;
@@ -82,13 +82,9 @@ GUIController *GUIController::create(HQNState &state)
     }
 }
 
-bool GUIController::init()
+bool GUIController::init(SDL_Window* window)
 {
-    // create the window
-    if (!(m_window = SDL_CreateWindow(DEFAULT_WINDOW_TITLE,
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, DEFAULT_WIDTH,
-        DEFAULT_HEIGHT, 0)))
-        return false;
+    m_window = window;
     if (!(m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED)))
         return false;
     if (!(m_tex = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888,

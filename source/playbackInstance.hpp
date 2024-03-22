@@ -41,35 +41,8 @@ class PlaybackInstance
   }
 
   // Initializes the playback module instance
-  PlaybackInstance(NESInstance *emu, const std::vector<std::string> &sequence, const std::string &overlayPath = "") : _emu(emu)
+  PlaybackInstance(NESInstance *emu, const std::string &overlayPath = "") : _emu(emu)
   {
-    // Allocating video buffer
-    _video_buffer = (uint8_t *)malloc(image_width * image_height);
-
-    // Setting video buffer
-    ((emulator_t*)_emu->getInternalEmulatorPointer())->set_pixels(_video_buffer, image_width + 8);
-
-    // Enabling emulation rendering
-    _emu->enableRendering();
-
-    // Loading Emulator instance HQN
-    _hqnState.setEmulatorPointer(_emu->getInternalEmulatorPointer());
-    static uint8_t video_buffer[image_width * image_height];
-    _hqnState.m_emu->set_pixels(video_buffer, image_width + 8);
-
-    // Building sequence information
-    for (const auto &input : sequence)
-    {
-      // Adding new step
-      addStep(input);
-
-      // Advance state based on the input received
-      _emu->advanceState(input);
-    }
-
-    // Adding last step with no input
-    addStep("<End Of Sequence>");
-
     // Loading overlay, if provided
     if (overlayPath != "")
     {
@@ -115,17 +88,42 @@ class PlaybackInstance
       _overlayButtonDownSurface = IMG_Load(imagePath.c_str());
       if (_overlayButtonDownSurface == NULL) JAFFAR_THROW_LOGIC("[Error] Could not load image: %s, Reason: %s\n", imagePath.c_str(), SDL_GetError());
     }
+  }
 
-    // Opening rendering window
-    SDL_SetMainReady();
+  void initialize(const std::vector<std::string> &sequence)
+  {
+    // Building sequence information
+    for (const auto &input : sequence)
+    {
+      // Adding new step
+      addStep(input);
 
-    // We can only call SDL_InitSubSystem once
-    if (!SDL_WasInit(SDL_INIT_VIDEO))
-      if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0)
-        JAFFAR_THROW_LOGIC("Failed to initialize video: %s", SDL_GetError());
+      // Advance state based on the input received
+      _emu->advanceState(input);
+    }
+
+    // Adding last step with no input
+    addStep("<End Of Sequence>");
+  }
+
+  void enableRendering(SDL_Window* window)
+  {
+    // Allocating video buffer
+    _video_buffer = (uint8_t *)malloc(image_width * image_height);
+
+    // Setting video buffer
+    ((emulator_t*)_emu->getInternalEmulatorPointer())->set_pixels(_video_buffer, image_width + 8);
+
+    // Loading Emulator instance HQN
+    _hqnState.setEmulatorPointer(_emu->getInternalEmulatorPointer());
+    static uint8_t video_buffer[image_width * image_height];
+    _hqnState.m_emu->set_pixels(video_buffer, image_width + 8);
+
+    // Enabling emulation rendering
+    _emu->enableRendering();
 
     // Creating HQN GUI
-    _hqnGUI = hqn::GUIController::create(_hqnState);
+    _hqnGUI = hqn::GUIController::create(_hqnState, window);
     _hqnGUI->setScale(1);
   }
 

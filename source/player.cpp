@@ -8,6 +8,23 @@
 #include "nesInstance.hpp"
 #include "playbackInstance.hpp"
 
+SDL_Window *launchOutputWindow()
+{
+  // Opening rendering window
+  SDL_SetMainReady();
+
+  // We can only call SDL_InitSubSystem once
+  if (!SDL_WasInit(SDL_INIT_VIDEO))
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) JAFFAR_THROW_LOGIC("Failed to initialize video: %s", SDL_GetError());
+
+  auto window = SDL_CreateWindow("JaffarPlus", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 100, 100, SDL_WINDOW_RESIZABLE);
+  if (window == nullptr) JAFFAR_THROW_LOGIC("Coult not open SDL window");
+
+  return window;
+}
+
+void closeOutputWindow(SDL_Window *window) { SDL_DestroyWindow(window); }
+
 int main(int argc, char *argv[])
 {
   // Parsing command line arguments
@@ -86,11 +103,11 @@ int main(int argc, char *argv[])
   jaffarCommon::logger::initializeTerminal();
 
   // Printing provided parameters
-  printw("[] Rom File Path:      '%s'\n", romFilePath.c_str());
-  printw("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
-  printw("[] Sequence Length:    %lu\n", sequence.size());
-  printw("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
-  printw("[] Generating Sequence...\n");
+  jaffarCommon::logger::log("[] Rom File Path:      '%s'\n", romFilePath.c_str());
+  jaffarCommon::logger::log("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
+  jaffarCommon::logger::log("[] Sequence Length:    %lu\n", sequence.size());
+  jaffarCommon::logger::log("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
+  jaffarCommon::logger::log("[] Generating Sequence...\n");
 
   jaffarCommon::logger::refreshTerminal();
 
@@ -116,7 +133,18 @@ int main(int argc, char *argv[])
   }
 
   // Creating playback instance
-  auto p = PlaybackInstance(&e, sequence);
+  auto p = PlaybackInstance(&e);
+
+  // If render is enabled then, create window now
+  SDL_Window* window = nullptr;
+  if (disableRender == false)
+  {
+    window = launchOutputWindow();
+    p.enableRendering(window);
+  }
+
+  // Initializing playback instance
+  p.initialize(sequence);
 
   // Getting state size
   auto stateSize = e.getFullStateSize();
@@ -151,13 +179,13 @@ int main(int argc, char *argv[])
     {
       jaffarCommon::logger::clearTerminal();
 
-      printw("[] ----------------------------------------------------------------\n");
-      printw("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
-      printw("[] Input:          %s\n", input.c_str());
-      printw("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
+      jaffarCommon::logger::log("[] ----------------------------------------------------------------\n");
+      jaffarCommon::logger::log("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
+      jaffarCommon::logger::log("[] Input:          %s\n", input.c_str());
+      jaffarCommon::logger::log("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
 
       // Only print commands if not in reproduce mode
-      if (isReproduce == false) printw("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
+      if (isReproduce == false) jaffarCommon::logger::log("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
 
       jaffarCommon::logger::refreshTerminal();
     }
@@ -192,7 +220,7 @@ int main(int argc, char *argv[])
       saveData.resize(stateSize);
       memcpy(saveData.data(), stateData, stateSize);
       if (jaffarCommon::file::saveStringToFile(saveData, saveFileName.c_str()) == false) JAFFAR_THROW_LOGIC("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
-      printw("[] Saved state to %s\n", saveFileName.c_str());
+      jaffarCommon::logger::log("[] Saved state to %s\n", saveFileName.c_str());
 
       // Do no show frame info again after this action
       showFrameInfo = false;
@@ -204,6 +232,9 @@ int main(int argc, char *argv[])
     // Start playback from current point
     if (command == 'q') continueRunning = false;
   }
+
+  // If render is enabled then, close window now
+  if (disableRender == false) closeOutputWindow(window);
 
   // Ending ncurses window
   jaffarCommon::logger::finalizeTerminal();
