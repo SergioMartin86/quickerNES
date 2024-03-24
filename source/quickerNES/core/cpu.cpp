@@ -222,8 +222,8 @@ uint8_t clock_table [256] = {
     3,5,2,8,4,4,6,6,2,4,2,7,4,4,7,7 // F
 };
 
-// This optimization is only possible on linux systems -- MSVC does not allow function alignment
-#ifdef __linux__
+// This optimization is only possible with the GNU compiler -- MSVC does not allow function alignment
+#ifdef __GNUC__
 __attribute__((optimize("align-functions=1024")))
 #endif
  Cpu::result_t Cpu::run ( nes_time_t end ) 
