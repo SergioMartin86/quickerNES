@@ -73,5 +73,8 @@ quickNESSrc = [
  quickNESDependency = declare_dependency(
   compile_args        : [  ],
   include_directories : include_directories(['.', 'core/nes_emu']),
-  sources             : [ quickNESSrc ]
+  sources             : [ quickNESSrc ],
+		dependencies        : [ 
+						  																		dependency('sdl2'),
+		                      ]
  )

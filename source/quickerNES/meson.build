@@ -33,5 +33,8 @@ quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
  quickerNESDependency = declare_dependency(
   compile_args        : [ ],
   include_directories : include_directories(['.']),
-  sources             : [ quickerNESSrc ]
+  sources             : [ quickerNESSrc ],
+  dependencies        : [ 
+						  																		dependency('sdl2'),
+		                      ]
  )
