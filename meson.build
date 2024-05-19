@@ -8,6 +8,11 @@ project('quickerNES','c','cpp',
 # Loading dependencies
 subdir('source')
 
+# Grabbing hqn dependency
+
+hqnSubproject = subproject('hqn')
+hqnDependency = hqnSubproject.get_variable('hqnDependency')
+
 # Do not build any targets if this is a subproject
 if meson.is_subproject() == false
 
@@ -18,11 +23,6 @@ commonCompileArgs = [ '-Wfatal-errors', '-Wall']
 
 jaffarCommonSubproject = subproject('jaffarCommon')
 jaffarCommonDependency = jaffarCommonSubproject.get_variable('jaffarCommonDependency')
-
-# Grabbing hqn dependency
-
-hqnSubproject = subproject('hqn')
-hqnDependency = hqnSubproject.get_variable('hqnDependency')
 
 # Building playback tool
   if get_option('buildPlayer') == true
