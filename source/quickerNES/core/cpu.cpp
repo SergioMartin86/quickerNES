@@ -146,12 +146,12 @@ void Cpu::reset( void const* unmapped_page )
  irq_time_ = LONG_MAX / 2 + 1;
  end_time_ = LONG_MAX / 2 + 1;
 
- code_map [0] = low_mem;
- code_map [1] = low_mem - 1 * page_size;
- code_map [2] = low_mem - 2 * page_size;
- code_map [3] = low_mem - 3 * page_size;
+ set_code_page(0, low_mem);
+ set_code_page(1, low_mem);
+ set_code_page(2, low_mem);
+ set_code_page(3, low_mem);
  for ( int32_t i = 4; i < page_count + 1; i++ )
-   code_map [i] = (uint8_t*) unmapped_page;
+   set_code_page(i, (uint8_t *) unmapped_page);
 
  isCorrectExecution = true;
 }

@@ -51,11 +51,16 @@ class Cpu
   // Clear registers, unmap memory, and map code pages to unmapped_page.
   void reset(void const *unmapped_page = 0);
 
+  inline void set_code_page(int i, uint8_t const *p)
+  {
+    code_map[i] = p - (unsigned)i * page_size;
+  }
+
   inline void map_code(nes_addr_t start, unsigned size, const void *data)
   {
     unsigned first_page = start / page_size;
-    const uint8_t *newPtr = (uint8_t *)data - start;
-    for (unsigned i = size / page_size; i--;) code_map[first_page + i] = newPtr;
+    for (unsigned i = size / page_size; i--;)
+      set_code_page(first_page + i, (uint8_t *)data + i * page_size);
   }
 
   // Access memory as the emulated CPU does.
