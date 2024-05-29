@@ -84,7 +84,12 @@ class Cpu
     result_badop   // unimplemented/illegal instruction
   };
 
+  // This optimization is only possible with the GNU compiler -- MSVC does not allow function alignment
+#if defined(__GNUC__) || defined(__clang__)
+  result_t run(nes_time_t end_time) __attribute__((aligned(1024)));
+#else
   result_t run(nes_time_t end_time);
+#endif
 
   nes_time_t time() const { return clock_count; }
 
