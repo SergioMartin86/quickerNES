@@ -106,6 +106,7 @@ class NESInstanceBase
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;
   virtual void *getInternalEmulatorPointer() = 0;
+  virtual void setNTABBlockSize(const size_t size) { };
 
   protected:
 

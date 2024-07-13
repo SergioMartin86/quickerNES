@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include "ppu/ppu.hpp"
 #include <cstdio>
 #include <string>
+#include <cstdint>
 #include <jaffarCommon/serializers/base.hpp>
 #include <jaffarCommon/deserializers/base.hpp>
 
@@ -83,6 +84,8 @@ class Core : private Cpu
   typedef Cpu cpu;
 
   public:
+
+  size_t _NTABBlockSize = 0x1000;
 
   // Flags for lite state storage
   bool TIMEBlockEnabled = true;
@@ -237,9 +240,7 @@ class Core : private Cpu
     // NTAB Block
     if (NTABBlockEnabled == true)
     {
-      size_t nametable_size = 0x1000;
-
-      const auto inputDataSize = nametable_size;
+      const auto inputDataSize = _NTABBlockSize;
       const auto inputData = (uint8_t *)ppu.impl->nt_ram;
       serializer.push(inputData, inputDataSize);
     }
@@ -360,10 +361,8 @@ class Core : private Cpu
     // NTAB Block
     if (NTABBlockEnabled == true)
     {
-      size_t nametable_size = 0x1000;
-
       const auto outputData = (uint8_t*) ppu.impl->nt_ram;
-      const auto inputDataSize = nametable_size;
+      const auto inputDataSize = _NTABBlockSize;
       deserializer.pop(outputData, inputDataSize);
     }
 
@@ -393,6 +392,8 @@ class Core : private Cpu
 
     if (sram_present) enable_sram(true);
   }
+
+void setNTABBlockSize(const size_t size) { _NTABBlockSize = size; }
 
 void enableStateBlock(const std::string& block)
 { 

@@ -50,6 +50,7 @@ class Emu
 // Save emulator state variants
   void serializeState(jaffarCommon::serializer::Base& serializer) const { emu.serializeState(serializer); }
   void deserializeState(jaffarCommon::deserializer::Base& deserializer) { emu.deserializeState(deserializer); }
+  void setNTABBlockSize(const size_t size) { emu.setNTABBlockSize(size); }
   void enableStateBlock(const std::string& block) { emu.enableStateBlock(block); };
   void disableStateBlock(const std::string& block) { emu.disableStateBlock(block); };
 

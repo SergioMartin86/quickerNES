@@ -48,6 +48,8 @@ class NESInstance final : public NESInstanceBase
     return serializer.getOutputSize();
   }
 
+  void setNTABBlockSize(const size_t size) override { _nes.setNTABBlockSize(size); }
+  
   protected:
 
   bool loadROMImpl(const uint8_t* romData, const size_t romSize) override
