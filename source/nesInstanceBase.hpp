@@ -16,22 +16,43 @@ class NESInstanceBase
   NESInstanceBase() = default;
   virtual ~NESInstanceBase() = default;
 
-  inline void advanceState(const std::string &move)
+  inline void advanceState(const std::string &input)
   {
-    bool isInputValid = _controller.parseInputString(move);
-    if (isInputValid == false) JAFFAR_THROW_LOGIC("Move provided cannot be parsed: '%s'\n", move.c_str());
+    // Storage for the decoded input
+    quickNES::Controller::input_t decodedInput;
+
+    // Getting decoded input from the input string
+    decodeInput(input, &decodedInput);
+
+    // Calling advance state with the decoded input
+    advanceState(&decodedInput);
+  }
+
+  inline void advanceState(const void* decodedInputBuffer)
+  {
+    // Casting decoded input to the right type
+    const auto decodedInput = (quickNES::Controller::input_t*) decodedInputBuffer;
 
     // Parsing power
-    if (_controller.getPowerButtonState() == true) JAFFAR_THROW_LOGIC("Power button pressed, but not supported: '%s'\n", move.c_str());
+    if (decodedInput->power == true) JAFFAR_THROW_LOGIC("Power button pressed, but not supported.");
 
     // Parsing reset
-    if (_controller.getResetButtonState() == true) doSoftReset();
+    if (decodedInput->reset == true) doSoftReset();
 
-    // Parsing Controllers
-    const auto controller1 = _controller.getController1Code();
-    const auto controller2 = _controller.getController2Code();
+    // Running specified inputs
+    advanceStateImpl(decodedInput->port1, decodedInput->port2);
+  }
 
-    advanceStateImpl(controller1, controller2);
+  inline size_t getDecodedInputSize() const
+  {
+    return sizeof(quickNES::Controller::input_t);
+  }
+
+  inline void decodeInput(const std::string &input, void* decodedInputBuffer) const
+  {
+    const auto decodedInput = (quickNES::Controller::input_t*) decodedInputBuffer;
+    bool isInputValid = _controller.parseInputString(input, decodedInput);
+    if (isInputValid == false) JAFFAR_THROW_LOGIC("Move provided cannot be parsed: '%s'\n", input.c_str());
   }
 
   inline void setController1Type(const std::string& type)

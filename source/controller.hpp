@@ -26,7 +26,7 @@ public:
     port_t port2 = 0;
   };
 
-  inline bool parseInputString(const std::string& input)
+  inline bool parseInputString(const std::string& input, input_t* decoded) const
   {
     // Parse valid flag
     bool isValid = true;
@@ -38,13 +38,13 @@ public:
     if (ss.get() != '|') isValid = false;
 
     // Parsing console inputs
-    isValid &= parseConsoleInputs(_input.reset, _input.power, ss);
+    isValid &= parseConsoleInputs(decoded->reset, decoded->power, ss);
 
     // Parsing controller 1 inputs
-    isValid &= parseControllerInputs(_controller1Type, _input.port1, ss);
+    isValid &= parseControllerInputs(_controller1Type, decoded->port1, ss);
 
     // Parsing controller 1 inputs
-    isValid &= parseControllerInputs(_controller2Type, _input.port2, ss);
+    isValid &= parseControllerInputs(_controller2Type, decoded->port2, ss);
 
     // End separator
     if (ss.get() != '|') isValid = false;
@@ -59,11 +59,6 @@ public:
 
   inline void setController1Type(const controller_t type) { _controller1Type = type; }
   inline void setController2Type(const controller_t type) { _controller2Type = type; }
-
-  inline bool getPowerButtonState() { return _input.power; }
-  inline bool getResetButtonState() { return _input.reset; }
-  inline port_t getController1Code() { return _input.port1; }
-  inline port_t getController2Code() { return _input.port2; }
 
   private:
 
@@ -204,7 +199,6 @@ public:
     return isValid;
   }
 
-  input_t _input;
   controller_t _controller1Type;
   controller_t _controller2Type;
   
