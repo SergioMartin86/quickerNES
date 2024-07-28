@@ -4,9 +4,9 @@
 
 // Emu 0.7.0
 
+#include "apu/multiBuffer.hpp"
 #include "cart.hpp"
 #include "core.hpp"
-#include "apu/multiBuffer.hpp"
 
 namespace quickerNES
 {
@@ -46,13 +46,13 @@ class Emu
 
   int get_joypad_read_count() const { return emu.joypad_read_count; }
   void set_tracecb(void (*cb)(unsigned int *dest)) { emu.set_tracecb(cb); }
-  
-// Save emulator state variants
-  void serializeState(jaffarCommon::serializer::Base& serializer) const { emu.serializeState(serializer); }
-  void deserializeState(jaffarCommon::deserializer::Base& deserializer) { emu.deserializeState(deserializer); }
+
+  // Save emulator state variants
+  void serializeState(jaffarCommon::serializer::Base &serializer) const { emu.serializeState(serializer); }
+  void deserializeState(jaffarCommon::deserializer::Base &deserializer) { emu.deserializeState(deserializer); }
   void setNTABBlockSize(const size_t size) { emu.setNTABBlockSize(size); }
-  void enableStateBlock(const std::string& block) { emu.enableStateBlock(block); };
-  void disableStateBlock(const std::string& block) { emu.disableStateBlock(block); };
+  void enableStateBlock(const std::string &block) { emu.enableStateBlock(block); };
+  void disableStateBlock(const std::string &block) { emu.disableStateBlock(block); };
 
   // Basic emulation
 
@@ -72,7 +72,7 @@ class Emu
   {
     static const uint8_t left = 8;
 
-    int burst_phase;       // NTSC burst phase for frame (0, 1, or 2)
+    int burst_phase; // NTSC burst phase for frame (0, 1, or 2)
 
     int sample_count; // number of samples (always a multiple of chan_count)
     int chan_count;   // 1: mono, 2: stereo
@@ -206,8 +206,8 @@ class Emu
   {
     low_mem_size = 0x800
   };
-  
-  uint8_t *get_low_mem() const { return (uint8_t*)emu.low_mem; }
+
+  uint8_t *get_low_mem() const { return (uint8_t *)emu.low_mem; }
   size_t get_low_mem_size() const { return low_mem_size; }
 
   // Optional 8K memory
@@ -232,11 +232,11 @@ class Emu
   uint8_t *pal_mem() const { return emu.ppu.getPaletteRAM(); }
   uint16_t pal_mem_size() const { return emu.ppu.getPaletteRAMSize(); }
 
-	uint8_t peek_prg(nes_addr_t addr) const { return *emu.get_code(addr); }
-	void poke_prg(nes_addr_t addr, uint8_t value) { *emu.get_code(addr) = value; }
-	uint8_t peek_ppu(int addr) { return emu.ppu.peekaddr(addr); }
+  uint8_t peek_prg(nes_addr_t addr) const { return *emu.get_code(addr); }
+  void poke_prg(nes_addr_t addr, uint8_t value) { *emu.get_code(addr) = value; }
+  uint8_t peek_ppu(int addr) { return emu.ppu.peekaddr(addr); }
 
-	uint8_t get_ppu2000() const { return emu.ppu.w2000; }
+  uint8_t get_ppu2000() const { return emu.ppu.w2000; }
 
   void get_regs(unsigned int *dest) const
   {
@@ -257,7 +257,7 @@ class Emu
 
   virtual void loading_state(State const &) {}
   long timestamp() const { return 0; }
-  void set_timestamp(long t) {  }
+  void set_timestamp(long t) {}
 
   private:
   // noncopyable
@@ -276,7 +276,7 @@ class Emu
   void clear_sound_buf();
   void fade_samples(blip_sample_t *, int size, int step);
 
-  void* pixels_base_ptr;
+  void *pixels_base_ptr;
   char *host_pixels;
   int host_palette_size;
   frame_t single_frame;
@@ -294,17 +294,15 @@ class Emu
   void SaveAudioBufferState();
   void RestoreAudioBufferState();
 
-  
-  inline void* get_pixels_base_ptr()
+  inline void *get_pixels_base_ptr()
   {
     return pixels_base_ptr;
   }
 };
 
-
 inline void Emu::set_pixels(void *p, long n)
 {
-  pixels_base_ptr = p; 
+  pixels_base_ptr = p;
   host_pixels = (char *)p + n;
   emu.ppu.host_row_bytes = n;
 }
@@ -319,4 +317,4 @@ inline long Emu::chr_size() const
   return cart()->chr_size() ? cart()->chr_size() : emu.ppu.chr_addr_size;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

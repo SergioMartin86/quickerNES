@@ -1,15 +1,14 @@
 #pragma once
 
-#include "core/emu.hpp"
 #include "../nesInstanceBase.hpp"
+#include "core/emu.hpp"
 
 typedef quickerNES::Emu emulator_t;
 
 class NESInstance final : public NESInstanceBase
 {
   public:
-
-  NESInstance(const nlohmann::json& config) : NESInstanceBase(config) {}
+  NESInstance(const nlohmann::json &config) : NESInstanceBase(config) {}
 
   uint8_t *getLowMem() const override { return _nes.get_low_mem(); };
   size_t getLowMemSize() const override { return _nes.get_low_mem_size(); };
@@ -26,16 +25,16 @@ class NESInstance final : public NESInstanceBase
   uint8_t *getCHRMem() const { return _nes.chr_mem(); };
   size_t getCHRMemSize() const { return _nes.chr_size(); };
 
-  void serializeState(jaffarCommon::serializer::Base& serializer) const override { _nes.serializeState(serializer); }
-  void deserializeState(jaffarCommon::deserializer::Base& deserializer) override { _nes.deserializeState(deserializer); }
+  void serializeState(jaffarCommon::serializer::Base &serializer) const override { _nes.serializeState(serializer); }
+  void deserializeState(jaffarCommon::deserializer::Base &deserializer) override { _nes.deserializeState(deserializer); }
 
   std::string getCoreName() const override { return "QuickerNES"; }
-  
+
   void doSoftReset() override { _nes.reset(false); }
   void doHardReset() override { _nes.reset(true); }
-  
+
   void *getInternalEmulatorPointer() override { return &_nes; }
-  
+
   inline size_t getFullStateSize() const override
   {
     jaffarCommon::serializer::Contiguous serializer;
@@ -51,7 +50,7 @@ class NESInstance final : public NESInstanceBase
   }
 
   void setNTABBlockSize(const size_t size) override { _nes.setNTABBlockSize(size); }
-  
+
   void advanceState(const jaffar::input_t &input) override
   {
     if (_doRendering == true) _nes.emulate_frame(input.port1, input.port2);
@@ -59,20 +58,17 @@ class NESInstance final : public NESInstanceBase
   }
 
   protected:
-
-  bool loadROMImpl(const uint8_t* romData, const size_t romSize) override
+  bool loadROMImpl(const uint8_t *romData, const size_t romSize) override
   {
     // Loading rom data
     _nes.load_ines(romData);
     return true;
   }
 
-  void enableStateBlockImpl(const std::string& block) override { _nes.enableStateBlock(block); };
-  void disableStateBlockImpl(const std::string& block) override { _nes.disableStateBlock(block); };
-
+  void enableStateBlockImpl(const std::string &block) override { _nes.enableStateBlock(block); };
+  void disableStateBlockImpl(const std::string &block) override { _nes.disableStateBlock(block); };
 
   private:
-
   // Emulator instance
   emulator_t _nes;
 };

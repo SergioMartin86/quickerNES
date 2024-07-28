@@ -679,4 +679,4 @@ void Noise::run(nes_time_t time, nes_time_t end_time)
   delay = time - end_time;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

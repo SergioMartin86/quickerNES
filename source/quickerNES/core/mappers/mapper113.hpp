@@ -30,4 +30,4 @@ namespace quickerNES
 
 typedef Mapper_AveNina<true> Mapper113;
 
-} // namespace quickNES
+} // namespace quickerNES

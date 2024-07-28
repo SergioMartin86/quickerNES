@@ -82,4 +82,4 @@ void Nes_Effects_Buffer::RestoreAudioBufferState()
 {
 }
 
-} // namespace quickNES
+} // namespace quickerNES

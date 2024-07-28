@@ -4,9 +4,9 @@
 // Konami VRC7 sound chip emulator
 // Snd_Emu 0.1.7. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
 
-#include <cstdint>
 #include "../blipBuffer.hpp"
 #include "emu2413_state.hpp"
+#include <cstdint>
 
 namespace quickerNES
 {
@@ -76,4 +76,4 @@ inline void Vrc7::osc_output(int i, Blip_Buffer *buf)
   oscs[i].output = buf;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

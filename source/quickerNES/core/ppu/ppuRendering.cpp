@@ -503,4 +503,4 @@ void Ppu_Rendering::draw_background(int start, int count)
   }
 }
 
-} // namespace quickNES
+} // namespace quickerNES

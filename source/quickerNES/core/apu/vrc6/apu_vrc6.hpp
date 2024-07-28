@@ -4,9 +4,9 @@
 // Konami VRC6 sound chip emulator
 // Snd_Emu 0.1.7
 
-#include <cstdint>
-#include "../blipBuffer.hpp"
 #include "../apu.hpp"
+#include "../blipBuffer.hpp"
+#include <cstdint>
 
 namespace quickerNES
 {
@@ -109,4 +109,4 @@ inline void Vrc6_Apu::treble_eq(blip_eq_t const &eq)
   square_synth.treble_eq(eq);
 }
 
-} // namespace quickNES
+} // namespace quickerNES

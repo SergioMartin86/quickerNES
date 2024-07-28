@@ -3,8 +3,8 @@
 // Namco 106 sound chip emulator
 // Snd_Emu 0.1.7
 
-#include <cstdint>
 #include "../apu.hpp"
+#include <cstdint>
 
 namespace quickerNES
 {
@@ -112,4 +112,4 @@ inline void Namco_Apu::write_data(nes_time_t time, int data)
   access() = data;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

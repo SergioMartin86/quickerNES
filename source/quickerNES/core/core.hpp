@@ -15,16 +15,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Emu 0.7.0
 
-#include <stdexcept>
-#include "cpu.hpp"
 #include "apu/apu.hpp"
+#include "cpu.hpp"
 #include "mappers/mapper.hpp"
 #include "ppu/ppu.hpp"
-#include <cstdio>
-#include <string>
 #include <cstdint>
-#include <jaffarCommon/serializers/base.hpp>
+#include <cstdio>
 #include <jaffarCommon/deserializers/base.hpp>
+#include <jaffarCommon/serializers/base.hpp>
+#include <stdexcept>
+#include <string>
 
 namespace quickerNES
 {
@@ -54,10 +54,9 @@ struct nes_state_t
 
 struct nes_state_lite_t
 {
-  uint16_t timestamp; // CPU clocks * 15 (for NTSC)
+  uint16_t timestamp;  // CPU clocks * 15 (for NTSC)
   uint8_t frame_count; // number of frames emulated since power-up
 };
-
 
 struct joypad_state_t
 {
@@ -84,7 +83,6 @@ class Core : private Cpu
   typedef Cpu cpu;
 
   public:
-
   size_t _NTABBlockSize = 0x1000;
 
   // Flags for lite state storage
@@ -156,7 +154,7 @@ class Core : private Cpu
     reset(true, true);
   }
 
-  inline void serializeState(jaffarCommon::serializer::Base& serializer) const
+  inline void serializeState(jaffarCommon::serializer::Base &serializer) const
   {
     // TIME Block
     if (TIMEBlockEnabled == true)
@@ -268,7 +266,7 @@ class Core : private Cpu
     }
   }
 
-  inline void deserializeState(jaffarCommon::deserializer::Base& deserializer)
+  inline void deserializeState(jaffarCommon::deserializer::Base &deserializer)
   {
     disable_rendering();
     error_count = 0;
@@ -277,10 +275,10 @@ class Core : private Cpu
     // TIME Block
     if (TIMEBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) &nes;
+      const auto outputData = (uint8_t *)&nes;
       const auto inputDataSize = sizeof(nes_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
-      
+
       nes.timestamp /= 5;
     }
 
@@ -288,8 +286,8 @@ class Core : private Cpu
     if (CPURBlockEnabled == true)
     {
       cpu_state_t s;
-      
-      const auto outputData = (uint8_t*) &s;
+
+      const auto outputData = (uint8_t *)&s;
       const auto inputDataSize = sizeof(cpu_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
 
@@ -304,7 +302,7 @@ class Core : private Cpu
     // PPUR Block
     if (PPURBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) &ppu;
+      const auto outputData = (uint8_t *)&ppu;
       const auto inputDataSize = sizeof(ppu_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
     }
@@ -314,7 +312,7 @@ class Core : private Cpu
     {
       Apu::apu_state_t apuState;
 
-      const auto outputData = (uint8_t*) &apuState;
+      const auto outputData = (uint8_t *)&apuState;
       const auto inputDataSize = sizeof(Apu::apu_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
 
@@ -325,7 +323,7 @@ class Core : private Cpu
     // CTRL Block
     if (CTRLBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) &joypad;
+      const auto outputData = (uint8_t *)&joypad;
       const auto inputDataSize = sizeof(joypad_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
     }
@@ -335,7 +333,7 @@ class Core : private Cpu
     {
       mapper->default_reset_state();
 
-      const auto outputData = (uint8_t*) mapper->state;
+      const auto outputData = (uint8_t *)mapper->state;
       const auto inputDataSize = mapper->state_size;
       deserializer.popContiguous(outputData, inputDataSize);
 
@@ -345,7 +343,7 @@ class Core : private Cpu
     // LRAM Block
     if (LRAMBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) low_mem;
+      const auto outputData = (uint8_t *)low_mem;
       const auto inputDataSize = low_ram_size;
       deserializer.pop(outputData, inputDataSize);
     }
@@ -353,7 +351,7 @@ class Core : private Cpu
     // SPRT Block
     if (SPRTBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) ppu.spr_ram;
+      const auto outputData = (uint8_t *)ppu.spr_ram;
       const auto inputDataSize = Ppu::spr_ram_size;
       deserializer.pop(outputData, inputDataSize);
     }
@@ -361,7 +359,7 @@ class Core : private Cpu
     // NTAB Block
     if (NTABBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) ppu.impl->nt_ram;
+      const auto outputData = (uint8_t *)ppu.impl->nt_ram;
       const auto inputDataSize = _NTABBlockSize;
       deserializer.pop(outputData, inputDataSize);
     }
@@ -371,7 +369,7 @@ class Core : private Cpu
     {
       if (ppu.chr_is_writable)
       {
-        const auto outputData = (uint8_t*) ppu.impl->chr_ram;
+        const auto outputData = (uint8_t *)ppu.impl->chr_ram;
         const auto inputDataSize = ppu.chr_size;
         deserializer.pop(outputData, inputDataSize);
 
@@ -384,7 +382,7 @@ class Core : private Cpu
     {
       if (sram_present)
       {
-        const auto outputData = (uint8_t*) impl->sram;
+        const auto outputData = (uint8_t *)impl->sram;
         const auto inputDataSize = impl->sram_size;
         deserializer.pop(outputData, inputDataSize);
       }
@@ -393,47 +391,141 @@ class Core : private Cpu
     if (sram_present) enable_sram(true);
   }
 
-void setNTABBlockSize(const size_t size) { _NTABBlockSize = size; }
+  void setNTABBlockSize(const size_t size) { _NTABBlockSize = size; }
 
-void enableStateBlock(const std::string& block)
-{ 
-   bool recognizedBlock = false;
-   
-   if (block == "TIME") { TIMEBlockEnabled = true; recognizedBlock = true; }
-   if (block == "CPUR") { CPURBlockEnabled = true; recognizedBlock = true; }
-   if (block == "PPUR") { PPURBlockEnabled = true; recognizedBlock = true; }
-   if (block == "APUR") { APURBlockEnabled = true; recognizedBlock = true; }
-   if (block == "CTRL") { CTRLBlockEnabled = true; recognizedBlock = true; }
-   if (block == "MAPR") { MAPRBlockEnabled = true; recognizedBlock = true; }
-   if (block == "LRAM") { LRAMBlockEnabled = true; recognizedBlock = true; }
-   if (block == "SPRT") { SPRTBlockEnabled = true; recognizedBlock = true; }
-   if (block == "NTAB") { NTABBlockEnabled = true; recognizedBlock = true; }
-   if (block == "CHRR") { CHRRBlockEnabled = true; recognizedBlock = true; }
-   if (block == "SRAM") { SRAMBlockEnabled = true; recognizedBlock = true; }
+  void enableStateBlock(const std::string &block)
+  {
+    bool recognizedBlock = false;
 
-   if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
-};
+    if (block == "TIME")
+    {
+      TIMEBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "CPUR")
+    {
+      CPURBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "PPUR")
+    {
+      PPURBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "APUR")
+    {
+      APURBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "CTRL")
+    {
+      CTRLBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "MAPR")
+    {
+      MAPRBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "LRAM")
+    {
+      LRAMBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "SPRT")
+    {
+      SPRTBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "NTAB")
+    {
+      NTABBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "CHRR")
+    {
+      CHRRBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "SRAM")
+    {
+      SRAMBlockEnabled = true;
+      recognizedBlock = true;
+    }
 
+    if (recognizedBlock == false)
+    {
+      fprintf(stderr, "Unrecognized block type: %s\n", block.c_str());
+      exit(-1);
+    }
+  };
 
-void disableStateBlock(const std::string& block)
-{ 
-   bool recognizedBlock = false;
-   
-   if (block == "TIME") { TIMEBlockEnabled = false; recognizedBlock = true; }
-   if (block == "CPUR") { CPURBlockEnabled = false; recognizedBlock = true; }
-   if (block == "PPUR") { PPURBlockEnabled = false; recognizedBlock = true; }
-   if (block == "APUR") { APURBlockEnabled = false; recognizedBlock = true; }
-   if (block == "CTRL") { CTRLBlockEnabled = false; recognizedBlock = true; }
-   if (block == "MAPR") { MAPRBlockEnabled = false; recognizedBlock = true; }
-   if (block == "LRAM") { LRAMBlockEnabled = false; recognizedBlock = true; }
-   if (block == "SPRT") { SPRTBlockEnabled = false; recognizedBlock = true; }
-   if (block == "NTAB") { NTABBlockEnabled = false; recognizedBlock = true; }
-   if (block == "CHRR") { CHRRBlockEnabled = false; recognizedBlock = true; }
-   if (block == "SRAM") { SRAMBlockEnabled = false; recognizedBlock = true; }
+  void disableStateBlock(const std::string &block)
+  {
+    bool recognizedBlock = false;
 
-   if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
-};
+    if (block == "TIME")
+    {
+      TIMEBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "CPUR")
+    {
+      CPURBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "PPUR")
+    {
+      PPURBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "APUR")
+    {
+      APURBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "CTRL")
+    {
+      CTRLBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "MAPR")
+    {
+      MAPRBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "LRAM")
+    {
+      LRAMBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "SPRT")
+    {
+      SPRTBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "NTAB")
+    {
+      NTABBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "CHRR")
+    {
+      CHRRBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "SRAM")
+    {
+      SRAMBlockEnabled = false;
+      recognizedBlock = true;
+    }
 
+    if (recognizedBlock == false)
+    {
+      fprintf(stderr, "Unrecognized block type: %s\n", block.c_str());
+      exit(-1);
+    }
+  };
 
   void reset(bool full_reset, bool erase_battery_ram)
   {
@@ -482,9 +574,9 @@ void disableStateBlock(const std::string& block)
 
   nes_time_t emulate_frame(uint32_t joypad1, uint32_t joypad2)
   {
-    #ifdef _QUICKERNES_DETECT_JOYPAD_READS
+#ifdef _QUICKERNES_DETECT_JOYPAD_READS
     joypad_read_count = 0;
-    #endif
+#endif
 
     current_joypad[0] = joypad1;
     current_joypad[1] = joypad2;
@@ -612,10 +704,10 @@ void disableStateBlock(const std::string& block)
   {
     if ((addr & 0xFFFE) == 0x4016)
     {
-      // For performance's sake, this counter is only kept on demand
-      #ifdef _QUICKERNES_DETECT_JOYPAD_READS
+// For performance's sake, this counter is only kept on demand
+#ifdef _QUICKERNES_DETECT_JOYPAD_READS
       joypad_read_count++;
-      #endif
+#endif
 
       // to do: to aid with recording, doesn't emulate transparent latch,
       // so a game that held strobe at 1 and read $4016 or $4017 would not get
@@ -986,19 +1078,19 @@ inline void Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
 #define NES_CPU_READ(cpu, addr, time) \
   static_cast<Core &>(*cpu).cpu_read(addr, time)
 
-#define NES_CPU_WRITEX(cpu, addr, data, time)                  \
-  {                                                            \
+#define NES_CPU_WRITEX(cpu, addr, data, time)              \
+  {                                                        \
     static_cast<Core &>(*cpu).cpu_write(addr, data, time); \
   }
 
-#define NES_CPU_WRITE(cpu, addr, data, time)                     \
-  {                                                              \
-    if (addr < 0x800)                                            \
-      cpu->low_mem[addr] = data;                                 \
-    else if (addr == 0x2007)                                     \
+#define NES_CPU_WRITE(cpu, addr, data, time)                 \
+  {                                                          \
+    if (addr < 0x800)                                        \
+      cpu->low_mem[addr] = data;                             \
+    else if (addr == 0x2007)                                 \
       static_cast<Core &>(*cpu).cpu_write_2007(data);        \
-    else                                                         \
+    else                                                     \
       static_cast<Core &>(*cpu).cpu_write(addr, data, time); \
   }
 
-} // namespace quickNES
+} // namespace quickerNES

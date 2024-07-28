@@ -100,4 +100,4 @@ class Mapper206 : public Mapper, namco_34xx_state_t
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

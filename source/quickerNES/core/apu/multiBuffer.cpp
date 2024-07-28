@@ -1,8 +1,8 @@
 
 // Blip_Buffer 0.4.0. http://www.slack.net/~ant/
 
-#include <cstdint>
 #include "multiBuffer.hpp"
+#include <cstdint>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -284,4 +284,4 @@ void Stereo_Buffer::RestoreAudioBufferState()
   right()->RestoreAudioBufferState();
 }
 
-} // namespace quickNES
+} // namespace quickerNES

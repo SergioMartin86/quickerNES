@@ -56,4 +56,4 @@ class Mapper232 : public Mapper
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

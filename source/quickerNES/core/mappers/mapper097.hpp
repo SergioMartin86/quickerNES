@@ -66,4 +66,4 @@ class Mapper097 : public Mapper
   uint8_t bank;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

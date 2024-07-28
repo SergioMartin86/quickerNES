@@ -1,12 +1,12 @@
-#include <cstdlib>
 #include "argparse/argparse.hpp"
-#include "jaffarCommon/serializers/contiguous.hpp"
 #include "jaffarCommon/deserializers/contiguous.hpp"
 #include "jaffarCommon/file.hpp"
 #include "jaffarCommon/logger.hpp"
+#include "jaffarCommon/serializers/contiguous.hpp"
 #include "jaffarCommon/string.hpp"
 #include "nesInstance.hpp"
 #include "playbackInstance.hpp"
+#include <cstdlib>
 
 SDL_Window *launchOutputWindow()
 {
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   // Loading ROM File
   std::string romFileData;
   if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
-  e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
+  e.loadROM((uint8_t *)romFileData.data(), romFileData.size());
 
   // If an initial state is provided, load it now
   if (stateFilePath != "")
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
   auto p = PlaybackInstance(&e);
 
   // If render is enabled then, create window now
-  SDL_Window* window = nullptr;
+  SDL_Window *window = nullptr;
   if (disableRender == false)
   {
     window = launchOutputWindow();

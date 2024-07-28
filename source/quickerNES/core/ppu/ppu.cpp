@@ -3,9 +3,9 @@
 
 // Emu 0.7.0. http://www.slack.net/~ant/
 
-#include <cstring>
 #include "ppu.hpp"
 #include "../core.hpp"
+#include <cstring>
 
 namespace quickerNES
 {
@@ -656,4 +656,4 @@ nes_time_t Ppu::earliest_open_bus_decay()
   return (decay_low < decay_high) ? decay_low : decay_high;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

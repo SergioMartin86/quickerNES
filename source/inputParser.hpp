@@ -4,10 +4,10 @@
 // by eien86
 
 #include <cstdint>
-#include <string>
-#include <sstream>
 #include <jaffarCommon/exceptions.hpp>
 #include <jaffarCommon/json.hpp>
+#include <sstream>
+#include <string>
 
 namespace jaffar
 {
@@ -22,12 +22,16 @@ struct input_t
   port_t port2 = 0;
 };
 
-
 class InputParser
 {
-public:
-
-  enum controller_t { none, joypad, fourscore1, fourscore2 };
+  public:
+  enum controller_t
+  {
+    none,
+    joypad,
+    fourscore1,
+    fourscore2
+  };
 
   InputParser(const nlohmann::json &config)
   {
@@ -35,10 +39,26 @@ public:
     {
       bool isTypeRecognized = false;
       const auto controller1Type = jaffarCommon::json::getString(config, "Controller 1 Type");
-      if (controller1Type == "None") { _controller1Type = controller_t::none; isTypeRecognized = true; }
-      if (controller1Type == "Joypad") { _controller1Type = controller_t::joypad; isTypeRecognized = true; }
-      if (controller1Type == "FourScore1") { _controller1Type = controller_t::fourscore1; isTypeRecognized = true; }
-      if (controller1Type == "FourScore2") { _controller1Type = controller_t::fourscore2; isTypeRecognized = true; }
+      if (controller1Type == "None")
+      {
+        _controller1Type = controller_t::none;
+        isTypeRecognized = true;
+      }
+      if (controller1Type == "Joypad")
+      {
+        _controller1Type = controller_t::joypad;
+        isTypeRecognized = true;
+      }
+      if (controller1Type == "FourScore1")
+      {
+        _controller1Type = controller_t::fourscore1;
+        isTypeRecognized = true;
+      }
+      if (controller1Type == "FourScore2")
+      {
+        _controller1Type = controller_t::fourscore2;
+        isTypeRecognized = true;
+      }
       if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Controller 1 type not recognized: '%s'\n", controller1Type.c_str());
     }
 
@@ -46,16 +66,31 @@ public:
     {
       bool isTypeRecognized = false;
       const auto controller2Type = jaffarCommon::json::getString(config, "Controller 2 Type");
-      if (controller2Type == "None") { _controller2Type = controller_t::none; isTypeRecognized = true; }
-      if (controller2Type == "Joypad") { _controller2Type = controller_t::joypad; isTypeRecognized = true; }
-      if (controller2Type == "FourScore1") { _controller2Type = controller_t::fourscore1; isTypeRecognized = true; }
-      if (controller2Type == "FourScore2") { _controller2Type = controller_t::fourscore2; isTypeRecognized = true; }
+      if (controller2Type == "None")
+      {
+        _controller2Type = controller_t::none;
+        isTypeRecognized = true;
+      }
+      if (controller2Type == "Joypad")
+      {
+        _controller2Type = controller_t::joypad;
+        isTypeRecognized = true;
+      }
+      if (controller2Type == "FourScore1")
+      {
+        _controller2Type = controller_t::fourscore1;
+        isTypeRecognized = true;
+      }
+      if (controller2Type == "FourScore2")
+      {
+        _controller2Type = controller_t::fourscore2;
+        isTypeRecognized = true;
+      }
       if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Controller 2 type not recognized: '%s'\n", controller2Type.c_str());
     }
-
   }
 
-  inline input_t parseInputString(const std::string& inputString) const
+  inline input_t parseInputString(const std::string &inputString) const
   {
     // Storage for the input
     input_t input;
@@ -86,13 +121,12 @@ public:
   }
 
   private:
-
-  static inline void reportBadInputString(const std::string& inputString)
+  static inline void reportBadInputString(const std::string &inputString)
   {
     JAFFAR_THROW_LOGIC("Could not decode input string: '%s'\n", inputString.c_str());
   }
 
-  static void parseJoyPadInput(uint8_t& code, std::istringstream& ss, const std::string& inputString)
+  static void parseJoyPadInput(uint8_t &code, std::istringstream &ss, const std::string &inputString)
   {
     // Currently read character
     char c;
@@ -141,16 +175,20 @@ public:
     if (c == 'A') code |= 0b00000001;
   }
 
-  static void parseControllerInputs(const controller_t type, port_t& port, std::istringstream& ss, const std::string& inputString)
+  static void parseControllerInputs(const controller_t type, port_t &port, std::istringstream &ss, const std::string &inputString)
   {
     // If no controller assigned then, its port is all zeroes.
-    if (type == controller_t::none) { port = 0; return; }
+    if (type == controller_t::none)
+    {
+      port = 0;
+      return;
+    }
 
     // Controller separator
     if (ss.get() != '|') reportBadInputString(inputString);
 
     // If normal joypad, parse its code now
-    if (type == controller_t::joypad) 
+    if (type == controller_t::joypad)
     {
       // Storage for joypad's code
       uint8_t code = 0;
@@ -167,7 +205,7 @@ public:
     }
 
     // If its fourscore, its like two joypads separated by a |
-    if (type == controller_t::fourscore1 || type == controller_t::fourscore2) 
+    if (type == controller_t::fourscore1 || type == controller_t::fourscore2)
     {
       // Storage for joypad's code
       uint8_t code1 = 0;
@@ -198,7 +236,7 @@ public:
     }
   }
 
-  static void parseConsoleInputs(bool& reset, bool& power, std::istringstream& ss, const std::string& inputString)
+  static void parseConsoleInputs(bool &reset, bool &power, std::istringstream &ss, const std::string &inputString)
   {
     // Currently read character
     char c;
@@ -218,7 +256,7 @@ public:
 
   controller_t _controller1Type;
   controller_t _controller2Type;
-  
+
 }; // class InputParser
 
 } // namespace jaffar

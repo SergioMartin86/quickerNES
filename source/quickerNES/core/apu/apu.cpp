@@ -19,7 +19,7 @@ namespace quickerNES
 int const amp_range = 15;
 
 Apu::Apu() : square1(&square_synth),
-                     square2(&square_synth)
+             square2(&square_synth)
 {
   dmc.apu = this;
   dmc.prg_reader = 0;
@@ -372,4 +372,4 @@ int Apu::read_status(nes_time_t time)
   return result;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

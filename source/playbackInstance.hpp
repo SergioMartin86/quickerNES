@@ -1,15 +1,15 @@
 #pragma once
 
-#include <string>
-#include <unistd.h>
+#include "nesInstance.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <extern/hqn/hqn.h>
 #include <extern/hqn/hqn_gui_controller.h>
-#include <jaffarCommon/serializers/contiguous.hpp>
 #include <jaffarCommon/deserializers/contiguous.hpp>
 #include <jaffarCommon/hash.hpp>
-#include "nesInstance.hpp"
+#include <jaffarCommon/serializers/contiguous.hpp>
+#include <string>
+#include <unistd.h>
 
 #define _INVERSE_FRAME_RATE 16667
 
@@ -106,13 +106,13 @@ class PlaybackInstance
     addStep("<End Of Sequence>");
   }
 
-  void enableRendering(SDL_Window* window)
+  void enableRendering(SDL_Window *window)
   {
     // Allocating video buffer
     _video_buffer = (uint8_t *)malloc(image_width * image_height);
 
     // Setting video buffer
-    ((emulator_t*)_emu->getInternalEmulatorPointer())->set_pixels(_video_buffer, image_width + 8);
+    ((emulator_t *)_emu->getInternalEmulatorPointer())->set_pixels(_video_buffer, image_width + 8);
 
     // Loading Emulator instance HQN
     _hqnState.setEmulatorPointer(_emu->getInternalEmulatorPointer());
@@ -233,7 +233,6 @@ class PlaybackInstance
   }
 
   private:
-
   // Internal sequence information
   std::vector<stepData_t> _stepSequence;
 

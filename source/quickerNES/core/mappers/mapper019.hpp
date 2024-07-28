@@ -199,4 +199,4 @@ class Mapper019 : public Mapper, namco106_state_t
   nes_time_t last_time;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

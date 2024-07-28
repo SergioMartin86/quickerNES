@@ -111,5 +111,4 @@ class Mapper_Namco_34x3 : public Mapper, namco_34x3_state_t
 
 typedef Mapper_Namco_34x3<false> Mapper088;
 
-
-} // namespace quickNES
+} // namespace quickerNES

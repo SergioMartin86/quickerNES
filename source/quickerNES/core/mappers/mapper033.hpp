@@ -103,4 +103,4 @@ class Mapper033 : public Mapper, tc0190_state_t
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

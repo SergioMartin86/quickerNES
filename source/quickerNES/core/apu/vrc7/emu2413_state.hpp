@@ -4,7 +4,7 @@
 
 namespace quickerNES
 {
-	
+
 typedef struct
 {
   e_int32 feedback;
@@ -38,4 +38,4 @@ extern "C"
 }
 #endif
 
-} // namespace quickNES
+} // namespace quickerNES
