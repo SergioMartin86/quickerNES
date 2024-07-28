@@ -112,12 +112,11 @@ int main(int argc, char *argv[])
   jaffarCommon::logger::refreshTerminal();
 
   // Creating emulator instance
+  nlohmann::json emulatorConfig;
+  emulatorConfig["Controller 1 Type"] = controller1Type;
+  emulatorConfig["Controller 2 Type"] = controller2Type;
   NESInstance e;
 
-  // Setting controller types
-  e.setController1Type(controller1Type);
-  e.setController2Type(controller2Type);
-  
   // Loading ROM File
   std::string romFileData;
   if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());

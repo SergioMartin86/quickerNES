@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     stateDisabledBlocks.push_back(entry.get<std::string>());
     stateDisabledBlocksOutput += entry.get<std::string>() + std::string(" ");
   } 
-  
+
   // Getting Controller 1 type
   if (scriptJson.contains("Controller 1 Type") == false) JAFFAR_THROW_LOGIC("Script file missing 'Controller 1 Type' entry\n");
   if (scriptJson["Controller 1 Type"].is_string() == false) JAFFAR_THROW_LOGIC("Script file 'Controller 1 Type' entry is not a string\n");
@@ -116,11 +116,7 @@ int main(int argc, char *argv[])
   const auto differentialCompressionUseZlib = differentialCompressionJs["Use Zlib"].get<bool>();
 
   // Creating emulator instance
-  NESInstance e;
-
-  // Setting controller types
-  e.setController1Type(controller1Type);
-  e.setController2Type(controller2Type);
+  NESInstance e(scriptJson);
 
   // Loading ROM File
   std::string romFileData;
@@ -165,6 +161,13 @@ int main(int argc, char *argv[])
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
 
+  // Getting input parser from the emulator
+  const auto inputParser = e.getInputParser();
+
+  // Getting decoded emulator input for each entry in the sequence
+  std::vector<jaffar::input_t> decodedSequence;
+  for (const auto& inputString : sequence) decodedSequence.push_back(inputParser->parseInputString(inputString));
+
   // Getting emulation core name
   std::string emulationCoreName = e.getCoreName();
 
@@ -174,7 +177,6 @@ int main(int argc, char *argv[])
   printf("[] Cycle Type:                             '%s'\n", cycleType.c_str());
   printf("[] Emulation Core:                         '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                               '%s'\n", romFilePath.c_str());
-  printf("[] Controller Types:                       '%s' / '%s'\n", controller1Type.c_str(), controller2Type.c_str());
   printf("[] ROM Hash:                               'SHA1: %s'\n", romSHA1.c_str());
   printf("[] Sequence File:                          '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:                        %lu\n", sequenceLength);
@@ -218,7 +220,7 @@ int main(int argc, char *argv[])
 
   // Actually running the sequence
   auto t0 = std::chrono::high_resolution_clock::now();
-  for (const std::string &input : sequence)
+  for (const auto &input : decodedSequence)
   {
     if (doPreAdvance == true) e.advanceState(input);
     

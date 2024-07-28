@@ -9,6 +9,8 @@ class NESInstance final : public NESInstanceBase
 {
   public:
 
+  NESInstance(const nlohmann::json& config) : NESInstanceBase(config) {}
+
   uint8_t *getLowMem() const override { return _nes.get_low_mem(); };
   size_t getLowMemSize() const override { return _nes.get_low_mem_size(); };
 
@@ -50,6 +52,12 @@ class NESInstance final : public NESInstanceBase
 
   void setNTABBlockSize(const size_t size) override { _nes.setNTABBlockSize(size); }
   
+  void advanceState(const jaffar::input_t &input) override
+  {
+    if (_doRendering == true) _nes.emulate_frame(input.port1, input.port2);
+    if (_doRendering == false) _nes.emulate_skip_frame(input.port1, input.port2);
+  }
+
   protected:
 
   bool loadROMImpl(const uint8_t* romData, const size_t romSize) override
@@ -61,11 +69,7 @@ class NESInstance final : public NESInstanceBase
 
   void enableStateBlockImpl(const std::string& block) override { _nes.enableStateBlock(block); };
   void disableStateBlockImpl(const std::string& block) override { _nes.disableStateBlock(block); };
-  void advanceStateImpl(const quickNES::Controller::port_t controller1, const quickNES::Controller::port_t controller2) override
-  {
-    if (_doRendering == true) _nes.emulate_frame(controller1, controller2);
-    if (_doRendering == false) _nes.emulate_skip_frame(controller1, controller2);
-  }
+
 
   private:
 

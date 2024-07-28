@@ -17,7 +17,8 @@ extern void register_mapper_70();
 class NESInstance final : public NESInstanceBase
 {
   public:
-  NESInstance() : NESInstanceBase()
+
+  NESInstance(const nlohmann::json& config) : NESInstanceBase(config)
   {
     // If running the original QuickNES, register extra mappers now
     register_misc_mappers();
@@ -60,6 +61,12 @@ class NESInstance final : public NESInstanceBase
 
   void *getInternalEmulatorPointer() override { return &_nes; }
 
+  void advanceState(const jaffar::input_t &input) override
+  {
+    if (_doRendering == true) _nes.emulate_frame(input.port1, input.port2);
+    if (_doRendering == false) _nes.emulate_skip_frame(input.port1, input.port2);
+  }
+  
   protected:
 
   bool loadROMImpl(const uint8_t* romData, const size_t romSize) override
@@ -74,11 +81,6 @@ class NESInstance final : public NESInstanceBase
   void enableStateBlockImpl(const std::string& block) override {};
   void disableStateBlockImpl(const std::string& block) override {};
 
-  void advanceStateImpl(const quickNES::Controller::port_t controller1, const quickNES::Controller::port_t controller2) override
-  {
-    if (_doRendering == true) _nes.emulate_frame(controller1, controller2);
-    if (_doRendering == false) _nes.emulate_skip_frame(controller1, controller2);
-  }
 
   private:
 
