@@ -15,7 +15,8 @@
 
 struct stepData_t
 {
-  std::string input;
+  std::string inputString;
+  jaffar::input_t decodedInput;
   uint8_t *stateData;
   jaffarCommon::hash::hash_t hash;
 };
@@ -26,10 +27,11 @@ class PlaybackInstance
   static const uint16_t image_height = 240;
 
   public:
-  void addStep(const std::string &input)
+  void addStep(const std::string &inputString, const jaffar::input_t decodedInput)
   {
     stepData_t step;
-    step.input = input;
+    step.inputString = inputString;
+    step.decodedInput = decodedInput;
     step.stateData = (uint8_t *)malloc(_emu->getFullStateSize());
 
     jaffarCommon::serializer::Contiguous serializer(step.stateData);
@@ -92,18 +94,24 @@ class PlaybackInstance
 
   void initialize(const std::vector<std::string> &sequence)
   {
+    // Getting input decoder
+    auto inputParser = _emu->getInputParser();
+
     // Building sequence information
     for (const auto &input : sequence)
     {
+      // Getting decoded input
+      const auto decodedInput = inputParser->parseInputString(input);
+
       // Adding new step
-      addStep(input);
+      addStep(input, decodedInput);
 
       // Advance state based on the input received
-      _emu->advanceState(input);
+      _emu->advanceState(decodedInput);
     }
 
     // Adding last step with no input
-    addStep("<End Of Sequence>");
+    addStep("<End Of Sequence>", jaffar::input_t());
   }
 
   void enableRendering(SDL_Window *window)
@@ -149,14 +157,14 @@ class PlaybackInstance
     // Load correct overlay images, if using overlay
     if (_useOverlay == true)
     {
-      if (step.input.find("A") != std::string::npos) overlayButtonASurface = _overlayButtonASurface;
-      if (step.input.find("B") != std::string::npos) overlayButtonBSurface = _overlayButtonBSurface;
-      if (step.input.find("S") != std::string::npos) overlayButtonSelectSurface = _overlayButtonSelectSurface;
-      if (step.input.find("T") != std::string::npos) overlayButtonStartSurface = _overlayButtonStartSurface;
-      if (step.input.find("L") != std::string::npos) overlayButtonLeftSurface = _overlayButtonLeftSurface;
-      if (step.input.find("R") != std::string::npos) overlayButtonRightSurface = _overlayButtonRightSurface;
-      if (step.input.find("U") != std::string::npos) overlayButtonUpSurface = _overlayButtonUpSurface;
-      if (step.input.find("D") != std::string::npos) overlayButtonDownSurface = _overlayButtonDownSurface;
+      if (step.inputString.find("A") != std::string::npos) overlayButtonASurface = _overlayButtonASurface;
+      if (step.inputString.find("B") != std::string::npos) overlayButtonBSurface = _overlayButtonBSurface;
+      if (step.inputString.find("S") != std::string::npos) overlayButtonSelectSurface = _overlayButtonSelectSurface;
+      if (step.inputString.find("T") != std::string::npos) overlayButtonStartSurface = _overlayButtonStartSurface;
+      if (step.inputString.find("L") != std::string::npos) overlayButtonLeftSurface = _overlayButtonLeftSurface;
+      if (step.inputString.find("R") != std::string::npos) overlayButtonRightSurface = _overlayButtonRightSurface;
+      if (step.inputString.find("U") != std::string::npos) overlayButtonUpSurface = _overlayButtonUpSurface;
+      if (step.inputString.find("D") != std::string::npos) overlayButtonDownSurface = _overlayButtonDownSurface;
     }
 
     // Since we do not store the blit information (too much memory), we need to load the previous frame and re-run the input
@@ -170,7 +178,7 @@ class PlaybackInstance
       const auto stateData = getStateData(stepId - 1);
       jaffarCommon::deserializer::Contiguous deserializer(stateData);
       _emu->deserializeState(deserializer);
-      _emu->advanceState(getStateInput(stepId - 1));
+      _emu->advanceState(getDecodedInput(stepId - 1));
     }
 
     // Updating image
@@ -184,7 +192,7 @@ class PlaybackInstance
     return _stepSequence.size();
   }
 
-  const std::string getInput(const size_t stepId) const
+  const std::string getInputString(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
     if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
@@ -193,7 +201,19 @@ class PlaybackInstance
     const auto &step = _stepSequence[stepId];
 
     // Returning step input
-    return step.input;
+    return step.inputString;
+  }
+
+  const jaffar::input_t getDecodedInput(const size_t stepId) const
+  {
+    // Checking the required step id does not exceed contents of the sequence
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
+
+    // Getting step information
+    const auto &step = _stepSequence[stepId];
+
+    // Returning step input
+    return step.decodedInput;
   }
 
   const uint8_t *getStateData(const size_t stepId) const
@@ -220,17 +240,6 @@ class PlaybackInstance
     return step.hash;
   }
 
-  const std::string getStateInput(const size_t stepId) const
-  {
-    // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) JAFFAR_THROW_LOGIC("[Error] Attempting to render a step larger than the step sequence");
-
-    // Getting step information
-    const auto &step = _stepSequence[stepId];
-
-    // Returning step input
-    return step.input;
-  }
 
   private:
   // Internal sequence information
