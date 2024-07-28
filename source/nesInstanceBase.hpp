@@ -4,6 +4,7 @@
 #include "jaffarCommon/logger.hpp"
 #include "jaffarCommon/serializers/contiguous.hpp"
 #include "jaffarCommon/serializers/differential.hpp"
+#include "jaffarCommon/deserializers/base.hpp"
 
 // Size of image generated in graphics buffer
 static const uint16_t image_width = 256;
