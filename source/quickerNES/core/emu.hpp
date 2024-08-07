@@ -54,15 +54,17 @@ class Emu
   void enableStateBlock(const std::string &block) { emu.enableStateBlock(block); };
   void disableStateBlock(const std::string &block) { emu.disableStateBlock(block); };
 
+  void setControllerType(Core::controllerType_t type) { emu.setControllerType(type); }
+
   // Basic emulation
 
   // Emulate one video frame using joypad1 and joypad2 as input. Afterwards, image
   // and sound are available for output using the accessors below.
-  virtual const char *emulate_frame(uint32_t joypad1, uint32_t joypad2 = 0);
+  virtual const char *emulate_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arkanoid_latch, uint8_t arkanoid_fire);
 
   // Emulate one video frame using joypad1 and joypad2 as input, but skips drawing.
   // Afterwards, audio is available for output using the accessors below.
-  virtual const char *emulate_skip_frame(uint32_t joypad1, uint32_t joypad2 = 0);
+  virtual const char *emulate_skip_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arkanoid_latch, uint8_t arkanoid_fire);
 
   // Maximum size of palette that can be generated
   static const uint16_t max_palette_size = 256;

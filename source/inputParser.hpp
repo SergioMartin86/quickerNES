@@ -20,6 +20,8 @@ struct input_t
   bool reset = false;
   port_t port1 = 0;
   port_t port2 = 0;
+  port_t arkanoidLatch = 0;
+  uint8_t arkanoidFire = 0;
 };
 
 class InputParser
@@ -30,9 +32,14 @@ class InputParser
     none,
     joypad,
     fourscore1,
-    fourscore2
+    fourscore2,
+    arkanoidNES,
+    arkanoidFamicom
   };
 
+  controller_t _controller1Type;
+  controller_t _controller2Type;
+  
   InputParser(const nlohmann::json &config)
   {
     // Parsing controller 1 type
@@ -57,6 +64,16 @@ class InputParser
       if (controller1Type == "FourScore2")
       {
         _controller1Type = controller_t::fourscore2;
+        isTypeRecognized = true;
+      }
+      if (controller1Type == "ArkanoidNES")
+      {
+        _controller1Type = controller_t::arkanoidNES;
+        isTypeRecognized = true;
+      }
+      if (controller1Type == "ArkanoidFamicom")
+      {
+        _controller1Type = controller_t::arkanoidFamicom;
         isTypeRecognized = true;
       }
       if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Controller 1 type not recognized: '%s'\n", controller1Type.c_str());
@@ -105,10 +122,12 @@ class InputParser
     parseConsoleInputs(input.reset, input.power, ss, inputString);
 
     // Parsing controller 1 inputs
-    parseControllerInputs(_controller1Type, input.port1, ss, inputString);
+    if (_controller1Type == arkanoidNES) parseArkanoidInput(input, ss, inputString);
+    if (_controller1Type == arkanoidFamicom) parseArkanoidInput(input, ss, inputString);
+    if (_controller1Type == joypad || _controller1Type == fourscore1) parseControllerInputs(_controller1Type, input.port1, ss, inputString);
 
-    // Parsing controller 1 inputs
-    parseControllerInputs(_controller2Type, input.port2, ss, inputString);
+    // Parsing controller 2 inputs
+    if (_controller2Type == joypad || _controller2Type == fourscore2) parseControllerInputs(_controller2Type, input.port2, ss, inputString);
 
     // End separator
     if (ss.get() != '|') reportBadInputString(inputString);
@@ -173,6 +192,55 @@ class InputParser
     c = ss.get();
     if (c != '.' && c != 'A') reportBadInputString(inputString);
     if (c == 'A') code |= 0b00000001;
+  }
+
+  static inline void parseArkanoidInput(input_t& input, std::istringstream& ss, const std::string& inputString)
+  {
+    uint8_t potentiometer = 0;
+    uint8_t fire = 0;
+
+    // Controller separator
+    if (ss.get() != '|') reportBadInputString(inputString);
+
+    if (ss.get() != ' ') reportBadInputString(inputString);
+    if (ss.get() != ' ') reportBadInputString(inputString);
+
+    char c = ss.get(); // Hundreds
+    if (c != ' ' && c < 48 && c > 57) reportBadInputString(inputString);
+    if (c != ' ') potentiometer += 100 * ( (uint8_t)c - 48 );
+
+    c = ss.get(); // Tenths
+    if (c != ' ' && c < 48 && c > 57) reportBadInputString(inputString);
+    if (c != ' ') potentiometer += 10 * ( (uint8_t)c - 48 );
+
+    c = ss.get(); // Units
+    if (c != ' ' && c < 48 && c > 57) reportBadInputString(inputString);
+    if (c != ' ') potentiometer += (uint8_t)c - 48;
+
+    // Comma
+    if (ss.get() != ',') reportBadInputString(inputString);
+
+    // Fire
+    
+    c = ss.get();
+    if (c != '.' && c != 'F') reportBadInputString(inputString);
+    if (c == 'F') fire = 1;
+
+    // Fire is encoded in port 1
+    input.arkanoidFire = fire;
+
+    // Potentiometer is encoded in port 2 - MSB and adding one bit for signalling the presence of the potentiometer, subtracted from 173
+    uint8_t subtracter = 171 - potentiometer;
+   
+    input.arkanoidLatch = 0;
+    if ((subtracter & 128) > 0) input.arkanoidLatch += 1;
+    if ((subtracter & 64) > 0) input.arkanoidLatch += 2;
+    if ((subtracter & 32) > 0) input.arkanoidLatch += 4;
+    if ((subtracter & 16) > 0) input.arkanoidLatch += 8;
+    if ((subtracter & 8) > 0) input.arkanoidLatch += 16;
+    if ((subtracter & 4) > 0) input.arkanoidLatch += 32;
+    if ((subtracter & 2) > 0) input.arkanoidLatch += 64;
+    if ((subtracter & 1) > 0) input.arkanoidLatch += 128;
   }
 
   static void parseControllerInputs(const controller_t type, port_t &port, std::istringstream &ss, const std::string &inputString)
@@ -253,9 +321,6 @@ class InputParser
     if (c == 'r') reset = true;
     if (c == '.') reset = false;
   }
-
-  controller_t _controller1Type;
-  controller_t _controller2Type;
 
 }; // class InputParser
 

@@ -8,7 +8,12 @@ typedef quickerNES::Emu emulator_t;
 class NESInstance final : public NESInstanceBase
 {
   public:
-  NESInstance(const nlohmann::json &config) : NESInstanceBase(config) {}
+  NESInstance(const nlohmann::json &config) : NESInstanceBase(config)
+  {
+    _nes.setControllerType(quickerNES::Core::controllerType_t::joypad_t);
+    if (_inputParser->_controller1Type == jaffar::InputParser::controller_t::arkanoidFamicom) _nes.setControllerType(quickerNES::Core::controllerType_t::arkanoidFamicom_t);
+    if (_inputParser->_controller1Type == jaffar::InputParser::controller_t::arkanoidNES) _nes.setControllerType(quickerNES::Core::controllerType_t::arkanoidNES_t);
+  }
 
   uint8_t *getLowMem() const override { return _nes.get_low_mem(); };
   size_t getLowMemSize() const override { return _nes.get_low_mem_size(); };
@@ -53,8 +58,8 @@ class NESInstance final : public NESInstanceBase
 
   void advanceState(const jaffar::input_t &input) override
   {
-    if (_doRendering == true) _nes.emulate_frame(input.port1, input.port2);
-    if (_doRendering == false) _nes.emulate_skip_frame(input.port1, input.port2);
+    if (_doRendering == true) _nes.emulate_frame(input.port1, input.port2, input.arkanoidLatch, input.arkanoidFire);
+    if (_doRendering == false) _nes.emulate_skip_frame(input.port1, input.port2, input.arkanoidLatch, input.arkanoidFire);
   }
 
   protected:

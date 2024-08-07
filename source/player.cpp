@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
   if (status == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = jaffarCommon::string::split(inputSequence, ' ');
+  const auto sequence = jaffarCommon::string::split(inputSequence, '\n');
 
   // Initializing terminal
   jaffarCommon::logger::initializeTerminal();
@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
       jaffarCommon::logger::log("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
       jaffarCommon::logger::log("[] Input:          %s\n", inputString.c_str());
       jaffarCommon::logger::log("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
+      jaffarCommon::logger::log("[] Paddle X:       %u\n", e.getLowMem()[0x11A]);
 
       // Only print commands if not in reproduce mode
       if (isReproduce == false) jaffarCommon::logger::log("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");

@@ -58,13 +58,13 @@ struct nes_state_lite_t
   uint8_t frame_count; // number of frames emulated since power-up
 };
 
-struct joypad_state_t
+struct input_state_t
 {
-  uint32_t joypad_latches[2]; // joypad 1 & 2 shift registers
+  uint32_t joypad_latches[2]; // input_state 1 & 2 shift registers
+  uint32_t arkanoid_latch; // arkanoid latch
+  uint8_t arkanoid_fire; // arkanoid latch
   uint8_t w4016;              // strobe
-  uint8_t unused[3];
 };
-static_assert(sizeof(joypad_state_t) == 12);
 
 struct cpu_state_t
 {
@@ -98,13 +98,22 @@ class Core : private Cpu
   bool CHRRBlockEnabled = true;
   bool SRAMBlockEnabled = true;
 
+  // APU and Joypad
+  enum controllerType_t
+  {
+    none_t,
+    joypad_t,
+    arkanoidNES_t,
+    arkanoidFamicom_t,
+  };
+  
   Core() : ppu(this)
   {
     cart = NULL;
     impl = NULL;
     mapper = NULL;
     memset(&nes, 0, sizeof nes);
-    memset(&joypad, 0, sizeof joypad);
+    memset(&input_state, 0, sizeof input_state);
   }
 
   ~Core()
@@ -206,8 +215,8 @@ class Core : private Cpu
     // CTRL Block
     if (CTRLBlockEnabled == true)
     {
-      const auto inputDataSize = sizeof(joypad_state_t);
-      const auto inputData = (uint8_t *)&joypad;
+      const auto inputDataSize = sizeof(input_state_t);
+      const auto inputData = (uint8_t *)&input_state;
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -323,8 +332,8 @@ class Core : private Cpu
     // CTRL Block
     if (CTRLBlockEnabled == true)
     {
-      const auto outputData = (uint8_t *)&joypad;
-      const auto inputDataSize = sizeof(joypad_state_t);
+      const auto outputData = (uint8_t *)&input_state;
+      const auto inputDataSize = sizeof(input_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
     }
 
@@ -549,8 +558,10 @@ class Core : private Cpu
       if (!cart->has_battery_ram() || erase_battery_ram)
         memset(impl->sram, 0xFF, impl->sram_size);
 
-      joypad.joypad_latches[0] = 0;
-      joypad.joypad_latches[1] = 0;
+      input_state.joypad_latches[0] = 0;
+      input_state.joypad_latches[1] = 0;
+      input_state.arkanoid_latch = 0;
+      input_state.arkanoid_fire = 0;
 
       nes.frame_count = 0;
     }
@@ -572,7 +583,7 @@ class Core : private Cpu
     error_count = 0;
   }
 
-  nes_time_t emulate_frame(uint32_t joypad1, uint32_t joypad2)
+  nes_time_t emulate_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arkanoid_latch, uint8_t arkanoid_fire)
   {
 #ifdef _QUICKERNES_DETECT_JOYPAD_READS
     joypad_read_count = 0;
@@ -580,6 +591,8 @@ class Core : private Cpu
 
     current_joypad[0] = joypad1;
     current_joypad[1] = joypad2;
+    current_arkanoid_latch = arkanoid_latch;
+    current_arkanoid_fire = arkanoid_fire;
 
     cpu_time_offset = ppu.begin_frame(nes.timestamp) - 1;
     ppu_2002_time = 0;
@@ -649,6 +662,8 @@ class Core : private Cpu
 
   public:
   uint32_t current_joypad[2];
+  uint32_t current_arkanoid_latch;
+  uint8_t current_arkanoid_fire;
   Cart const *cart;
   Mapper *mapper;
   nes_state_t nes;
@@ -697,26 +712,73 @@ class Core : private Cpu
     return t;
   }
 
-  // APU and Joypad
-  joypad_state_t joypad;
+
+  controllerType_t _controllerType = controllerType_t::none_t;
+  
+  input_state_t input_state;
+
+  void setControllerType(controllerType_t type) { _controllerType = type; }
 
   int read_io(nes_addr_t addr)
   {
     if ((addr & 0xFFFE) == 0x4016)
     {
-// For performance's sake, this counter is only kept on demand
-#ifdef _QUICKERNES_DETECT_JOYPAD_READS
-      joypad_read_count++;
-#endif
+      // For performance's sake, this counter is only kept on demand
+      #ifdef _QUICKERNES_DETECT_JOYPAD_READS
+            joypad_read_count++;
+      #endif
 
-      // to do: to aid with recording, doesn't emulate transparent latch,
-      // so a game that held strobe at 1 and read $4016 or $4017 would not get
-      // the current A status as occurs on a NES
-      if (joypad.w4016 & 1) return 0;
-      const uint8_t result = joypad.joypad_latches[addr & 1] & 1;
-      joypad.joypad_latches[addr & 1] >>= 1;
-      return result;
+      // If write flag is put into w4016, reading from it returns nothing
+      if (input_state.w4016 & 1) return 0;
+
+      // Proceed depending on input type
+      switch(_controllerType)
+      {
+        case controllerType_t::joypad_t:
+        {
+            const uint8_t result = input_state.joypad_latches[addr & 1] & 1;
+            input_state.joypad_latches[addr & 1] >>= 1;
+            return result;
+        }
+
+        case controllerType_t::arkanoidNES_t:
+        {
+            if (addr == 0x4017) 
+            {
+              // latch 0 encodes fire, latch 1 encodes potentiometer
+              const uint8_t result = (input_state.arkanoid_latch & 1) * 16 + current_arkanoid_fire * 8;
+
+              // Advancing latch 1
+              input_state.arkanoid_latch >>= 1;
+              return result;
+            }
+        }
+
+        case controllerType_t::arkanoidFamicom_t:
+        {
+            if (addr == 0x4016) 
+            {
+              // latch 0 encodes fire
+              const uint8_t result = (input_state.joypad_latches[0] & 1) * 2;
+              return result;
+            }
+
+            if (addr == 0x4017) 
+            {
+              // latch 1 encodes potentiometer
+              const uint8_t result = (input_state.joypad_latches[1] & 1) * 2;
+
+              // Advancing latch 1
+              input_state.joypad_latches[1] >>= 1;
+              return result;
+            }
+        }
+
+        default:
+          return 0;
+      } 
     }
+
 
     if (addr == Apu::status_addr)
       return impl->apu.read_status(clock());
@@ -734,16 +796,18 @@ class Core : private Cpu
       return;
     }
 
-    // joypad strobe
+    // input_state strobe
     if (addr == 0x4016)
     {
       // if strobe goes low, latch data
-      if (joypad.w4016 & 1 & ~data)
+      if (input_state.w4016 & 1 & ~data)
       {
-        joypad.joypad_latches[0] = current_joypad[0];
-        joypad.joypad_latches[1] = current_joypad[1];
+        input_state.joypad_latches[0] = current_joypad[0];
+        input_state.joypad_latches[1] = current_joypad[1];
+        input_state.arkanoid_latch = current_arkanoid_latch;
+        input_state.arkanoid_fire = current_arkanoid_fire;
       }
-      joypad.w4016 = data;
+      input_state.w4016 = data;
       return;
     }
 

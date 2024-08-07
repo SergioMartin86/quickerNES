@@ -84,7 +84,6 @@ class NESInstanceBase
   // Flag to determine whether to enable/disable rendering
   bool _doRendering = true;
 
-  private:
   // Input parser instance
   std::unique_ptr<jaffar::InputParser> _inputParser;
 };

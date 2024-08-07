@@ -104,16 +104,16 @@ void Emu::set_palette_range(int begin, int end)
   host_palette_size = end - emu.ppu.palette_begin;
 }
 
-const char *Emu::emulate_skip_frame(uint32_t joypad1, uint32_t joypad2)
+const char *Emu::emulate_skip_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arkanoid_latch, uint8_t arkanoid_fire)
 {
   char *old_host_pixels = host_pixels;
   host_pixels = NULL;
-  emu.emulate_frame(joypad1, joypad2);
+  emu.emulate_frame(joypad1, joypad2, arkanoid_latch, arkanoid_fire);
   host_pixels = old_host_pixels;
   return 0;
 }
 
-const char *Emu::emulate_frame(uint32_t joypad1, uint32_t joypad2)
+const char *Emu::emulate_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arkanoid_latch, uint8_t arkanoid_fire)
 {
   emu.ppu.host_pixels = NULL;
 
@@ -144,7 +144,7 @@ const char *Emu::emulate_frame(uint32_t joypad1, uint32_t joypad2)
     if (sound_buf->samples_avail())
       clear_sound_buf();
 
-    nes_time_t frame_len = emu.emulate_frame(joypad1, joypad2);
+    nes_time_t frame_len = emu.emulate_frame(joypad1, joypad2, arkanoid_latch, arkanoid_fire);
     sound_buf->end_frame(frame_len, false);
 
     f = frame_;
@@ -159,7 +159,7 @@ const char *Emu::emulate_frame(uint32_t joypad1, uint32_t joypad2)
   else
   {
     emu.ppu.max_palette_size = 0;
-    emu.emulate_frame(joypad1, joypad2);
+    emu.emulate_frame(joypad1, joypad2, arkanoid_latch, arkanoid_fire);
   }
 
   return 0;
