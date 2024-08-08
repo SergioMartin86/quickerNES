@@ -22,7 +22,7 @@ jobs:
     - name: Installing apt packages
       run: sudo apt install libgtest-dev gcovr libtbb-dev libsdl2-dev libsdl2-image-dev
     - name: Run meson configuration
-      run: meson setup build -DonlyOpenSource=true
+      run: meson setup build -DonlyOpenSource=true -DenableArkanoidInputs=true
     - name: Building project
       run: ninja -C build
     - name: Running tests

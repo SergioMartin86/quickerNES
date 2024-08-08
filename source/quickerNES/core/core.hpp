@@ -719,6 +719,7 @@ class Core : private Cpu
 
   void setControllerType(controllerType_t type) { _controllerType = type; }
 
+#ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
   int read_io(nes_addr_t addr)
   {
     if ((addr & 0xFFFE) == 0x4016)
@@ -761,10 +762,10 @@ class Core : private Cpu
               // latch 0 encodes fire
               uint8_t result = (input_state.arkanoid_fire & 1) * 2;
 
-              // latch 0 also encodes joypad 1
+              // latch 0 also encodes input_state 1
               result += (input_state.joypad_latches[0] & 1) & 1;
 
-              // Advancing joypad latch
+              // Advancing input_state latch
               input_state.joypad_latches[0] >>= 1;
 
               return result;
@@ -792,6 +793,26 @@ class Core : private Cpu
 
     return addr >> 8; // simulate open bus
   }
+#else
+  int read_io(nes_addr_t addr)
+  {
+    if ((addr & 0xFFFE) == 0x4016)
+    {
+      // to do: to aid with recording, doesn't emulate transparent latch,
+      // so a game that held strobe at 1 and read $4016 or $4017 would not get
+      // the current A status as occurs on a NES
+      if (input_state.w4016 & 1) return 0;
+      const uint8_t result = input_state.joypad_latches[addr & 1] & 1;
+      input_state.joypad_latches[addr & 1] >>= 1;
+      return result;
+    }
+
+    if (addr == Apu::status_addr)
+      return impl->apu.read_status(clock());
+
+    return addr >> 8; // simulate open bus
+  }
+#endif
 
   void write_io(nes_addr_t addr, int data)
   {

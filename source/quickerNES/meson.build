@@ -28,10 +28,17 @@ quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
  'core/cpu.cpp'
 ]
 
+quickerNESCompileArgs = [ ]
+
+# Checking for arkanoid input support
+if get_option('enableArkanoidInputs') == true
+ quickerNESCompileArgs += '-D_QUICKERNES_SUPPORT_ARKANOID_INPUTS'
+endif
+
 # quickerNES Core Configuration
 
  quickerNESDependency = declare_dependency(
-  compile_args        : [ ],
+  compile_args        : quickerNESCompileArgs,
   include_directories : include_directories(['.', '..']),
   sources             : [ quickerNESSrc ],
   dependencies        : [ 
