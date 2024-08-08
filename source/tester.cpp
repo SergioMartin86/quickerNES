@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
   if (jaffarCommon::file::loadStringFromFile(sequenceRaw, sequenceFilePath) == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = jaffarCommon::string::split(sequenceRaw, ' ');
+  const auto sequence = jaffarCommon::string::split(sequenceRaw, '\n');
 
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
