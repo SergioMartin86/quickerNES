@@ -66,6 +66,8 @@ class InputParser
         _controller1Type = controller_t::fourscore2;
         isTypeRecognized = true;
       }
+
+      #ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
       if (controller1Type == "ArkanoidNES")
       {
         _controller1Type = controller_t::arkanoidNES;
@@ -76,6 +78,8 @@ class InputParser
         _controller1Type = controller_t::arkanoidFamicom;
         isTypeRecognized = true;
       }
+      #endif
+      
       if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Controller 1 type not recognized: '%s'\n", controller1Type.c_str());
     }
 

@@ -61,8 +61,12 @@ struct nes_state_lite_t
 struct input_state_t
 {
   uint32_t joypad_latches[2]; // input_state 1 & 2 shift registers
+
+  #ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
   uint32_t arkanoid_latch; // arkanoid latch
   uint8_t arkanoid_fire; // arkanoid latch
+  #endif
+
   uint8_t w4016;              // strobe
 };
 
@@ -560,8 +564,11 @@ class Core : private Cpu
 
       input_state.joypad_latches[0] = 0;
       input_state.joypad_latches[1] = 0;
+
+      #ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
       input_state.arkanoid_latch = 0;
       input_state.arkanoid_fire = 0;
+      #endif
 
       nes.frame_count = 0;
     }
@@ -832,8 +839,11 @@ class Core : private Cpu
       {
         input_state.joypad_latches[0] = current_joypad[0];
         input_state.joypad_latches[1] = current_joypad[1];
+
+        #ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
         input_state.arkanoid_latch = current_arkanoid_latch;
         input_state.arkanoid_fire = current_arkanoid_fire;
+        #endif
       }
       input_state.w4016 = data;
       return;
