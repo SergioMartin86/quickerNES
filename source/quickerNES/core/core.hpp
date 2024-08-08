@@ -746,7 +746,7 @@ class Core : private Cpu
             if (addr == 0x4017) 
             {
               // latch 0 encodes fire, latch 1 encodes potentiometer
-              const uint8_t result = (input_state.arkanoid_latch & 1) * 16 + current_arkanoid_fire * 8;
+              const uint8_t result = (input_state.arkanoid_latch & 1) * 16 + input_state.arkanoid_fire * 8;
 
               // Advancing latch 1
               input_state.arkanoid_latch >>= 1;
@@ -759,17 +759,24 @@ class Core : private Cpu
             if (addr == 0x4016) 
             {
               // latch 0 encodes fire
-              const uint8_t result = (input_state.joypad_latches[0] & 1) * 2;
+              uint8_t result = (input_state.arkanoid_fire & 1) * 2;
+
+              // latch 0 also encodes joypad 1
+              result += (input_state.joypad_latches[0] & 1) & 1;
+
+              // Advancing joypad latch
+              input_state.joypad_latches[0] >>= 1;
+
               return result;
             }
 
             if (addr == 0x4017) 
             {
               // latch 1 encodes potentiometer
-              const uint8_t result = (input_state.joypad_latches[1] & 1) * 2;
+              const uint8_t result = (input_state.arkanoid_latch & 1) * 2;
 
               // Advancing latch 1
-              input_state.joypad_latches[1] >>= 1;
+              input_state.arkanoid_latch >>= 1;
               return result;
             }
         }

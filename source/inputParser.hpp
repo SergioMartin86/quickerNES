@@ -122,8 +122,8 @@ class InputParser
     parseConsoleInputs(input.reset, input.power, ss, inputString);
 
     // Parsing controller 1 inputs
-    if (_controller1Type == arkanoidNES) parseArkanoidInput(input, ss, inputString);
-    if (_controller1Type == arkanoidFamicom) parseArkanoidInput(input, ss, inputString);
+    if (_controller1Type == arkanoidNES) parseArkanoidNESInput(input, ss, inputString);
+    if (_controller1Type == arkanoidFamicom) parseArkanoidFamicomInput(input, ss, inputString);
     if (_controller1Type == joypad || _controller1Type == fourscore1) parseControllerInputs(_controller1Type, input.port1, ss, inputString);
 
     // Parsing controller 2 inputs
@@ -303,6 +303,28 @@ class InputParser
       port |= (uint32_t)0 | 1 << 31;
     }
   }
+
+  static inline void parseArkanoidNESInput(input_t& input, std::istringstream& ss, const std::string& inputString)
+  {
+    // Simply parse the arkanoid controller input
+    parseArkanoidInput(input, ss, inputString);
+  }
+
+  static inline void parseArkanoidFamicomInput(input_t& input, std::istringstream& ss, const std::string& inputString)
+  {
+    // Parsing joypad controller
+    parseControllerInputs(controller_t::joypad, input.port1, ss, inputString);
+
+    // Controller separator
+    if (ss.get() != '|') reportBadInputString(inputString);
+
+    // Advancing 7 positions (this input is not supported)
+    for (size_t i = 0; i < 7; i++) if (ss.get() != '.') reportBadInputString(inputString);
+
+    // Then, parse the arkanoid controller input
+    parseArkanoidInput(input, ss, inputString);
+  }
+
 
   static void parseConsoleInputs(bool &reset, bool &power, std::istringstream &ss, const std::string &inputString)
   {
