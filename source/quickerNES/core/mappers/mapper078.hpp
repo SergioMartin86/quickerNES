@@ -77,4 +77,4 @@ class Mapper078 : public Mapper
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

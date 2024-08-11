@@ -126,4 +126,4 @@ class Mapper032 : public Mapper, mapper32_state_t
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

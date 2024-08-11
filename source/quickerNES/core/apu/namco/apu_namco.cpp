@@ -180,4 +180,4 @@ void Namco_Apu::load_state(namco_state_t const &in)
   run_until(last_time);
 }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -126,4 +126,4 @@ class Mapper001 : public Mapper, mmc1_state_t
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

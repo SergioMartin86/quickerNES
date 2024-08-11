@@ -149,4 +149,4 @@ class Mapper005 : public Mapper, mmc5_state_t
   nes_time_t irq_time;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

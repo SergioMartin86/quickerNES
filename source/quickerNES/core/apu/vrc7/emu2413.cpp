@@ -108,7 +108,7 @@ static const unsigned char default_inst[15][8] = {
 
 /* AM speed(Hz) and depth(dB) */
 #define AM_SPEED 3.7
-//#define AM_DEPTH 4.8
+// #define AM_DEPTH 4.8
 #define AM_DEPTH 2.4
 
 /* Cut the lower b bit(s) off. */
@@ -243,7 +243,7 @@ static void makeDphaseTable(OPLL *opll)
 
 static void makeTllTable(OPLL *opll)
 {
-#define dB2(x) ((x)*2)
+#define dB2(x) ((x) * 2)
 
   static const double kltable[16] = {
     dB2(0.000), dB2(9.000), dB2(12.000), dB2(13.875), dB2(15.000), dB2(16.125), dB2(16.875), dB2(17.625), dB2(18.000), dB2(18.750), dB2(19.125), dB2(19.500), dB2(19.875), dB2(20.250), dB2(20.625), dB2(21.000)};
@@ -1152,4 +1152,4 @@ void OPLL_writeIO(OPLL *opll, e_uint32 adr, e_uint32 val)
     opll->adr = val;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -52,4 +52,4 @@ class Mapper066 : public Mapper
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

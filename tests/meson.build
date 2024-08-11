@@ -90,5 +90,29 @@ if get_option('onlyOpenSource') == false
        workdir : meson.current_source_dir(),
        timeout: testTimeout,
        args : [ testFile, '--cycleType', 'Full'],
-       suite : [ testSuite ])       
+       suite : [ testSuite ])   
+
+  if get_option('enableArkanoidInputs') == true
+
+  testFile = 'arkanoid.arkNESController.test'
+  testSuite = testFile.split('.')[0]
+  testName = testFile.split('.')[1]
+  test(testName,
+       quickerNESTester,
+       workdir : meson.current_source_dir(),
+       timeout: testTimeout,
+       args : [ testFile, '--cycleType', 'Full'],
+       suite : [ testSuite ])          
+
+  testFile = 'arkanoid2.arkFamicomController.test'
+  testSuite = testFile.split('.')[0]
+  testName = testFile.split('.')[1]
+  test(testName,
+       quickerNESTester,
+       workdir : meson.current_source_dir(),
+       timeout: testTimeout,
+       args : [ testFile, '--cycleType', 'Full'],
+       suite : [ testSuite ])              
+
+  endif
 endif

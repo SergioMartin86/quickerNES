@@ -3,9 +3,9 @@
 // NES 2A03 APU sound chip emulator
 // Snd_Emu 0.1.7
 
+#include "oscs.hpp"
 #include <climits>
 #include <cstdint>
-#include "oscs.hpp"
 
 namespace quickerNES
 {
@@ -360,4 +360,4 @@ inline void Apu::load_state(apu_state_t const &state)
   dmc.run(last_time, last_time);
 }
 
-} // namespace quickNES
+} // namespace quickerNES

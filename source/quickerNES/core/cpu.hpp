@@ -14,7 +14,6 @@ typedef unsigned nes_addr_t; // 16-bit address
 class Cpu
 {
   public:
-
   void set_tracecb(void (*cb)(unsigned int *data))
   {
     tracecb = cb;
@@ -157,10 +156,10 @@ class Cpu
     return (uint8_t *)code_map[addr >> page_bits] + addr;
   }
 
-   inline const uint8_t *get_code(nes_addr_t addr) const
+  inline const uint8_t *get_code(nes_addr_t addr) const
   {
     return (const uint8_t *)code_map[addr >> page_bits] + addr;
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

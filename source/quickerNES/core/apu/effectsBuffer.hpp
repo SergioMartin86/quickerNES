@@ -3,11 +3,11 @@
 // Multi-channel effects buffer with panning, echo and reverb
 // Game_Music_Emu 0.3.0
 
-#include <stdint.h>
 #include "multiBuffer.hpp"
+#include <stdint.h>
 
 namespace quickerNES
-{ 
+{
 
 // Effects_Buffer uses several buffers and outputs stereo sample pairs.
 class Effects_Buffer : public Multi_Buffer
@@ -101,4 +101,4 @@ inline Effects_Buffer::channel_t Effects_Buffer::channel(int i)
   return channels[i % chan_count];
 }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -77,4 +77,4 @@ class Mapper246 : public Mapper
   uint8_t regs[8];
 };
 
-} // namespace quickNES
+} // namespace quickerNES

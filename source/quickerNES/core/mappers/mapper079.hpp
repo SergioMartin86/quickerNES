@@ -95,4 +95,4 @@ void Mapper_AveNina<multicart>::write_regs()
 
 typedef Mapper_AveNina<false> Mapper079;
 
-} // namespace quickNES
+} // namespace quickerNES

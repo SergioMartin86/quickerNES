@@ -1,9 +1,10 @@
 #pragma once
 
+#include "inputParser.hpp"
+#include "jaffarCommon/logger.hpp"
 #include "jaffarCommon/serializers/contiguous.hpp"
 #include "jaffarCommon/serializers/differential.hpp"
-#include "jaffarCommon/logger.hpp"
-#include "controller.hpp"
+#include "jaffarCommon/deserializers/base.hpp"
 
 // Size of image generated in graphics buffer
 static const uint16_t image_width = 256;
@@ -12,56 +13,19 @@ static const uint16_t image_height = 240;
 class NESInstanceBase
 {
   public:
+  NESInstanceBase(const nlohmann::json &config)
+  {
+    _inputParser = std::make_unique<jaffar::InputParser>(config);
+  }
 
-  NESInstanceBase() = default;
   virtual ~NESInstanceBase() = default;
 
-  inline void advanceState(const std::string &move)
-  {
-    bool isInputValid = _controller.parseInputString(move);
-    if (isInputValid == false) JAFFAR_THROW_LOGIC("Move provided cannot be parsed: '%s'\n", move.c_str());
-
-    // Parsing power
-    if (_controller.getPowerButtonState() == true) JAFFAR_THROW_LOGIC("Power button pressed, but not supported: '%s'\n", move.c_str());
-
-    // Parsing reset
-    if (_controller.getResetButtonState() == true) doSoftReset();
-
-    // Parsing Controllers
-    const auto controller1 = _controller.getController1Code();
-    const auto controller2 = _controller.getController2Code();
-
-    advanceStateImpl(controller1, controller2);
-  }
-
-  inline void setController1Type(const std::string& type)
-  {
-    bool isTypeRecognized = false;
-
-    if (type == "None") { _controller.setController1Type(quickNES::Controller::controller_t::none); isTypeRecognized = true; }
-    if (type == "Joypad") { _controller.setController1Type(quickNES::Controller::controller_t::joypad); isTypeRecognized = true; }
-    if (type == "FourScore1") { _controller.setController1Type(quickNES::Controller::controller_t::fourscore1); isTypeRecognized = true; }
-    if (type == "FourScore2") { _controller.setController1Type(quickNES::Controller::controller_t::fourscore2); isTypeRecognized = true; }
-
-    if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Input type not recognized: '%s'\n", type.c_str());
-  }
-
-  inline void setController2Type(const std::string& type)
-  {
-    bool isTypeRecognized = false;
-
-    if (type == "None") { _controller.setController2Type(quickNES::Controller::controller_t::none); isTypeRecognized = true; }
-    if (type == "Joypad") { _controller.setController2Type(quickNES::Controller::controller_t::joypad); isTypeRecognized = true; }
-    if (type == "FourScore1") { _controller.setController2Type(quickNES::Controller::controller_t::fourscore1); isTypeRecognized = true; }
-    if (type == "FourScore2") { _controller.setController2Type(quickNES::Controller::controller_t::fourscore2); isTypeRecognized = true; }
-    
-    if (isTypeRecognized == false) JAFFAR_THROW_LOGIC("Input type not recognized: '%s'\n", type.c_str());
-  }
+  virtual void advanceState(const jaffar::input_t &input) = 0;
 
   inline void enableRendering() { _doRendering = true; };
   inline void disableRendering() { _doRendering = false; };
 
-  inline bool loadROM(const uint8_t* romData, const size_t romSize)
+  inline bool loadROM(const uint8_t *romData, const size_t romSize)
   {
     // Actually loading rom file
     auto status = loadROMImpl(romData, romSize);
@@ -73,7 +37,7 @@ class NESInstanceBase
     return status;
   }
 
-  void enableStateBlock(const std::string& block)
+  void enableStateBlock(const std::string &block)
   {
     // Calling implementation
     enableStateBlockImpl(block);
@@ -82,7 +46,7 @@ class NESInstanceBase
     _stateSize = getFullStateSize();
   }
 
-  void disableStateBlock(const std::string& block)
+  void disableStateBlock(const std::string &block)
   {
     // Calling implementation
     disableStateBlockImpl(block);
@@ -93,26 +57,26 @@ class NESInstanceBase
 
   virtual size_t getFullStateSize() const = 0;
   virtual size_t getDifferentialStateSize() const = 0;
+  inline jaffar::InputParser *getInputParser() const { return _inputParser.get(); }
 
   // Virtual functions
 
   virtual uint8_t *getLowMem() const = 0;
   virtual size_t getLowMemSize() const = 0;
 
-  virtual void serializeState(jaffarCommon::serializer::Base& serializer) const = 0;
-  virtual void deserializeState(jaffarCommon::deserializer::Base& deserializer) = 0;
+  virtual void serializeState(jaffarCommon::serializer::Base &serializer) const = 0;
+  virtual void deserializeState(jaffarCommon::deserializer::Base &deserializer) = 0;
 
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;
   virtual void *getInternalEmulatorPointer() = 0;
+  virtual void setNTABBlockSize(const size_t size) {};
 
   protected:
-
-  virtual void enableStateBlockImpl(const std::string& block) = 0;
-  virtual void disableStateBlockImpl(const std::string& block) = 0;
-  virtual bool loadROMImpl(const uint8_t* romData, const size_t romSize) = 0;
-  virtual void advanceStateImpl(const quickNES::Controller::port_t controller1, const quickNES::Controller::port_t controller2) = 0;
+  virtual void enableStateBlockImpl(const std::string &block) = 0;
+  virtual void disableStateBlockImpl(const std::string &block) = 0;
+  virtual bool loadROMImpl(const uint8_t *romData, const size_t romSize) = 0;
 
   // Storage for the light state size
   size_t _stateSize;
@@ -120,8 +84,6 @@ class NESInstanceBase
   // Flag to determine whether to enable/disable rendering
   bool _doRendering = true;
 
-  private:
-
-  // Controller class for input parsing
-  quickNES::Controller _controller;
+  // Input parser instance
+  std::unique_ptr<jaffar::InputParser> _inputParser;
 };

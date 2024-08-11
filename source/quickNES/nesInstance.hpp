@@ -1,10 +1,10 @@
 #pragma once
 
-#include "jaffarCommon/serializers/base.hpp"
-#include "jaffarCommon/deserializers/base.hpp"
+#include "../nesInstanceBase.hpp"
 #include "core/nes_emu/Nes_Emu.h"
 #include "core/nes_emu/Nes_State.h"
-#include "../nesInstanceBase.hpp"
+#include "jaffarCommon/deserializers/base.hpp"
+#include "jaffarCommon/serializers/base.hpp"
 
 #define _DUMMY_SIZE 65536
 
@@ -17,7 +17,7 @@ extern void register_mapper_70();
 class NESInstance final : public NESInstanceBase
 {
   public:
-  NESInstance() : NESInstanceBase()
+  NESInstance(const nlohmann::json &config) : NESInstanceBase(config)
   {
     // If running the original QuickNES, register extra mappers now
     register_misc_mappers();
@@ -28,14 +28,14 @@ class NESInstance final : public NESInstanceBase
   uint8_t *getLowMem() const override { return _nes.low_mem(); };
   size_t getLowMemSize() const override { return 0x800; };
 
-  void serializeState(jaffarCommon::serializer::Base& serializer) const override
+  void serializeState(jaffarCommon::serializer::Base &serializer) const override
   {
     Mem_Writer w(serializer.getOutputDataBuffer(), _stateSize, 0);
     Auto_File_Writer a(w);
     _nes.save_state(a);
   }
 
-  void deserializeState(jaffarCommon::deserializer::Base& deserializer) override
+  void deserializeState(jaffarCommon::deserializer::Base &deserializer) override
   {
     Mem_File_Reader r(deserializer.getInputDataBuffer(), _stateSize);
     Auto_File_Reader a(r);
@@ -60,9 +60,14 @@ class NESInstance final : public NESInstanceBase
 
   void *getInternalEmulatorPointer() override { return &_nes; }
 
-  protected:
+  void advanceState(const jaffar::input_t &input) override
+  {
+    if (_doRendering == true) _nes.emulate_frame(input.port1, input.port2);
+    if (_doRendering == false) _nes.emulate_skip_frame(input.port1, input.port2);
+  }
 
-  bool loadROMImpl(const uint8_t* romData, const size_t romSize) override
+  protected:
+  bool loadROMImpl(const uint8_t *romData, const size_t romSize) override
   {
     // Loading rom data
     Mem_File_Reader romReader(romData, (int)romSize);
@@ -71,17 +76,10 @@ class NESInstance final : public NESInstanceBase
     return result == 0;
   }
 
-  void enableStateBlockImpl(const std::string& block) override {};
-  void disableStateBlockImpl(const std::string& block) override {};
-
-  void advanceStateImpl(const quickNES::Controller::port_t controller1, const quickNES::Controller::port_t controller2) override
-  {
-    if (_doRendering == true) _nes.emulate_frame(controller1, controller2);
-    if (_doRendering == false) _nes.emulate_skip_frame(controller1, controller2);
-  }
+  void enableStateBlockImpl(const std::string &block) override {};
+  void disableStateBlockImpl(const std::string &block) override {};
 
   private:
-
   // Emulator instance
   emulator_t _nes;
 };

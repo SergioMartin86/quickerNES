@@ -50,4 +50,4 @@ class Mapper087 : public Mapper
   void write(nes_time_t, nes_addr_t, int) {}
 };
 
-} // namespace quickNES
+} // namespace quickerNES

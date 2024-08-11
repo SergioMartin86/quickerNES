@@ -1,6 +1,6 @@
-#include <cstring>
 #include "apu_vrc7.hpp"
 #include "emu2413.hpp"
+#include <cstring>
 
 namespace quickerNES
 {
@@ -208,4 +208,4 @@ void Vrc7::update_last_amp()
   }
 }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -94,4 +94,4 @@ class Mapper015 : public Mapper, Mapper015_state_t
   unsigned long int i;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

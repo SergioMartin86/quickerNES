@@ -256,4 +256,4 @@ void Mapper_VRC2_4<type_a, type_b>::write_irq(nes_time_t time,
 
 typedef Mapper_VRC2_4<true, true> Mapper021;
 
-} // namespace quickNES
+} // namespace quickerNES

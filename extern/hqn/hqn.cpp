@@ -79,13 +79,13 @@ error_t HQNState::advanceFrame(bool sleep)
         SDL_Delay(wantTicks - ticks);
     }
     // m_frameTime = wantTicks - m_prevFrame;
-    error_t result = m_emu->emulate_frame(joypad[0], joypad[1]);
+    // error_t result = m_emu->emulate_frame(joypad[0], joypad[1]);
     if (m_listener)
         m_listener->onAdvanceFrame(this);
     ticks = SDL_GetTicks();
     m_frameTime = ticks - m_prevFrame;
     m_prevFrame = ticks;
-    return result;
+    return 0;
 }
 
 void HQNState::setFramerate(int fps)

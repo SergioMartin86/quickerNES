@@ -3,8 +3,8 @@
 // Effects_Buffer with non-linear sound
 // Nes_Emu 0.7.0
 
-#include "effectsBuffer.hpp"
 #include "buffer.hpp"
+#include "effectsBuffer.hpp"
 
 namespace quickerNES
 {
@@ -38,4 +38,4 @@ class Nes_Effects_Buffer : public Effects_Buffer
   friend Multi_Buffer *set_apu(Nes_Effects_Buffer *, Apu *);
 };
 
-} // namespace quickNES
+} // namespace quickerNES

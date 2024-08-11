@@ -377,4 +377,4 @@ inline int Blip_Reader::begin(Blip_Buffer &blip_buf)
 int const blip_max_length = 0;
 int const blip_default_length = 250;
 
-} // namespace quickNES
+} // namespace quickerNES

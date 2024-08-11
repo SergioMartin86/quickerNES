@@ -15,15 +15,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Emu 0.7.0
 
-#include <stdexcept>
-#include "cpu.hpp"
 #include "apu/apu.hpp"
+#include "cpu.hpp"
 #include "mappers/mapper.hpp"
 #include "ppu/ppu.hpp"
+#include <cstdint>
 #include <cstdio>
-#include <string>
-#include <jaffarCommon/serializers/base.hpp>
 #include <jaffarCommon/deserializers/base.hpp>
+#include <jaffarCommon/serializers/base.hpp>
+#include <stdexcept>
+#include <string>
 
 namespace quickerNES
 {
@@ -53,18 +54,21 @@ struct nes_state_t
 
 struct nes_state_lite_t
 {
-  uint16_t timestamp; // CPU clocks * 15 (for NTSC)
+  uint16_t timestamp;  // CPU clocks * 15 (for NTSC)
   uint8_t frame_count; // number of frames emulated since power-up
 };
 
-
-struct joypad_state_t
+struct input_state_t
 {
-  uint32_t joypad_latches[2]; // joypad 1 & 2 shift registers
+  uint32_t joypad_latches[2]; // input_state 1 & 2 shift registers
+
+  #ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
+  uint32_t arkanoid_latch; // arkanoid latch
+  uint8_t arkanoid_fire; // arkanoid latch
+  #endif
+
   uint8_t w4016;              // strobe
-  uint8_t unused[3];
 };
-static_assert(sizeof(joypad_state_t) == 12);
 
 struct cpu_state_t
 {
@@ -83,6 +87,7 @@ class Core : private Cpu
   typedef Cpu cpu;
 
   public:
+  size_t _NTABBlockSize = 0x1000;
 
   // Flags for lite state storage
   bool TIMEBlockEnabled = true;
@@ -97,13 +102,22 @@ class Core : private Cpu
   bool CHRRBlockEnabled = true;
   bool SRAMBlockEnabled = true;
 
+  // APU and Joypad
+  enum controllerType_t
+  {
+    none_t,
+    joypad_t,
+    arkanoidNES_t,
+    arkanoidFamicom_t,
+  };
+  
   Core() : ppu(this)
   {
     cart = NULL;
     impl = NULL;
     mapper = NULL;
     memset(&nes, 0, sizeof nes);
-    memset(&joypad, 0, sizeof joypad);
+    memset(&input_state, 0, sizeof input_state);
   }
 
   ~Core()
@@ -153,7 +167,7 @@ class Core : private Cpu
     reset(true, true);
   }
 
-  inline void serializeState(jaffarCommon::serializer::Base& serializer) const
+  inline void serializeState(jaffarCommon::serializer::Base &serializer) const
   {
     // TIME Block
     if (TIMEBlockEnabled == true)
@@ -205,8 +219,8 @@ class Core : private Cpu
     // CTRL Block
     if (CTRLBlockEnabled == true)
     {
-      const auto inputDataSize = sizeof(joypad_state_t);
-      const auto inputData = (uint8_t *)&joypad;
+      const auto inputDataSize = sizeof(input_state_t);
+      const auto inputData = (uint8_t *)&input_state;
       serializer.pushContiguous(inputData, inputDataSize);
     }
 
@@ -237,9 +251,7 @@ class Core : private Cpu
     // NTAB Block
     if (NTABBlockEnabled == true)
     {
-      size_t nametable_size = 0x1000;
-
-      const auto inputDataSize = nametable_size;
+      const auto inputDataSize = _NTABBlockSize;
       const auto inputData = (uint8_t *)ppu.impl->nt_ram;
       serializer.push(inputData, inputDataSize);
     }
@@ -267,7 +279,7 @@ class Core : private Cpu
     }
   }
 
-  inline void deserializeState(jaffarCommon::deserializer::Base& deserializer)
+  inline void deserializeState(jaffarCommon::deserializer::Base &deserializer)
   {
     disable_rendering();
     error_count = 0;
@@ -276,10 +288,10 @@ class Core : private Cpu
     // TIME Block
     if (TIMEBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) &nes;
+      const auto outputData = (uint8_t *)&nes;
       const auto inputDataSize = sizeof(nes_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
-      
+
       nes.timestamp /= 5;
     }
 
@@ -287,8 +299,8 @@ class Core : private Cpu
     if (CPURBlockEnabled == true)
     {
       cpu_state_t s;
-      
-      const auto outputData = (uint8_t*) &s;
+
+      const auto outputData = (uint8_t *)&s;
       const auto inputDataSize = sizeof(cpu_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
 
@@ -303,7 +315,7 @@ class Core : private Cpu
     // PPUR Block
     if (PPURBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) &ppu;
+      const auto outputData = (uint8_t *)&ppu;
       const auto inputDataSize = sizeof(ppu_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
     }
@@ -313,7 +325,7 @@ class Core : private Cpu
     {
       Apu::apu_state_t apuState;
 
-      const auto outputData = (uint8_t*) &apuState;
+      const auto outputData = (uint8_t *)&apuState;
       const auto inputDataSize = sizeof(Apu::apu_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
 
@@ -324,8 +336,8 @@ class Core : private Cpu
     // CTRL Block
     if (CTRLBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) &joypad;
-      const auto inputDataSize = sizeof(joypad_state_t);
+      const auto outputData = (uint8_t *)&input_state;
+      const auto inputDataSize = sizeof(input_state_t);
       deserializer.popContiguous(outputData, inputDataSize);
     }
 
@@ -334,7 +346,7 @@ class Core : private Cpu
     {
       mapper->default_reset_state();
 
-      const auto outputData = (uint8_t*) mapper->state;
+      const auto outputData = (uint8_t *)mapper->state;
       const auto inputDataSize = mapper->state_size;
       deserializer.popContiguous(outputData, inputDataSize);
 
@@ -344,7 +356,7 @@ class Core : private Cpu
     // LRAM Block
     if (LRAMBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) low_mem;
+      const auto outputData = (uint8_t *)low_mem;
       const auto inputDataSize = low_ram_size;
       deserializer.pop(outputData, inputDataSize);
     }
@@ -352,7 +364,7 @@ class Core : private Cpu
     // SPRT Block
     if (SPRTBlockEnabled == true)
     {
-      const auto outputData = (uint8_t*) ppu.spr_ram;
+      const auto outputData = (uint8_t *)ppu.spr_ram;
       const auto inputDataSize = Ppu::spr_ram_size;
       deserializer.pop(outputData, inputDataSize);
     }
@@ -360,10 +372,8 @@ class Core : private Cpu
     // NTAB Block
     if (NTABBlockEnabled == true)
     {
-      size_t nametable_size = 0x1000;
-
-      const auto outputData = (uint8_t*) ppu.impl->nt_ram;
-      const auto inputDataSize = nametable_size;
+      const auto outputData = (uint8_t *)ppu.impl->nt_ram;
+      const auto inputDataSize = _NTABBlockSize;
       deserializer.pop(outputData, inputDataSize);
     }
 
@@ -372,7 +382,7 @@ class Core : private Cpu
     {
       if (ppu.chr_is_writable)
       {
-        const auto outputData = (uint8_t*) ppu.impl->chr_ram;
+        const auto outputData = (uint8_t *)ppu.impl->chr_ram;
         const auto inputDataSize = ppu.chr_size;
         deserializer.pop(outputData, inputDataSize);
 
@@ -385,7 +395,7 @@ class Core : private Cpu
     {
       if (sram_present)
       {
-        const auto outputData = (uint8_t*) impl->sram;
+        const auto outputData = (uint8_t *)impl->sram;
         const auto inputDataSize = impl->sram_size;
         deserializer.pop(outputData, inputDataSize);
       }
@@ -394,45 +404,141 @@ class Core : private Cpu
     if (sram_present) enable_sram(true);
   }
 
-void enableStateBlock(const std::string& block)
-{ 
-   bool recognizedBlock = false;
-   
-   if (block == "TIME") { TIMEBlockEnabled = true; recognizedBlock = true; }
-   if (block == "CPUR") { CPURBlockEnabled = true; recognizedBlock = true; }
-   if (block == "PPUR") { PPURBlockEnabled = true; recognizedBlock = true; }
-   if (block == "APUR") { APURBlockEnabled = true; recognizedBlock = true; }
-   if (block == "CTRL") { CTRLBlockEnabled = true; recognizedBlock = true; }
-   if (block == "MAPR") { MAPRBlockEnabled = true; recognizedBlock = true; }
-   if (block == "LRAM") { LRAMBlockEnabled = true; recognizedBlock = true; }
-   if (block == "SPRT") { SPRTBlockEnabled = true; recognizedBlock = true; }
-   if (block == "NTAB") { NTABBlockEnabled = true; recognizedBlock = true; }
-   if (block == "CHRR") { CHRRBlockEnabled = true; recognizedBlock = true; }
-   if (block == "SRAM") { SRAMBlockEnabled = true; recognizedBlock = true; }
+  void setNTABBlockSize(const size_t size) { _NTABBlockSize = size; }
 
-   if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
-};
+  void enableStateBlock(const std::string &block)
+  {
+    bool recognizedBlock = false;
 
+    if (block == "TIME")
+    {
+      TIMEBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "CPUR")
+    {
+      CPURBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "PPUR")
+    {
+      PPURBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "APUR")
+    {
+      APURBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "CTRL")
+    {
+      CTRLBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "MAPR")
+    {
+      MAPRBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "LRAM")
+    {
+      LRAMBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "SPRT")
+    {
+      SPRTBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "NTAB")
+    {
+      NTABBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "CHRR")
+    {
+      CHRRBlockEnabled = true;
+      recognizedBlock = true;
+    }
+    if (block == "SRAM")
+    {
+      SRAMBlockEnabled = true;
+      recognizedBlock = true;
+    }
 
-void disableStateBlock(const std::string& block)
-{ 
-   bool recognizedBlock = false;
-   
-   if (block == "TIME") { TIMEBlockEnabled = false; recognizedBlock = true; }
-   if (block == "CPUR") { CPURBlockEnabled = false; recognizedBlock = true; }
-   if (block == "PPUR") { PPURBlockEnabled = false; recognizedBlock = true; }
-   if (block == "APUR") { APURBlockEnabled = false; recognizedBlock = true; }
-   if (block == "CTRL") { CTRLBlockEnabled = false; recognizedBlock = true; }
-   if (block == "MAPR") { MAPRBlockEnabled = false; recognizedBlock = true; }
-   if (block == "LRAM") { LRAMBlockEnabled = false; recognizedBlock = true; }
-   if (block == "SPRT") { SPRTBlockEnabled = false; recognizedBlock = true; }
-   if (block == "NTAB") { NTABBlockEnabled = false; recognizedBlock = true; }
-   if (block == "CHRR") { CHRRBlockEnabled = false; recognizedBlock = true; }
-   if (block == "SRAM") { SRAMBlockEnabled = false; recognizedBlock = true; }
+    if (recognizedBlock == false)
+    {
+      fprintf(stderr, "Unrecognized block type: %s\n", block.c_str());
+      exit(-1);
+    }
+  };
 
-   if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
-};
+  void disableStateBlock(const std::string &block)
+  {
+    bool recognizedBlock = false;
 
+    if (block == "TIME")
+    {
+      TIMEBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "CPUR")
+    {
+      CPURBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "PPUR")
+    {
+      PPURBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "APUR")
+    {
+      APURBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "CTRL")
+    {
+      CTRLBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "MAPR")
+    {
+      MAPRBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "LRAM")
+    {
+      LRAMBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "SPRT")
+    {
+      SPRTBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "NTAB")
+    {
+      NTABBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "CHRR")
+    {
+      CHRRBlockEnabled = false;
+      recognizedBlock = true;
+    }
+    if (block == "SRAM")
+    {
+      SRAMBlockEnabled = false;
+      recognizedBlock = true;
+    }
+
+    if (recognizedBlock == false)
+    {
+      fprintf(stderr, "Unrecognized block type: %s\n", block.c_str());
+      exit(-1);
+    }
+  };
 
   void reset(bool full_reset, bool erase_battery_ram)
   {
@@ -456,8 +562,13 @@ void disableStateBlock(const std::string& block)
       if (!cart->has_battery_ram() || erase_battery_ram)
         memset(impl->sram, 0xFF, impl->sram_size);
 
-      joypad.joypad_latches[0] = 0;
-      joypad.joypad_latches[1] = 0;
+      input_state.joypad_latches[0] = 0;
+      input_state.joypad_latches[1] = 0;
+
+      #ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
+      input_state.arkanoid_latch = 0;
+      input_state.arkanoid_fire = 0;
+      #endif
 
       nes.frame_count = 0;
     }
@@ -479,14 +590,16 @@ void disableStateBlock(const std::string& block)
     error_count = 0;
   }
 
-  nes_time_t emulate_frame(uint32_t joypad1, uint32_t joypad2)
+  nes_time_t emulate_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arkanoid_latch, uint8_t arkanoid_fire)
   {
-    #ifdef _QUICKERNES_DETECT_JOYPAD_READS
+#ifdef _QUICKERNES_DETECT_JOYPAD_READS
     joypad_read_count = 0;
-    #endif
+#endif
 
     current_joypad[0] = joypad1;
     current_joypad[1] = joypad2;
+    current_arkanoid_latch = arkanoid_latch;
+    current_arkanoid_fire = arkanoid_fire;
 
     cpu_time_offset = ppu.begin_frame(nes.timestamp) - 1;
     ppu_2002_time = 0;
@@ -556,6 +669,8 @@ void disableStateBlock(const std::string& block)
 
   public:
   uint32_t current_joypad[2];
+  uint32_t current_arkanoid_latch;
+  uint8_t current_arkanoid_fire;
   Cart const *cart;
   Mapper *mapper;
   nes_state_t nes;
@@ -604,24 +719,98 @@ void disableStateBlock(const std::string& block)
     return t;
   }
 
-  // APU and Joypad
-  joypad_state_t joypad;
 
+  controllerType_t _controllerType = controllerType_t::none_t;
+  
+  input_state_t input_state;
+
+  void setControllerType(controllerType_t type) { _controllerType = type; }
+
+#ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
   int read_io(nes_addr_t addr)
   {
     if ((addr & 0xFFFE) == 0x4016)
     {
       // For performance's sake, this counter is only kept on demand
       #ifdef _QUICKERNES_DETECT_JOYPAD_READS
-      joypad_read_count++;
+            joypad_read_count++;
       #endif
 
+      // If write flag is put into w4016, reading from it returns nothing
+      if (input_state.w4016 & 1) return 0;
+
+      // Proceed depending on input type
+      switch(_controllerType)
+      {
+        case controllerType_t::joypad_t:
+        {
+            const uint8_t result = input_state.joypad_latches[addr & 1] & 1;
+            input_state.joypad_latches[addr & 1] >>= 1;
+            return result;
+        }
+
+        case controllerType_t::arkanoidNES_t:
+        {
+            if (addr == 0x4017) 
+            {
+              // latch 0 encodes fire, latch 1 encodes potentiometer
+              const uint8_t result = (input_state.arkanoid_latch & 1) * 16 + input_state.arkanoid_fire * 8;
+
+              // Advancing latch 1
+              input_state.arkanoid_latch >>= 1;
+              return result;
+            }
+        }
+
+        case controllerType_t::arkanoidFamicom_t:
+        {
+            if (addr == 0x4016) 
+            {
+              // latch 0 encodes fire
+              uint8_t result = (input_state.arkanoid_fire & 1) * 2;
+
+              // latch 0 also encodes input_state 1
+              result += (input_state.joypad_latches[0] & 1) & 1;
+
+              // Advancing input_state latch
+              input_state.joypad_latches[0] >>= 1;
+
+              return result;
+            }
+
+            if (addr == 0x4017) 
+            {
+              // latch 1 encodes potentiometer
+              const uint8_t result = (input_state.arkanoid_latch & 1) * 2;
+
+              // Advancing latch 1
+              input_state.arkanoid_latch >>= 1;
+              return result;
+            }
+        }
+
+        default:
+          return 0;
+      } 
+    }
+
+
+    if (addr == Apu::status_addr)
+      return impl->apu.read_status(clock());
+
+    return addr >> 8; // simulate open bus
+  }
+#else
+  int read_io(nes_addr_t addr)
+  {
+    if ((addr & 0xFFFE) == 0x4016)
+    {
       // to do: to aid with recording, doesn't emulate transparent latch,
       // so a game that held strobe at 1 and read $4016 or $4017 would not get
       // the current A status as occurs on a NES
-      if (joypad.w4016 & 1) return 0;
-      const uint8_t result = joypad.joypad_latches[addr & 1] & 1;
-      joypad.joypad_latches[addr & 1] >>= 1;
+      if (input_state.w4016 & 1) return 0;
+      const uint8_t result = input_state.joypad_latches[addr & 1] & 1;
+      input_state.joypad_latches[addr & 1] >>= 1;
       return result;
     }
 
@@ -630,6 +819,7 @@ void disableStateBlock(const std::string& block)
 
     return addr >> 8; // simulate open bus
   }
+#endif
 
   void write_io(nes_addr_t addr, int data)
   {
@@ -641,16 +831,21 @@ void disableStateBlock(const std::string& block)
       return;
     }
 
-    // joypad strobe
+    // input_state strobe
     if (addr == 0x4016)
     {
       // if strobe goes low, latch data
-      if (joypad.w4016 & 1 & ~data)
+      if (input_state.w4016 & 1 & ~data)
       {
-        joypad.joypad_latches[0] = current_joypad[0];
-        joypad.joypad_latches[1] = current_joypad[1];
+        input_state.joypad_latches[0] = current_joypad[0];
+        input_state.joypad_latches[1] = current_joypad[1];
+
+        #ifdef _QUICKERNES_SUPPORT_ARKANOID_INPUTS
+        input_state.arkanoid_latch = current_arkanoid_latch;
+        input_state.arkanoid_fire = current_arkanoid_fire;
+        #endif
       }
-      joypad.w4016 = data;
+      input_state.w4016 = data;
       return;
     }
 
@@ -985,19 +1180,19 @@ inline void Core::cpu_write(nes_addr_t addr, int data, nes_time_t time)
 #define NES_CPU_READ(cpu, addr, time) \
   static_cast<Core &>(*cpu).cpu_read(addr, time)
 
-#define NES_CPU_WRITEX(cpu, addr, data, time)                  \
-  {                                                            \
+#define NES_CPU_WRITEX(cpu, addr, data, time)              \
+  {                                                        \
     static_cast<Core &>(*cpu).cpu_write(addr, data, time); \
   }
 
-#define NES_CPU_WRITE(cpu, addr, data, time)                     \
-  {                                                              \
-    if (addr < 0x800)                                            \
-      cpu->low_mem[addr] = data;                                 \
-    else if (addr == 0x2007)                                     \
+#define NES_CPU_WRITE(cpu, addr, data, time)                 \
+  {                                                          \
+    if (addr < 0x800)                                        \
+      cpu->low_mem[addr] = data;                             \
+    else if (addr == 0x2007)                                 \
       static_cast<Core &>(*cpu).cpu_write_2007(data);        \
-    else                                                         \
+    else                                                     \
       static_cast<Core &>(*cpu).cpu_write(addr, data, time); \
   }
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -62,4 +62,4 @@ class Mapper156 : public Mapper, m156_state_t
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES

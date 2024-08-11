@@ -114,4 +114,4 @@ class Cart
   unsigned mapper;
 };
 
-} // namespace quickNES
+} // namespace quickerNES

@@ -30,4 +30,4 @@ namespace quickerNES
 
 typedef Mapper_Namco_34x3<true> Mapper154;
 
-} // namespace quickNES
+} // namespace quickerNES

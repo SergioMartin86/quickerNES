@@ -433,4 +433,4 @@ long Ppu_Impl::recalc_sprite_max(int scanline)
   return 0;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

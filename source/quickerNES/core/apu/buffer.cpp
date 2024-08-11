@@ -227,4 +227,4 @@ void Nonlinearizer::RestoreAudioBufferState()
   prev = extra_prev;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

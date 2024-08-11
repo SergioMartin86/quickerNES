@@ -1,12 +1,12 @@
-#include <cstdlib>
 #include "argparse/argparse.hpp"
-#include "jaffarCommon/serializers/contiguous.hpp"
 #include "jaffarCommon/deserializers/contiguous.hpp"
 #include "jaffarCommon/file.hpp"
 #include "jaffarCommon/logger.hpp"
+#include "jaffarCommon/serializers/contiguous.hpp"
 #include "jaffarCommon/string.hpp"
 #include "nesInstance.hpp"
 #include "playbackInstance.hpp"
+#include <cstdlib>
 
 SDL_Window *launchOutputWindow()
 {
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
   if (status == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = jaffarCommon::string::split(inputSequence, ' ');
+  const auto sequence = jaffarCommon::string::split(inputSequence, '\n');
 
   // Initializing terminal
   jaffarCommon::logger::initializeTerminal();
@@ -112,16 +112,15 @@ int main(int argc, char *argv[])
   jaffarCommon::logger::refreshTerminal();
 
   // Creating emulator instance
-  NESInstance e;
+  nlohmann::json emulatorConfig;
+  emulatorConfig["Controller 1 Type"] = controller1Type;
+  emulatorConfig["Controller 2 Type"] = controller2Type;
+  NESInstance e(emulatorConfig);
 
-  // Setting controller types
-  e.setController1Type(controller1Type);
-  e.setController2Type(controller2Type);
-  
   // Loading ROM File
   std::string romFileData;
   if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
-  e.loadROM((uint8_t*)romFileData.data(), romFileData.size());
+  e.loadROM((uint8_t *)romFileData.data(), romFileData.size());
 
   // If an initial state is provided, load it now
   if (stateFilePath != "")
@@ -136,7 +135,7 @@ int main(int argc, char *argv[])
   auto p = PlaybackInstance(&e);
 
   // If render is enabled then, create window now
-  SDL_Window* window = nullptr;
+  SDL_Window *window = nullptr;
   if (disableRender == false)
   {
     window = launchOutputWindow();
@@ -166,7 +165,7 @@ int main(int argc, char *argv[])
     if (disableRender == false) p.renderFrame(currentStep);
 
     // Getting input
-    const auto &input = p.getStateInput(currentStep);
+    const auto &inputString = p.getInputString(currentStep);
 
     // Getting state hash
     const auto hash = p.getStateHash(currentStep);
@@ -181,8 +180,9 @@ int main(int argc, char *argv[])
 
       jaffarCommon::logger::log("[] ----------------------------------------------------------------\n");
       jaffarCommon::logger::log("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
-      jaffarCommon::logger::log("[] Input:          %s\n", input.c_str());
+      jaffarCommon::logger::log("[] Input:          %s\n", inputString.c_str());
       jaffarCommon::logger::log("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
+      jaffarCommon::logger::log("[] Paddle X:       %u\n", e.getLowMem()[0x11A]);
 
       // Only print commands if not in reproduce mode
       if (isReproduce == false) jaffarCommon::logger::log("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");

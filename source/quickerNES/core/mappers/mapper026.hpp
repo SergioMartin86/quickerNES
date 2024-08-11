@@ -11,4 +11,4 @@ namespace quickerNES
 
 typedef Mapper_Vrc6<3> Mapper026;
 
-} // namespace quickNES
+} // namespace quickerNES

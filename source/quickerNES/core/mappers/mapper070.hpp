@@ -84,4 +84,4 @@ class Mapper_74x161x162x32 : public Mapper
 
 typedef Mapper_74x161x162x32<70> Mapper070;
 
-} // namespace quickNES
+} // namespace quickerNES

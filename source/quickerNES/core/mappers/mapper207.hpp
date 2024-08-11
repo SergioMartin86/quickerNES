@@ -93,4 +93,4 @@ class Mapper207 : public Mapper, taito_x1005_state_t
   virtual void write(nes_time_t, nes_addr_t addr, int data) {}
 };
 
-} // namespace quickNES
+} // namespace quickerNES

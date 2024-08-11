@@ -3,8 +3,8 @@
 // NES PPU emulator
 // Emu 0.7.0
 
-#include <climits>
 #include "ppuRendering.hpp"
+#include <climits>
 
 namespace quickerNES
 {
@@ -143,4 +143,4 @@ inline void Ppu::update_open_bus(nes_time_t time)
   if (time >= decay_high) open_bus &= ~0xE0;
 }
 
-} // namespace quickNES
+} // namespace quickerNES

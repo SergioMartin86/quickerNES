@@ -61,4 +61,4 @@ inline void Ppu_Rendering::draw_sprites(int start, int count)
   draw_scanlines(start, count, host_pixels + host_row_bytes * start, host_row_bytes, 2);
 }
 
-} // namespace quickNES
+} // namespace quickerNES

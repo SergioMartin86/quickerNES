@@ -72,4 +72,4 @@ class Mapper244 : public Mapper, mapper244_state_t
   }
 };
 
-} // namespace quickNES
+} // namespace quickerNES
