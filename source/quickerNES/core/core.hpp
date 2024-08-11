@@ -105,10 +105,10 @@ class Core : private Cpu
   // APU and Joypad
   enum controllerType_t
   {
-    none_t,
-    joypad_t,
-    arkanoidNES_t,
-    arkanoidFamicom_t,
+    none_t = 0,
+    joypad_t = 1,
+    arkanoidNES_t = 2,
+    arkanoidFamicom_t = 3,
   };
   
   Core() : ppu(this)
