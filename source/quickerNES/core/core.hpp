@@ -138,7 +138,7 @@ class Core : private Cpu
     return 0;
   }
 
-  void open(Cart const *new_cart)
+  const char *open(Cart const *new_cart)
   {
     close();
     init();
@@ -153,7 +153,7 @@ class Core : private Cpu
     if (mapper == nullptr)
     {
       fprintf(stderr, "Could not find mapper for code: %u\n", mapperCode);
-      exit(-1);
+      return "Unsupported mapper";
     }
 
     // Assigning backwards pointers to cartdrige and emulator now
@@ -165,6 +165,8 @@ class Core : private Cpu
     cart = new_cart;
     memset(impl->unmapped_page, unmapped_fill, sizeof impl->unmapped_page);
     reset(true, true);
+
+    return nullptr;
   }
 
   inline void serializeState(jaffarCommon::serializer::Base &serializer) const

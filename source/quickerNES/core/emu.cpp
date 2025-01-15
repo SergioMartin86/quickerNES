@@ -78,16 +78,19 @@ inline void Emu::clear_sound_buf()
   sound_buf->clear();
 }
 
-void Emu::set_cart(Cart const *new_cart)
+const char *Emu::set_cart(Cart const *new_cart)
 {
   auto_init();
-  emu.open(new_cart);
+  const char *error = emu.open(new_cart);
+  if (error) return error;
 
   channel_count_ = Apu::osc_count + emu.mapper->channel_count();
   sound_buf->set_channel_count(channel_count());
   set_equalizer(equalizer_);
   enable_sound(true);
   reset();
+
+  return nullptr;
 }
 
 void Emu::reset(bool full_reset, bool erase_battery_ram)
@@ -167,10 +170,10 @@ const char *Emu::emulate_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arka
 
 // Extras
 
-void Emu::load_ines(const uint8_t *buffer)
+const char *Emu::load_ines(const uint8_t *buffer)
 {
   private_cart.load_ines(buffer);
-  set_cart(&private_cart);
+  return set_cart(&private_cart);
 }
 
 void Emu::write_chr(void const *p, long count, long offset)
