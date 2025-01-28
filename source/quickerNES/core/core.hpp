@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include <stdexcept>
 #include <string>
 
-#ifdef QUICKERNES_ENABLE_INPUT_CALLBACK
+#ifdef _QUICKERNES_ENABLE_INPUT_CALLBACK
 extern void (*input_callback_cb)(void);
 #endif
 
@@ -849,7 +849,7 @@ class Core : private Cpu
         input_state.arkanoid_fire = current_arkanoid_fire;
         #endif
 
-		#ifdef QUICKERNES_ENABLE_INPUT_CALLBACK
+		#ifdef _QUICKERNES_ENABLE_INPUT_CALLBACK
         input_callback_cb();
 		#endif
       }
