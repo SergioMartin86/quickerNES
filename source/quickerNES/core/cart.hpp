@@ -34,7 +34,7 @@ class Cart
     uint8_t chr_count; // number of 8K CHR banks
     uint8_t flags;     // MMMM FTBV Mapper low, Four-screen, Trainer, Battery, V mirror
     uint8_t flags2;    // MMMM --XX Mapper high 4 bits
-    uint8_t zero[8];   // if zero [7] is non-zero, treat flags2 as zero
+    uint8_t zero[8];
   };
   static_assert(sizeof(ines_header_t) == 16);
 
@@ -49,7 +49,7 @@ class Cart
       memcpy(&h, &buffer[bufferPos], copySize);
       bufferPos += copySize;
     }
-    if (h.zero[7]) h.flags2 = 0;
+
     set_mapper(h.flags, h.flags2);
 
     // skip trainer
