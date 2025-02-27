@@ -172,7 +172,9 @@ const char *Emu::emulate_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arka
 
 const char *Emu::load_ines(const uint8_t *buffer)
 {
-  private_cart.load_ines(buffer);
+  const char *error = private_cart.load_ines(buffer);
+  if (error) return error;
+
   return set_cart(&private_cart);
 }
 
