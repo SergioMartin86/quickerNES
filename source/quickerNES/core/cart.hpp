@@ -39,7 +39,7 @@ class Cart
   static_assert(sizeof(ines_header_t) == 16);
 
   // Load iNES file
-  void load_ines(const uint8_t *buffer)
+  const char *load_ines(const uint8_t *buffer)
   {
     ines_header_t h;
 
@@ -49,6 +49,9 @@ class Cart
       memcpy(&h, &buffer[bufferPos], copySize);
       bufferPos += copySize;
     }
+
+    if (memcmp(h.signature, "NES\x1A", 4) != 0)
+      return "Not an iNES file";
 
     set_mapper(h.flags, h.flags2);
 
@@ -73,6 +76,8 @@ class Cart
       memcpy(chr(), &buffer[bufferPos], copySize);
       bufferPos += copySize;
     }
+
+    return nullptr;
   }
 
   inline bool has_battery_ram() const { return mapper & 0x02; }
