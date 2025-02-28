@@ -22,7 +22,7 @@ class Emu
   // Basic setup
 
   // Load iNES file into emulator and clear recording
-  void load_ines(const uint8_t *buffer);
+  const char* load_ines(const uint8_t *buffer);
 
   // Set sample rate for sound generation
   const char *set_sample_rate(long);
@@ -98,7 +98,7 @@ class Emu
   // Use already-loaded cartridge. Retains pointer, so it must be kept around until
   // closed. A cartridge can be shared among multiple emulators. After opening,
   // cartridge's CHR data shouldn't be modified since a copy is cached internally.
-  void set_cart(Cart const *);
+  const char *set_cart(Cart const *new_cart);
 
   // Pointer to current cartridge, or NULL if none is loaded
   Cart const *cart() const { return emu.cart; }
