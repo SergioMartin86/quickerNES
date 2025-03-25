@@ -30,6 +30,9 @@ class NESInstance final : public NESInstanceBase
   uint8_t *getCHRMem() const { return _nes.chr_mem(); };
   size_t getCHRMemSize() const { return _nes.chr_size(); };
 
+  uint8_t *getPALMem() const { return _nes.pal_mem(); };
+  size_t getPALMemSize() const { return _nes.pal_mem_size(); };
+
   void serializeState(jaffarCommon::serializer::Base &serializer) const override { _nes.serializeState(serializer); }
   void deserializeState(jaffarCommon::deserializer::Base &deserializer) override { _nes.deserializeState(deserializer); }
 
