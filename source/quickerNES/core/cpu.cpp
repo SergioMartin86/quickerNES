@@ -477,7 +477,7 @@ uint8_t clock_table[256] = {
 
 
 // This optimization is only possible with the GNU compiler -- MSVC does not allow function alignment
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 __attribute__((optimize("align-functions=1024")))
 #endif
 Cpu::result_t
@@ -1480,8 +1480,7 @@ end:
   CALC_STATUS(temp);
   r.status = temp;
 }
-  
-  this->clock_count = clock_count;
+
   r.pc = pc;
   r.sp = GET_SP();
   r.a = a;

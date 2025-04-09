@@ -26,6 +26,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include <stdexcept>
 #include <string>
 
+#ifdef _QUICKERNES_ENABLE_INPUT_CALLBACK
+extern void (*input_callback_cb)(void);
+#endif
+
 namespace quickerNES
 {
 
@@ -138,7 +142,7 @@ class Core : private Cpu
     return 0;
   }
 
-  void open(Cart const *new_cart)
+  const char *open(Cart const *new_cart)
   {
     close();
     init();
@@ -153,7 +157,7 @@ class Core : private Cpu
     if (mapper == nullptr)
     {
       fprintf(stderr, "Could not find mapper for code: %u\n", mapperCode);
-      exit(-1);
+      return "Unsupported mapper";
     }
 
     // Assigning backwards pointers to cartdrige and emulator now
@@ -165,6 +169,8 @@ class Core : private Cpu
     cart = new_cart;
     memset(impl->unmapped_page, unmapped_fill, sizeof impl->unmapped_page);
     reset(true, true);
+
+    return nullptr;
   }
 
   inline void serializeState(jaffarCommon::serializer::Base &serializer) const
@@ -844,6 +850,10 @@ class Core : private Cpu
         input_state.arkanoid_latch = current_arkanoid_latch;
         input_state.arkanoid_fire = current_arkanoid_fire;
         #endif
+
+		#ifdef _QUICKERNES_ENABLE_INPUT_CALLBACK
+        input_callback_cb();
+		#endif
       }
       input_state.w4016 = data;
       return;
