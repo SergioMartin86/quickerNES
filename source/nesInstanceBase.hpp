@@ -61,7 +61,7 @@ class NESInstanceBase
 
   // Virtual functions
 
-  virtual uint8_t *getLowMem() const = 0;
+  virtual uint8_t *getLowMem() = 0;
   virtual size_t getLowMemSize() const = 0;
 
   virtual void serializeState(jaffarCommon::serializer::Base &serializer) const = 0;

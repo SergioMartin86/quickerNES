@@ -10,22 +10,14 @@
 
 typedef Nes_Emu emulator_t;
 
-extern void register_misc_mappers();
-extern void register_extra_mappers();
-extern void register_mapper_70();
-
 class NESInstance final : public NESInstanceBase
 {
   public:
   NESInstance(const nlohmann::json &config) : NESInstanceBase(config)
   {
-    // If running the original QuickNES, register extra mappers now
-    register_misc_mappers();
-    register_extra_mappers();
-    register_mapper_70();
   }
 
-  uint8_t *getLowMem() const override { return _nes.low_mem(); };
+  uint8_t *getLowMem() override { return _nes.low_mem(); };
   size_t getLowMemSize() const override { return 0x800; };
 
   void serializeState(jaffarCommon::serializer::Base &serializer) const override
