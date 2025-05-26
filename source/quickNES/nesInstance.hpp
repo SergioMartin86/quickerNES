@@ -22,16 +22,30 @@ class NESInstance final : public NESInstanceBase
 
   void serializeState(jaffarCommon::serializer::Base &serializer) const override
   {
-    Mem_Writer w(serializer.getOutputDataBuffer(), _stateSize, 0);
-    Auto_File_Writer a(w);
-    _nes.save_state(a);
+    auto outputDataBuffer = serializer.getOutputDataBuffer();
+
+    if (outputDataBuffer != nullptr) 
+    {
+      Mem_Writer w(outputDataBuffer, _stateSize, 0);
+      Auto_File_Writer a(w);
+      _nes.save_state(a);
+    }
+
+    serializer.push(nullptr, _stateSize);
   }
 
   void deserializeState(jaffarCommon::deserializer::Base &deserializer) override
   {
-    Mem_File_Reader r(deserializer.getInputDataBuffer(), _stateSize);
-    Auto_File_Reader a(r);
-    _nes.load_state(a);
+    auto inputDataBuffer = deserializer.getInputDataBuffer();
+
+    if (inputDataBuffer != nullptr) 
+    {
+      Mem_File_Reader r(inputDataBuffer, _stateSize);
+      Auto_File_Reader a(r);
+      _nes.load_state(a);
+    }
+    
+    deserializer.pop(nullptr, _stateSize);
   }
 
   inline size_t getFullStateSize() const override
