@@ -237,7 +237,9 @@ Mapper *Mapper::getMapperFromCode(const int mapperCode)
   if (mapperCode == 2) mapper = new Mapper002();
   if (mapperCode == 3) mapper = new Mapper003();
   if (mapperCode == 4) mapper = new Mapper004();
-  if (mapperCode == 5) mapper = new Mapper005();
+  // https://github.com/TASEmulators/BizHawk/commit/b1f4a77251fbb1a9553958766891617756a75293
+  // MMC5 support is poor in QuickNES, so we do not use it
+  //if (mapperCode == 5) mapper = new Mapper005();
   if (mapperCode == 7) mapper = new Mapper007();
   if (mapperCode == 9) mapper = new Mapper009();
   if (mapperCode == 10) mapper = new Mapper010();
