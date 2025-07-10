@@ -92,6 +92,7 @@ class Core : private Cpu
 
   public:
   size_t _NTABBlockSize = 0x1000;
+  size_t _SRAMBlockSize = impl->sram_size;
 
   // Flags for lite state storage
   bool TIMEBlockEnabled = true;
@@ -278,7 +279,7 @@ class Core : private Cpu
     {
       if (sram_present)
       {
-        const auto inputDataSize = impl->sram_size;
+        const auto inputDataSize = _SRAMBlockSize;
         const auto inputData = (uint8_t *)impl->sram;
         serializer.push(inputData, inputDataSize);
       }
@@ -402,7 +403,7 @@ class Core : private Cpu
       if (sram_present)
       {
         const auto outputData = (uint8_t *)impl->sram;
-        const auto inputDataSize = impl->sram_size;
+        const auto inputDataSize = _SRAMBlockSize;
         deserializer.pop(outputData, inputDataSize);
       }
     }
@@ -411,6 +412,7 @@ class Core : private Cpu
   }
 
   void setNTABBlockSize(const size_t size) { _NTABBlockSize = size; }
+  void setSRAMBlockSize(const size_t size) { _SRAMBlockSize = size; }
 
   void enableStateBlock(const std::string &block)
   {

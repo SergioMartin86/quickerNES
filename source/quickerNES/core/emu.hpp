@@ -51,6 +51,7 @@ class Emu
   void serializeState(jaffarCommon::serializer::Base &serializer) const { emu.serializeState(serializer); }
   void deserializeState(jaffarCommon::deserializer::Base &deserializer) { emu.deserializeState(deserializer); }
   void setNTABBlockSize(const size_t size) { emu.setNTABBlockSize(size); }
+  void setSRAMBlockSize(const size_t size) { emu.setSRAMBlockSize(size); }
   void enableStateBlock(const std::string &block) { emu.enableStateBlock(block); };
   void disableStateBlock(const std::string &block) { emu.disableStateBlock(block); };
 

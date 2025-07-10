@@ -72,6 +72,7 @@ class NESInstanceBase
   virtual std::string getCoreName() const = 0;
   virtual void *getInternalEmulatorPointer() = 0;
   virtual void setNTABBlockSize(const size_t size) {};
+  virtual void setSRAMBlockSize(const size_t size) {};
 
   protected:
   virtual void enableStateBlockImpl(const std::string &block) = 0;

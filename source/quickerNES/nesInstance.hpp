@@ -58,6 +58,7 @@ class NESInstance final : public NESInstanceBase
   }
 
   void setNTABBlockSize(const size_t size) override { _nes.setNTABBlockSize(size); }
+  void setSRAMBlockSize(const size_t size) override { _nes.setSRAMBlockSize(size); }
 
   void advanceState(const jaffar::input_t &input) override
   {
