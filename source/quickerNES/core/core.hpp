@@ -137,7 +137,7 @@ class Core : private Cpu
   {
     if (!impl)
     {
-      impl = new (std::no_throw) impl_t;
+      impl = new (std::nothrow) impl_t;
       if (!impl) return "Out of memory";
       memset(impl->sram, 0xFF, impl->sram_size);
       impl->apu.dmc_reader(read_dmc, this);
