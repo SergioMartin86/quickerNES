@@ -38,8 +38,15 @@ class Cart
     uint8_t prg_count; // number of 16K PRG banks
     uint8_t chr_count; // number of 8K CHR banks
     uint8_t flags;     // MMMM FTBV Mapper low, Four-screen, Trainer, Battery, V mirror
-    uint8_t flags2;    // MMMM --XX Mapper high 4 bits
-    uint8_t zero[8];
+    uint8_t flags2;    // MMMM NNPV Mapper high 4 bits, NES 2.0 (below bytes are NES 2.0 only), Playchoice-10, Vs. System
+    uint8_t ex_mapper; // SSSS MMMM Submapper, mapper extended high 4 bits
+    uint8_t ex_rom;    // CCCC PPPP CHR bank count high 4 bits, PRG bank count high 4 bits
+    uint8_t prg_ram;   // NNNN RRRR PRG NVRAM size, PRG RAM size
+    uint8_t chr_ram;   // NNNN RRRR CHR NVRAM size, CHR RAM size
+    uint8_t region;    // XXXX XXRR Region timing required
+    uint8_t ex_flags;  // Extended console flags (meaning varies depending on console type in flags2)
+    uint8_t misc_roms; // Number of miscellaneous ROMs present
+    uint8_t ex_device; // XXDD DDDD Default expansion device
   };
   static_assert(sizeof(ines_header_t) == 16);
 
@@ -61,17 +68,80 @@ class Cart
     if (memcmp(h.signature, "NES\x1A", 4) != 0)
       return "Not an iNES file";
 
+    // Only plain NES is supported
+    if (h.flags2 & 0x03)
+      return "Unsupported console type";
+
+    // check if NES 2.0 is present
+    if ((h.flags2 & 0x0C) == 0x08)
+    {
+       // If there's a non-zero submapper present, we can't rely on default iNES behavior
+       // If extended high mapper bits are set, then it won't be supported mapper anyways
+       if (h.ex_mapper != 0)
+         return "Unsupported mapper";
+
+       // iNES normally dictates PRG RAM is hardcoded to be 8K
+       // NES 2.0 allows for specifying the size, but >8K is unsupported here
+       long prg_ram_size = 0;
+       if (h.prg_ram & 0x0F) prg_ram_size += 64L << (h.prg_ram & 0x0F);
+       if (h.prg_ram & 0xF0) prg_ram_size += 64L << (h.prg_ram >> 4);
+       if (prg_ram_size > 0x2000)
+         return "Unsupported mapper";
+
+       // Ensure the iNES battery flag is set if NES 2.0 indicates there should be a battery
+       if (h.prg_ram & 0xF0)
+         h.flags |= 0x02;
+
+       // iNES normally dictates CHR RAM is hardcoded to be 0 or 8K depending on if CHR ROM is present
+       // NES 2.0 allows for specifying CHR RAM size, regardless of CHR ROM
+       // Anything outside of iNES behavior is unsupported however
+       long chr_ram_size = 0;
+       if (h.chr_ram & 0x0F) chr_ram_size += 64L << (h.chr_ram & 0x0F);
+       if (h.chr_ram & 0xF0) chr_ram_size += 64L << (h.chr_ram >> 4);
+       if (chr_ram_size > 0x2000)
+         return "Unsupported mapper";
+       if (chr_ram_size != 0 && (h.chr_count != 0 || (h.ex_rom & 0xF0)))
+         return "Unsupported mapper";
+
+       // iNES can't reliably indicate the game's region, but NES 2.0 can
+       // Only NTSC timing is emulated, everything else is unsupported
+       if (h.region & 0x01)
+         return "Unsupported region";
+
+       if (h.misc_roms > 0)
+         return "Unsupported mapper";
+    }
+
     set_mapper(h.flags, h.flags2);
 
     // skip trainer
     if (h.flags & 0x04) bufferPos += 512;
 
     // Allocating memory for prg and chr
-    prg_size_ = h.prg_count * 16 * 1024L;
-    chr_size_ = h.chr_count * 8 * 1024L;
+
+    unsigned prg_count, chr_count;
+
+    // NES 2.0 allows for even larger ROMs than iNES allows
+    if ((h.flags2 & 0x0C) == 0x08)
+    {
+      // Don't bother supporting exponent-multiplier notation (mapping system can't really handle this)
+      if ((h.ex_rom & 0x0F) == 0x0F || (h.ex_rom & 0xF0) == 0xF0)
+        return "Unsupported ROM size";
+
+      prg_count = ((h.ex_rom & 0x0F) << 8) | h.prg_count;
+      chr_count = ((h.ex_rom & 0xF0) << 4) | h.chr_count;
+    }
+    else
+    {
+      prg_count = h.prg_count ? h.prg_count : 256;
+      chr_count = h.chr_count;
+    }
+
+    prg_size_ = prg_count * 16 * 1024L;
+    chr_size_ = chr_count * 8 * 1024L;
 
     size_t rom_size = prg_size_ + chr_size_;
-    if (rom_size == 0 || rom_size + bufferPos > length)
+    if (prg_size_ == 0 || rom_size + bufferPos > length)
       return "Malformed iNES file";
 
     auto p = malloc(rom_size);
