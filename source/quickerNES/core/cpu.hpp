@@ -3,7 +3,7 @@
 // NES 6502 CPU emulator
 // Emu 0.7.0
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace quickerNES
 {

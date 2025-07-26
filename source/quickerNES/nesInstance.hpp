@@ -70,7 +70,7 @@ class NESInstance final : public NESInstanceBase
   bool loadROMImpl(const uint8_t *romData, const size_t romSize) override
   {
     // Loading rom data
-    _nes.load_ines(romData);
+    _nes.load_ines(romData, romSize);
     return true;
   }
 

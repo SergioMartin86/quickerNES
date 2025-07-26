@@ -1,9 +1,9 @@
 // Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "ppuRendering.hpp"
+#include <stddef.h>
+#include <string.h>
 #include <algorithm>
-#include <cstddef>
-#include <cstring>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

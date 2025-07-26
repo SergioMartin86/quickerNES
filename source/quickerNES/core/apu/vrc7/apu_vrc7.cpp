@@ -1,6 +1,6 @@
 #include "apu_vrc7.hpp"
 #include "emu2413.hpp"
-#include <cstring>
+#include <string.h>
 
 namespace quickerNES
 {

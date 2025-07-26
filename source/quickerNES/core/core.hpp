@@ -19,10 +19,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include "cpu.hpp"
 #include "mappers/mapper.hpp"
 #include "ppu/ppu.hpp"
-#include <cstdint>
-#include <cstdio>
+#include <stdint.h>
+#include <stdio.h>
 #include <jaffarCommon/deserializers/base.hpp>
 #include <jaffarCommon/serializers/base.hpp>
+#include <algorithm>
+#include <new>
 #include <stdexcept>
 #include <string>
 
@@ -135,9 +137,12 @@ class Core : private Cpu
   {
     if (!impl)
     {
-      impl = new impl_t;
+      impl = new (std::no_throw) impl_t;
+      if (!impl) return "Out of memory";
+      memset(impl->sram, 0xFF, impl->sram_size);
       impl->apu.dmc_reader(read_dmc, this);
       impl->apu.irq_notifier(apu_irq_changed, this);
+      memset(impl->unmapped_page, unmapped_fill, sizeof impl->unmapped_page);
     }
 
     return 0;
@@ -146,7 +151,9 @@ class Core : private Cpu
   const char *open(Cart const *new_cart)
   {
     close();
-    init();
+
+    const char *error = init();
+    if (error) return error;
 
     // Getting cartdrige mapper code
     auto mapperCode = new_cart->mapper_code();
@@ -165,7 +172,8 @@ class Core : private Cpu
     mapper->cart_ = new_cart;
     mapper->emu_ = this;
 
-    ppu.open_chr(new_cart->chr(), new_cart->chr_size());
+    error = ppu.open_chr(new_cart->chr(), new_cart->chr_size());
+    if (error) return error;
 
     cart = new_cart;
     memset(impl->unmapped_page, unmapped_fill, sizeof impl->unmapped_page);

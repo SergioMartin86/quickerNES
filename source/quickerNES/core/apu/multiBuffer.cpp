@@ -2,7 +2,7 @@
 // Blip_Buffer 0.4.0. http://www.slack.net/~ant/
 
 #include "multiBuffer.hpp"
-#include <cstdint>
+#include <stdint.h>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -51,7 +51,8 @@ Mono_Buffer::~Mono_Buffer()
 
 const char *Mono_Buffer::set_sample_rate(long rate, int msec)
 {
-  buf.set_sample_rate(rate, msec);
+  const char *error = buf.set_sample_rate(rate, msec);
+  if (error) return error;
   return Multi_Buffer::set_sample_rate(buf.sample_rate(), buf.length());
 }
 
@@ -117,7 +118,12 @@ Stereo_Buffer::~Stereo_Buffer()
 
 const char *Stereo_Buffer::set_sample_rate(long rate, int msec)
 {
-  for (int i = 0; i < buf_count; i++) bufs[i].set_sample_rate(rate, msec);
+  for (int i = 0; i < buf_count; i++)
+  {
+    const char *error = bufs[i].set_sample_rate(rate, msec);
+    if (error) return error;
+  }
+
   return Multi_Buffer::set_sample_rate(bufs[0].sample_rate(), bufs[0].length());
 }
 

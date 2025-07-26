@@ -1,9 +1,11 @@
 // Emu 0.7.0. http://www.slack.net/~ant/
 
 #include "ppuImpl.hpp"
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <new>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -65,7 +67,8 @@ const char *Ppu_Impl::open_chr(uint8_t const *new_chr, long chr_data_size)
 
   if (!impl)
   {
-    impl = new impl_t;
+    impl = new (std::nothrow) impl_t();
+    if (!impl) return "Out of memory";
     chr_ram = impl->chr_ram;
   }
 
@@ -83,7 +86,8 @@ const char *Ppu_Impl::open_chr(uint8_t const *new_chr, long chr_data_size)
 
   // allocate aligned memory for cache
   long tile_count = chr_size / bytes_per_tile;
-  tile_cache_mem = new uint8_t[tile_count * sizeof(cached_tile_t) * 2 + cache_line_size];
+  tile_cache_mem = (uint8_t *)calloc(tile_count * sizeof(cached_tile_t) * 2 + cache_line_size, sizeof(uint8_t));
+  if (!tile_cache_mem) return "Out of memory";
   tile_cache = (cached_tile_t *)(tile_cache_mem + cache_line_size -
                                  (uintptr_t)tile_cache_mem % cache_line_size);
   flipped_tiles = tile_cache + tile_count;
@@ -101,7 +105,7 @@ const char *Ppu_Impl::open_chr(uint8_t const *new_chr, long chr_data_size)
 
 void Ppu_Impl::close_chr()
 {
-  delete[] tile_cache_mem;
+  free(tile_cache_mem);
   tile_cache_mem = NULL;
 }
 

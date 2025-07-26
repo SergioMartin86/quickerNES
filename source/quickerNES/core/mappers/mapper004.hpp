@@ -5,7 +5,7 @@
 #include "mapper.hpp"
 
 #include "../core.hpp"
-#include <cstring>
+#include <string.h>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

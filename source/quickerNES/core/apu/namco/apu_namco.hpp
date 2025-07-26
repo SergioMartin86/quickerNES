@@ -4,7 +4,7 @@
 // Snd_Emu 0.1.7
 
 #include "../apu.hpp"
-#include <cstdint>
+#include <stdint.h>
 
 namespace quickerNES
 {

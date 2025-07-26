@@ -2,10 +2,10 @@
 // Blip_Buffer 0.4.0. http://www.slack.net/~ant/
 
 #include "blipBuffer.hpp"
-#include <climits>
-#include <cmath>
-#include <cstdlib>
-#include <cstring>
+#include <limits.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

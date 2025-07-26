@@ -15,9 +15,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
 // Emu 0.7.0. http://www.slack.net/~ant/
 
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 namespace quickerNES
 {
@@ -26,6 +26,11 @@ class Cart
 {
   public:
   Cart() = default;
+
+  ~Cart()
+  {
+    free(prg_);
+  }
 
   struct ines_header_t
   {
@@ -39,8 +44,11 @@ class Cart
   static_assert(sizeof(ines_header_t) == 16);
 
   // Load iNES file
-  const char *load_ines(const uint8_t *buffer)
+  const char *load_ines(const uint8_t *buffer, const uint32_t length)
   {
+    if (length < sizeof(ines_header_t))
+      return "Not an iNES file";
+
     ines_header_t h;
 
     size_t bufferPos = 0;
@@ -62,7 +70,14 @@ class Cart
     prg_size_ = h.prg_count * 16 * 1024L;
     chr_size_ = h.chr_count * 8 * 1024L;
 
-    auto p = malloc(prg_size_ + chr_size_);
+    size_t rom_size = prg_size_ + chr_size_;
+    if (rom_size == 0 || rom_size + bufferPos > length)
+      return "Malformed iNES file";
+
+    auto p = malloc(rom_size);
+    if (!p)
+      return "Out of memory";
+
     prg_ = (uint8_t *)p;
     chr_ = &prg_[prg_size_];
 
@@ -71,6 +86,7 @@ class Cart
       memcpy(prg(), &buffer[bufferPos], copySize);
       bufferPos += copySize;
     }
+
     {
       size_t copySize = chr_size();
       memcpy(chr(), &buffer[bufferPos], copySize);

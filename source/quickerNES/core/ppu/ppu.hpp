@@ -4,7 +4,7 @@
 // Emu 0.7.0
 
 #include "ppuRendering.hpp"
-#include <climits>
+#include <limits.h>
 
 namespace quickerNES
 {

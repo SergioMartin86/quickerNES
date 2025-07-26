@@ -6,7 +6,7 @@
 
 #include "../blipBuffer.hpp"
 #include "emu2413_state.hpp"
-#include <cstdint>
+#include <stdint.h>
 
 namespace quickerNES
 {

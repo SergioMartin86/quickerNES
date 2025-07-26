@@ -22,7 +22,7 @@ class Emu
   // Basic setup
 
   // Load iNES file into emulator and clear recording
-  const char* load_ines(const uint8_t *buffer);
+  const char* load_ines(const uint8_t *buffer, const uint32_t length);
 
   // Set sample rate for sound generation
   const char *set_sample_rate(long);

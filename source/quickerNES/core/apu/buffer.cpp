@@ -36,8 +36,10 @@ void Buffer::enable_nonlinearity(bool b)
 const char *Buffer::set_sample_rate(long rate, int msec)
 {
   enable_nonlinearity(nonlin.enabled); // reapply
-  buf.set_sample_rate(rate, msec);
-  tnd.set_sample_rate(rate, msec);
+  const char *error = buf.set_sample_rate(rate, msec);
+  if (error) return error;
+  error = tnd.set_sample_rate(rate, msec);
+  if (error) return error;
   return Multi_Buffer::set_sample_rate(buf.sample_rate(), buf.length());
 }
 
