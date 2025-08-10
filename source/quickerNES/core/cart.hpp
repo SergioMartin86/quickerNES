@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 namespace quickerNES
 {
@@ -72,13 +73,26 @@ class Cart
     if (h.flags2 & 0x03)
       return "Unsupported console type";
 
+    printf("[QuickerNES] Cart Mapper Info: Mapper: (%d / %d) - Submapper: %d\n", h.flags, h.flags2, h.ex_mapper);
+
     // check if NES 2.0 is present
     if ((h.flags2 & 0x0C) == 0x08)
     {
-       // If there's a non-zero submapper present, we can't rely on default iNES behavior
-       // If extended high mapper bits are set, then it won't be supported mapper anyways
-       if (h.ex_mapper != 0)
-         return "Unsupported mapper";
+      // If there's a non-zero submapper present, we can't rely on default iNES behavior
+      // If extended high mapper bits are set, then it won't be supported mapper anyways
+      if (h.ex_mapper != 0)
+      {
+        bool isSubMapperSupported = false;
+
+        // These particular cases are known to be supported even though non-zero submapper is present
+
+        // Pac-Man - Championship Edition (USA, Europe) (Namco Museum Archives Vol 1).nes
+        // SHA1: 4CBAD49930253086FBAF4D082288DF74C76D1ABC
+        // MD5 : EE8BC8BAED5B9C5299E84E80E6490DE6
+        if (h.flags == 50 && h.flags2 == 24 && h.ex_mapper == 48) isSubMapperSupported = true;
+
+        if (isSubMapperSupported == false) return "Unsupported mapper";
+      }
 
        // iNES normally dictates PRG RAM is hardcoded to be 8K
        // NES 2.0 allows for specifying the size, but >8K is unsupported here
