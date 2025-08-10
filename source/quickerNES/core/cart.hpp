@@ -75,6 +75,11 @@ class Cart
     // check if NES 2.0 is present
     if ((h.flags2 & 0x0C) == 0x08)
     {
+       // If there's a non-zero submapper present, we can't rely on default iNES behavior
+       // If extended high mapper bits are set, then it won't be supported mapper anyways
+       if (h.ex_mapper != 0)
+         return "Unsupported mapper";
+
        // iNES normally dictates PRG RAM is hardcoded to be 8K
        // NES 2.0 allows for specifying the size, but >8K is unsupported here
        long prg_ram_size = 0;
