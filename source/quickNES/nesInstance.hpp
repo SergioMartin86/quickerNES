@@ -10,36 +10,42 @@
 
 typedef Nes_Emu emulator_t;
 
-extern void register_misc_mappers();
-extern void register_extra_mappers();
-extern void register_mapper_70();
-
 class NESInstance final : public NESInstanceBase
 {
   public:
   NESInstance(const nlohmann::json &config) : NESInstanceBase(config)
   {
-    // If running the original QuickNES, register extra mappers now
-    register_misc_mappers();
-    register_extra_mappers();
-    register_mapper_70();
   }
 
-  uint8_t *getLowMem() const override { return _nes.low_mem(); };
+  uint8_t *getLowMem() override { return _nes.low_mem(); };
   size_t getLowMemSize() const override { return 0x800; };
 
   void serializeState(jaffarCommon::serializer::Base &serializer) const override
   {
-    Mem_Writer w(serializer.getOutputDataBuffer(), _stateSize, 0);
-    Auto_File_Writer a(w);
-    _nes.save_state(a);
+    auto outputDataBuffer = serializer.getOutputDataBuffer();
+
+    if (outputDataBuffer != nullptr) 
+    {
+      Mem_Writer w(outputDataBuffer, _stateSize, 0);
+      Auto_File_Writer a(w);
+      _nes.save_state(a);
+    }
+
+    serializer.push(nullptr, _stateSize);
   }
 
   void deserializeState(jaffarCommon::deserializer::Base &deserializer) override
   {
-    Mem_File_Reader r(deserializer.getInputDataBuffer(), _stateSize);
-    Auto_File_Reader a(r);
-    _nes.load_state(a);
+    auto inputDataBuffer = deserializer.getInputDataBuffer();
+
+    if (inputDataBuffer != nullptr) 
+    {
+      Mem_File_Reader r(inputDataBuffer, _stateSize);
+      Auto_File_Reader a(r);
+      _nes.load_state(a);
+    }
+    
+    deserializer.pop(nullptr, _stateSize);
   }
 
   inline size_t getFullStateSize() const override

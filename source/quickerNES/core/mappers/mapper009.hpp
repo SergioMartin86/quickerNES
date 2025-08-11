@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mapper.hpp"
-#include <cstring>
+#include <string.h>
 
 namespace quickerNES
 {
@@ -28,7 +28,7 @@ class Mapper009 : public Mapper
 
   virtual void reset_state()
   {
-    std::memset(regs, 0, sizeof(regs));
+    memset(regs, 0, sizeof(regs));
   }
 
   virtual void apply_mapping()

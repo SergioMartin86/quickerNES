@@ -61,7 +61,7 @@ class NESInstanceBase
 
   // Virtual functions
 
-  virtual uint8_t *getLowMem() const = 0;
+  virtual uint8_t *getLowMem() = 0;
   virtual size_t getLowMemSize() const = 0;
 
   virtual void serializeState(jaffarCommon::serializer::Base &serializer) const = 0;
@@ -72,6 +72,7 @@ class NESInstanceBase
   virtual std::string getCoreName() const = 0;
   virtual void *getInternalEmulatorPointer() = 0;
   virtual void setNTABBlockSize(const size_t size) {};
+  virtual void setSRAMBlockSize(const size_t size) {};
 
   protected:
   virtual void enableStateBlockImpl(const std::string &block) = 0;

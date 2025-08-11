@@ -19,10 +19,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 #include "cpu.hpp"
 #include "mappers/mapper.hpp"
 #include "ppu/ppu.hpp"
-#include <cstdint>
-#include <cstdio>
+#include <stdint.h>
+#include <stdio.h>
 #include <jaffarCommon/deserializers/base.hpp>
 #include <jaffarCommon/serializers/base.hpp>
+#include <algorithm>
+#include <new>
 #include <stdexcept>
 #include <string>
 
@@ -92,6 +94,7 @@ class Core : private Cpu
 
   public:
   size_t _NTABBlockSize = 0x1000;
+  size_t _SRAMBlockSize = impl->sram_size;
 
   // Flags for lite state storage
   bool TIMEBlockEnabled = true;
@@ -134,9 +137,12 @@ class Core : private Cpu
   {
     if (!impl)
     {
-      impl = new impl_t;
+      impl = new (std::nothrow) impl_t;
+      if (!impl) return "Out of memory";
+      memset(impl->sram, 0xFF, impl->sram_size);
       impl->apu.dmc_reader(read_dmc, this);
       impl->apu.irq_notifier(apu_irq_changed, this);
+      memset(impl->unmapped_page, unmapped_fill, sizeof impl->unmapped_page);
     }
 
     return 0;
@@ -145,7 +151,9 @@ class Core : private Cpu
   const char *open(Cart const *new_cart)
   {
     close();
-    init();
+
+    const char *error = init();
+    if (error) return error;
 
     // Getting cartdrige mapper code
     auto mapperCode = new_cart->mapper_code();
@@ -164,7 +172,8 @@ class Core : private Cpu
     mapper->cart_ = new_cart;
     mapper->emu_ = this;
 
-    ppu.open_chr(new_cart->chr(), new_cart->chr_size());
+    error = ppu.open_chr(new_cart->chr(), new_cart->chr_size());
+    if (error) return error;
 
     cart = new_cart;
     memset(impl->unmapped_page, unmapped_fill, sizeof impl->unmapped_page);
@@ -278,7 +287,7 @@ class Core : private Cpu
     {
       if (sram_present)
       {
-        const auto inputDataSize = impl->sram_size;
+        const auto inputDataSize = _SRAMBlockSize;
         const auto inputData = (uint8_t *)impl->sram;
         serializer.push(inputData, inputDataSize);
       }
@@ -402,7 +411,7 @@ class Core : private Cpu
       if (sram_present)
       {
         const auto outputData = (uint8_t *)impl->sram;
-        const auto inputDataSize = impl->sram_size;
+        const auto inputDataSize = _SRAMBlockSize;
         deserializer.pop(outputData, inputDataSize);
       }
     }
@@ -411,6 +420,7 @@ class Core : private Cpu
   }
 
   void setNTABBlockSize(const size_t size) { _NTABBlockSize = size; }
+  void setSRAMBlockSize(const size_t size) { _SRAMBlockSize = size; }
 
   void enableStateBlock(const std::string &block)
   {

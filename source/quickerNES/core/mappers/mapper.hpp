@@ -5,7 +5,7 @@
 
 #include "../cart.hpp"
 #include "../cpu.hpp"
-#include <climits>
+#include <limits.h>
 
 namespace quickerNES
 {

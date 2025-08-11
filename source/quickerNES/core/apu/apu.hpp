@@ -4,8 +4,8 @@
 // Snd_Emu 0.1.7
 
 #include "oscs.hpp"
-#include <climits>
-#include <cstdint>
+#include <limits.h>
+#include <stdint.h>
 
 namespace quickerNES
 {

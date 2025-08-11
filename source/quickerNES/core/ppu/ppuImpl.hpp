@@ -3,7 +3,7 @@
 // NES PPU misc functions and setup
 // Emu 0.7.0
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace quickerNES
 {

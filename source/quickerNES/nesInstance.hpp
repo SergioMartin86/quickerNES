@@ -15,7 +15,7 @@ class NESInstance final : public NESInstanceBase
     if (_inputParser->_controller1Type == jaffar::InputParser::controller_t::arkanoidNES) _nes.setControllerType(quickerNES::Core::controllerType_t::arkanoidNES_t);
   }
 
-  uint8_t *getLowMem() const override { return _nes.get_low_mem(); };
+  uint8_t *getLowMem() override { return _nes.get_low_mem(); };
   size_t getLowMemSize() const override { return _nes.get_low_mem_size(); };
 
   uint8_t *getWorkMem() const { return _nes.high_mem(); };
@@ -58,6 +58,7 @@ class NESInstance final : public NESInstanceBase
   }
 
   void setNTABBlockSize(const size_t size) override { _nes.setNTABBlockSize(size); }
+  void setSRAMBlockSize(const size_t size) override { _nes.setSRAMBlockSize(size); }
 
   void advanceState(const jaffar::input_t &input) override
   {
@@ -69,7 +70,7 @@ class NESInstance final : public NESInstanceBase
   bool loadROMImpl(const uint8_t *romData, const size_t romSize) override
   {
     // Loading rom data
-    _nes.load_ines(romData);
+    _nes.load_ines(romData, romSize);
     return true;
   }
 

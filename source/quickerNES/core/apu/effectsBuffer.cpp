@@ -1,7 +1,8 @@
 // Game_Music_Emu 0.3.0. http://www.slack.net/~ant/
 
 #include "effectsBuffer.hpp"
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 
 /* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -77,23 +78,29 @@ Effects_Buffer::Effects_Buffer(bool center_only) : Multi_Buffer(2)
 
 Effects_Buffer::~Effects_Buffer()
 {
-  delete[] echo_buf;
-  delete[] reverb_buf;
+  free(echo_buf);
+  free(reverb_buf);
 }
 
 const char *Effects_Buffer::set_sample_rate(long rate, int msec)
 {
   if (!echo_buf)
   {
-    echo_buf = new blip_sample_t[echo_size];
+    echo_buf = (blip_sample_t *)calloc(echo_size, sizeof(blip_sample_t));
+    if (!echo_buf) return "Out of memory";
   }
 
   if (!reverb_buf)
   {
-    reverb_buf = new blip_sample_t[reverb_size];
+    reverb_buf = (blip_sample_t *)calloc(reverb_size, sizeof(blip_sample_t));
+    if (!reverb_buf) return "Out of memory";
   }
 
-  for (int i = 0; i < buf_count; i++) bufs[i].set_sample_rate(rate, msec);
+  for (int i = 0; i < buf_count; i++)
+  {
+    const char *error = bufs[i].set_sample_rate(rate, msec);
+    if (error) return error;
+  }
 
   config(config_);
   clear();

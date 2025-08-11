@@ -4,7 +4,8 @@
 #include "apu/NESEffectsBuffer.hpp"
 #include "apu/buffer.hpp"
 #include "mappers/mapper.hpp"
-#include <cstring>
+#include <string.h>
+#include <new>
 
 /* Copyright (C) 2004-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -65,7 +66,8 @@ inline const char *Emu::auto_init()
 {
   if (!init_called)
   {
-    init_();
+    const char *error = init_();
+    if (error) return error;
     init_called = true;
   }
   return 0;
@@ -80,12 +82,14 @@ inline void Emu::clear_sound_buf()
 
 const char *Emu::set_cart(Cart const *new_cart)
 {
-  auto_init();
-  const char *error = emu.open(new_cart);
+  const char *error = auto_init();
+  if (error) return error;
+  error = emu.open(new_cart);
   if (error) return error;
 
   channel_count_ = Apu::osc_count + emu.mapper->channel_count();
-  sound_buf->set_channel_count(channel_count());
+  error = sound_buf->set_channel_count(channel_count());
+  if (error) return error;
   set_equalizer(equalizer_);
   enable_sound(true);
   reset();
@@ -170,9 +174,9 @@ const char *Emu::emulate_frame(uint32_t joypad1, uint32_t joypad2, uint32_t arka
 
 // Extras
 
-const char *Emu::load_ines(const uint8_t *buffer)
+const char *Emu::load_ines(const uint8_t *buffer, const uint32_t length)
 {
-  const char *error = private_cart.load_ines(buffer);
+  const char *error = private_cart.load_ines(buffer, length);
   if (error) return error;
 
   return set_cart(&private_cart);
@@ -199,13 +203,15 @@ Multi_Buffer *set_apu(Buffer *buf, Apu *apu)
 
 const char *Emu::set_sample_rate(long rate, class Buffer *buf)
 {
-  auto_init();
+  const char *error = auto_init();
+  if (error) return error;
   return set_sample_rate(rate, set_apu(buf, &emu.impl->apu));
 }
 
 const char *Emu::set_sample_rate(long rate, class Nes_Effects_Buffer *buf)
 {
-  auto_init();
+  const char *error = auto_init();
+  if (error) return error;
   return set_sample_rate(rate, set_apu(buf, &emu.impl->apu));
 }
 
@@ -218,9 +224,11 @@ void Emu::set_frame_rate(double rate)
 
 const char *Emu::set_sample_rate(long rate, Multi_Buffer *new_buf)
 {
-  auto_init();
+  const char *error = auto_init();
+  if (error) return error;
   emu.impl->apu.volume(1.0); // cancel any previous non-linearity
-  new_buf->set_sample_rate(rate, 1200 / frame_rate);
+  error = new_buf->set_sample_rate(rate, 1200 / frame_rate);
+  if (error) return error;
   sound_buf = new_buf;
   sound_buf_changed_count = 0;
   if (new_buf != default_sound_buf)
@@ -234,7 +242,12 @@ const char *Emu::set_sample_rate(long rate, Multi_Buffer *new_buf)
 
 const char *Emu::set_sample_rate(long rate)
 {
-  if (!default_sound_buf) default_sound_buf = new Mono_Buffer;
+  if (!default_sound_buf)
+  {
+    default_sound_buf = new (std::nothrow) Mono_Buffer;
+    if (!default_sound_buf) return "Out of memory";
+  }
+
   return set_sample_rate(rate, default_sound_buf);
 }
 

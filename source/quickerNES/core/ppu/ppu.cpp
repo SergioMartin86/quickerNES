@@ -5,7 +5,8 @@
 
 #include "ppu.hpp"
 #include "../core.hpp"
-#include <cstring>
+#include <string.h>
+#include <algorithm>
 
 namespace quickerNES
 {

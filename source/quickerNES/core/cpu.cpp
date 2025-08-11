@@ -2,9 +2,9 @@
 
 #include "cpu.hpp"
 #include "core.hpp"
-#include <climits>
-#include <cstdio>
-#include <cstring>
+#include <limits.h>
+#include <stdio.h>
+#include <string.h>
 
 /**
  * Optimizations by Sergio Martin (eien86) 2023-2024

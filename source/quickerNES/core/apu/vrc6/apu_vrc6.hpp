@@ -6,7 +6,7 @@
 
 #include "../apu.hpp"
 #include "../blipBuffer.hpp"
-#include <cstdint>
+#include <stdint.h>
 
 namespace quickerNES
 {
