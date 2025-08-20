@@ -25,7 +25,8 @@ quickerNESPPUSrc = [
 quickerNESSrc = quickerNESAPUSrc + quickerNESPPUSrc + [
  'core/mappers/mapper.cpp', 
  'core/emu.cpp', 
- 'core/cpu.cpp'
+ 'core/cpuPaged.cpp',
+ 'core/cpuFlat.cpp'
 ]
 
 quickerNESCompileArgs = [ ]
