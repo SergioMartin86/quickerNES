@@ -125,14 +125,13 @@ namespace quickerNES
 // Adding likely to fail because typically for loops exit conditions fail until the last one
 #define BRANCH(cond)                        \
   {                                         \
-    int offset = instruction.data;              \
-    int extra_clock = (++pc & 0xFF) + offset; \
+    int extra_clock = (++pc & 0xFF) + instruction.data; \
     if (!(cond))                            \
     {                                       \
       clock_count--;                        \
       goto loop;                            \
     }                                       \
-    pc += offset;                           \
+    pc += instruction.data;                           \
     pc = uint16_t(pc);                      \
     clock_count += (extra_clock >> 8) & 1;  \
     goto loop;                              \
