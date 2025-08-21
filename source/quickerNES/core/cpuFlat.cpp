@@ -125,9 +125,8 @@ namespace quickerNES
 // Adding likely to fail because typically for loops exit conditions fail until the last one
 #define BRANCH(cond)                        \
   {                                         \
-    pc++;                                   \
-    int offset = (int8_t)data;              \
-    int extra_clock = (pc & 0xFF) + offset; \
+    int offset = instruction.data;              \
+    int extra_clock = (++pc & 0xFF) + offset; \
     if (!(cond))                            \
     {                                       \
       clock_count--;                        \
@@ -211,13 +210,14 @@ Cpu::runFlat(nes_time_t end)
 
   struct [[gnu::packed]] instruction_t {
   uint8_t opcode;
-  uint32_t data = 0;
+  int8_t data = 0;
   } instruction;
+  uint32_t data ;
 
 loop:
 
   *((uint16_t*)&instruction) = *((uint16_t*)(&flat_code_map[pc++]));
-  uint32_t data = *(uint8_t*)&instruction.data;
+  data = *(uint8_t*)&instruction.data;
 
   if (clock_count >= clock_limit) [[unlikely]]
     goto stop;
