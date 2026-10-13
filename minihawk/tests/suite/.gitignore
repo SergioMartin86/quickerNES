@@ -1,0 +1,2 @@
+# save states of games this repository cannot contain: kept beside the tests on the machine that has the games
+*.state

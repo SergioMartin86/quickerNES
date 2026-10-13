@@ -7,3 +7,4 @@ test.sol
 *.out
 *.sh
 
+*.state
